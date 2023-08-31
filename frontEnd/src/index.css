@@ -1,0 +1,196 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+.selcted-row-clr{
+  background-color:rgb(150, 147, 147) !important;
+    color: white;
+}
+
+.in-fields {
+  height: 35px;
+  margin-top: 10px;
+  border-radius: 6px;
+  text-indent: 5px;
+}
+
+
+
+.ip-select {
+  font-size: 14px;
+  padding: -3px 10px 10px 5px;
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  border-bottom: 1px solid #757575;
+}
+
+
+.admin-title {
+  color: white;
+  height: 40px;
+  display: flex;
+  font-size: 1rem;
+  text-align: left;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+.side-nav {
+  background-color: #263159 !important;
+  background-color: #263159 !important;
+  color: black;
+  height: 100vh;
+  overflow: hidden;
+  width: 40px;
+  display: flex;
+  padding: 5px;
+  justify-content: center;
+  position: sticky;
+  top: 82;
+  left: 0;
+  transition: 350ms;
+  z-index: 10;
+  color: #000000;
+}
+
+.side-nav:hover {
+  background-color: #263159 !important;
+  color: black;
+  height: 100vh;
+  overflow: hidden;
+  width: 142px;
+  display: flex;
+  justify-content: center;
+  position: sticky;
+  top: 82;
+  left: 0;
+  transition: 150ms;
+  z-index: 10;
+  color: #000000;
+}
+
+.side-nav-main-title {
+  display: none;
+}
+.side-nav-main-icon {
+  font-size: 1.2rem;
+}
+
+.side-nav:hover .side-nav-main-icon {
+  font-size: 13px;
+}
+
+.side-nav-sub-menu {
+  display: none;
+}
+.side-nav:hover .side-nav-sub-menu {
+  display: block;
+}
+
+.side-nav-main-container {
+  display: flex;
+}
+.side-nav:hover .side-nav-main-title {
+  display: block;
+}
+
+.closed-view {
+  background-color: #263159 !important;
+  color: black;
+  height: 100vh;
+  overflow: hidden;
+  width: 38px;
+  display: flex;
+  padding: 5px;
+  justify-content: center;
+  position: sticky;
+  top: 82;
+  left: 0;
+  transition: 350ms;
+  z-index: 10;
+  color: #000000;
+}
+
+.header {
+  height: 60px !important;
+}
+
+.link-default {
+  text-decoration: none;
+  color: white;
+}
+.active-link-url {
+  height: 35px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 12px;
+  background-color: #707075;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.sub-menu-icon {
+  padding-left: 10px;
+  font-size: 1rem;
+}
+
+.sub-menu-label {
+  display: none;
+}
+
+.side-nav:hover .sub-menu-label {
+  display: block;
+}
+
+.card-container {
+  padding: 35px;
+  display: flex;
+  gap: 30px;
+}
+
+.dashboard-card {
+  height: 250px;
+  cursor: pointer;
+  width: 175px;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px,
+    rgba(0, 0, 0, 0.05) 0px 5px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-link {
+  font-family: cursive;
+  text-decoration: none;
+  color: black;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+

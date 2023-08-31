@@ -1,0 +1,26 @@
+import React from 'react'
+import { Table } from 'react-bootstrap'
+
+export default function MachineUtilisation() {
+  return (
+    <div>
+    <div style={{height:"400px",width:"800px",overflowY: "scroll",overflowX: "scroll",marginTop:"20px"}}>
+       <Table striped className="table-data border" style={{border:"1px"}}>
+            <thead className="tableHeaderBGColor">
+            <tr>
+                   
+                    <th>Machine</th>
+                    <th>Operation</th>
+                    <th>Machine Hours</th>
+                    
+                    
+            </tr>
+            </thead>
+             <tbody className='tablebody'>
+              </tbody>
+      </Table>
+     </div>
+  
+</div>
+  )
+}
