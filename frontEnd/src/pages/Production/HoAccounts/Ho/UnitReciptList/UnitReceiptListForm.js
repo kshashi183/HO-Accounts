@@ -7,22 +7,22 @@ export default function UnitReceiptListForm() {
 
             <div className='col-md-12'>
                 <div className='row'>
-                    
-                        <h4 className='title'>Receipt Voucher Creator</h4>
-                    
+
+                    <h4 className='title'>Receipt Voucher Creator</h4>
+
                 </div>
             </div>
 
             <div className='col-md-12'>
-               
+
                 <label className="form-label">Unit Payment Receipt</label>
-               
+
             </div>
             <div className='col-md-12 mb-2'>
-               
-               <label className="form-label">Select Customer</label>
-               
-           </div>
+
+                <label className="form-label">Select Customer</label>
+
+            </div>
 
 
             <hr className="horizontal-line" />
@@ -128,95 +128,95 @@ export default function UnitReceiptListForm() {
 
 
 
-<div className='row mt-3'>
-            <div className='col-md-6' style={{ height: '500px', overflowX: 'scroll', overflowY: 'scroll' }}>
+            <div className='row mt-3'>
+                <div className='col-md-6' style={{ height: '500px', overflowX: 'scroll', overflowY: 'scroll' }}>
 
-                <Table striped className="table-data border">
-                    <thead className="tableHeaderBGColor">
-                        <tr>
-
-                           
-                            <th style={{ whiteSpace: 'nowrap' }}>Srl</th>
-                           
-                            <th style={{ whiteSpace: 'nowrap' }}>Inv No</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Date</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Type</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Amount</th>
-                            
-                            <th style={{ whiteSpace: 'nowrap' }}>Received</th>
-                          
-                            <th style={{ whiteSpace: 'nowrap' }}>Receivew Now</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Ref No</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Inv Updated</th>
+                    <Table striped className="table-data border">
+                        <thead className="tableHeaderBGColor">
+                            <tr>
 
 
-                        </tr>
+                                <th style={{ whiteSpace: 'nowrap' }}>Srl</th>
 
-                    </thead>
+                                <th style={{ whiteSpace: 'nowrap' }}>Inv No</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Date</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Type</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Amount</th>
 
-                    <tbody className='tablebody'>
+                                <th style={{ whiteSpace: 'nowrap' }}>Received</th>
 
-                        <tr>
-
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-
-                        </tr>
-
-                    </tbody>
-                </Table>
-
-            </div>
+                                <th style={{ whiteSpace: 'nowrap' }}>Receivew Now</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Ref No</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Inv Updated</th>
 
 
+                            </tr>
+
+                        </thead>
+
+                        <tbody className='tablebody'>
+
+                            <tr>
+
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+
+                            </tr>
+
+                        </tbody>
+                    </Table>
+
+                </div>
 
 
-            <div className='col-md-6' style={{ height: '500px', overflowX: 'scroll', overflowY: 'scroll' }}>
-
-<Table striped className="table-data border">
-    <thead className="tableHeaderBGColor">
-        <tr>
-
-            
-            <th style={{ whiteSpace: 'nowrap' }}>Select</th>
-            <th style={{ whiteSpace: 'nowrap' }}>Inv Type</th>
-            <th style={{ whiteSpace: 'nowrap' }}>Inv No</th>
-            
-            <th style={{ whiteSpace: 'nowrap' }}>Date</th>
-            <th style={{ whiteSpace: 'nowrap' }}>Amount</th>
-            <th style={{ whiteSpace: 'nowrap' }}>Received</th>
-            <th style={{ whiteSpace: 'nowrap' }}>Balance</th>
 
 
-        </tr>
+                <div className='col-md-6' style={{ height: '500px', overflowX: 'scroll', overflowY: 'scroll' }}>
 
-    </thead>
+                    <Table striped className="table-data border">
+                        <thead className="tableHeaderBGColor">
+                            <tr>
 
-    <tbody className='tablebody'>
 
-        <tr>
+                                <th style={{ whiteSpace: 'nowrap' }}>Select</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Inv Type</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Inv No</th>
 
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+                                <th style={{ whiteSpace: 'nowrap' }}>Date</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Amount</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Received</th>
+                                <th style={{ whiteSpace: 'nowrap' }}>Balance</th>
 
-        </tr>
 
-    </tbody>
-</Table>
+                            </tr>
 
-</div>
+                        </thead>
+
+                        <tbody className='tablebody'>
+
+                            <tr>
+
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+
+                            </tr>
+
+                        </tbody>
+                    </Table>
+
+                </div>
 
 
 

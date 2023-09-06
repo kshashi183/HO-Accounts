@@ -495,3 +495,23 @@ td {
   /* border-left: 4px solid #707075; */
 }
 
+.disabled-button {
+  background-color: #ccc;
+  color: #999;
+
+  width: 155px;
+  height: 38px;
+  border: none;
+  margin-right: 10px;
+  
+  border-radius: 5px;
+  padding: 3px;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.custom-checkbox {
+  width: 12px;  /* Adjust the width as needed */
+  height: 12px; /* Adjust the height as needed */
+}
+

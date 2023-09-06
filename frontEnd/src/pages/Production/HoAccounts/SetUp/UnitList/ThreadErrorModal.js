@@ -1,11 +1,14 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
-export default function ThreadErrorModal({threadModal, setThreadModal}) {
+import { Axios } from 'axios';
+export default function ThreadErrorModal({threadModal, setThreadModal,unitDetailsData}) {
     const handleClose=()=>{
         setThreadModal(false);
     }
 
+
+    
   return (
     <div>
       <Modal show={threadModal} onHide={handleClose}>
@@ -13,19 +16,17 @@ export default function ThreadErrorModal({threadModal, setThreadModal}) {
           <Modal.Title>magod_machine</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body> Threading Error: Column 'UnitName' is constrainedto be unique. 
-            value 'UnitName' is already present.
+        <Modal.Body>  Column 'UnitName'  And 'UnitID' is constrained to be unique. 
+           
 
          </Modal.Body> 
 
         <Modal.Footer>
-          <Button variant="primary" 
+          <Button variant="primary" onClick={handleClose}
         >
            Ok
           </Button>
-          {/* <Button variant="secondary" onClick={handleClose}>
-            No
-          </Button> */}
+         
         </Modal.Footer>
       </Modal>
     </div>

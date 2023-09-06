@@ -29,7 +29,7 @@ const navigate=useNavigate();
 
                 <div className="col-md-3">
                  <button className="button-style mt-2 group-button"
-                        style={{ width: "150px", marginLeft: "20px" }}  onClick={()=>navigate("/production/hoAccounts/openvoucher")}>
+                        style={{ width: "150px", marginLeft: "20px" }}  onClick={()=>navigate("/HOAccounts/HO/Openvoucher")}>
                         Open Voucher
                     </button> 
                 </div>

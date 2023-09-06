@@ -22,8 +22,8 @@ export default function RvAdjustmentForm() {
                     </select>
                 </div>
 
-                <div className="col-md-2 mt-2">
-                    <label className="form-label"> </label>
+                <div className="col-md-2 ">
+                    <label className="form-label">Select Customer </label>
                     {/* <input type='search'></input> */}
                     <select className="ip-select">
                         <option value="option 1"> Name1</option>
@@ -34,7 +34,8 @@ export default function RvAdjustmentForm() {
 
                 <div className="col-md-3 mt-2">
                     <button className="button-style mt-2 group-button"
-                        style={{ width: "180px", marginLeft: "20px" }}>
+                        style={{ width: "180px", marginLeft: "20px" }} 
+                        onClick={()=>navigate("/HOAccounts/HO/AdjustmentVoucher")}>
                         Adjustment Voucher
                     </button>
                 </div>

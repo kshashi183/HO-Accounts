@@ -14,12 +14,12 @@ export default function CreateNewForm() {
                 <div className="d-flex ms-3" style={{gap:'10px'}}>
                     <div className=" col-md-5">
                         <label className="form-label">Href No</label>
-                        <input className="in-field" style={{marginTop:'-10px'}}/>
+                        <input className="in-field" />
                     </div>
                     
                     <div className=" col-md-6">
-                        <label className="form-label"></label>
-                        <input className="in-field mt-0" type="text" style={{marginTop:'-10px'}}/>
+                        <label className="form-label">Date</label>
+                        <input className="in-field mt-0" type="text" />
                     </div>
 
 
@@ -33,7 +33,7 @@ export default function CreateNewForm() {
 
                     <div className='row'>
                 <div className=" col-md-6">
-                                    <label className="form-label">Customer</label>
+                                    <label className="form-label">Select Unit </label>
                                     <select className="ip-select">
                                         <option value="option 1">Magod</option>
                                         <option value="option 2">a</option>
@@ -41,8 +41,8 @@ export default function CreateNewForm() {
                                     </select>
                                 </div>
 
-                                <div className=" col-md-5 mt-2 ms-4">
-                                    <label className="form-label"></label>
+                                <div className=" col-md-5  ms-4">
+                                    <label className="form-label">Customer</label>
                                     <select className="ip-select">
                                         <option value="option 1"></option>
                                         <option value="option 2">Online Payment</option>

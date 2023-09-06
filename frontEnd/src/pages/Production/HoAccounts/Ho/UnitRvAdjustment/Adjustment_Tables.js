@@ -1,25 +1,20 @@
-import React from 'react';
-import { Table } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import React from 'react'
+import { Table } from 'react-bootstrap'
 
-export default function FormAndTable() {
-    const navigate = useNavigate();
+export default function Adjustment_Tables() {
     return (
         <div>
 
-
-
             <div className='row col-md-12 mb-2'>
 
-                <label className="form-label col-md-3 mt-1" style={{ whiteSpace: 'nowrap' }}>Select Invoices</label>
+                <label className="form-label col-md-3 mt-1">Select Invoices</label>
 
 
                 <div className='col-md-3 mt-2'>
-
                     <select className="ip-select">
-                        <option value="option 1">MAGOD LASER</option>
-                        <option value="option 2"></option>
-                        <option value="option 3"></option>
+                        <option value="option 1">Cash</option>
+                        <option value="option 2">Online Payment</option>
+                        <option value="option 3">Cheque</option>
                     </select>
                 </div>
 
@@ -32,7 +27,7 @@ export default function FormAndTable() {
                 </div>
                 <div className="col-md-2 ">
                     <button className="button-style mt-1 group-button"
-                        onClick={() => navigate("/HOAccounts")} style={{ width: '80px' }}>
+                        onClick={() => navigate("/home")} style={{ width: '80px' }}>
                         Close
                     </button>
                 </div>
@@ -73,5 +68,5 @@ export default function FormAndTable() {
                 </Table>
             </div>
         </div>
-    );
+    )
 }

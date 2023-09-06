@@ -25,6 +25,8 @@ import UnitReceiptListForm from "./pages/Production/HoAccounts/Ho/UnitReciptList
 import OpenVoucher from "./pages/Production/HoAccounts/Ho/UnitReciptList/OpenVoucher";
 import CompanyListFormTables from "./pages/Production/HoAccounts/Tally/CompanyList/CompanyListFormTables";
 import UnitSyncForm from "./pages/Production/HoAccounts/Ho/UnitSync/UnitSyncForm";
+import AdjustmentVoucherForm from "./pages/Production/HoAccounts/Ho/UnitRvAdjustment/AdjustmentVoucherForm";
+import AdjustmentCallFile from "./pages/Production/HoAccounts/Ho/UnitRvAdjustment/AdjustmentCallFile";
 
 
 // import SyncCall from "./pages/Production/HoAccounts/Ho/Sync/SyncCall";
@@ -64,9 +66,10 @@ function App() {
               <Route path="UnitInvoiceList" element={<HoUnitInvoices />} />
               <Route path="MonthlyReport" element={<MonthlyReport />} />
               <Route path="RvAdjustment" element={<RvAdjustmentForm />} />
+              <Route path="AdjustmentVoucher" element={<AdjustmentCallFile/>} />
               <Route path="TallyExport" element={<TallyExportCall />} />
               <Route path="UnitReciptList" element={<OpenVoucher />} />
-              <Route path="openvoucher" element={<UnitReceiptListForm />} />
+              <Route path="Openvoucher" element={<UnitReceiptListForm />} />
               <Route path="UnitSync" element={<UnitSyncForm />} />
               <Route path="HOPrv">
                 <Route path="CreateNew" element={<CreateNewCallFile />} />

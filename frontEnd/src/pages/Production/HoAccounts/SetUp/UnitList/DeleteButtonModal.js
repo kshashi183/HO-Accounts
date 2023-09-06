@@ -1,11 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
+import axios from 'axios';
+import {toast} from 'react-toastify';
+ 
+// Import toastify css file
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function DeleteButtonModal({setDeleteModal, deleteModal}) {
-    const handleClose=()=>{
-setDeleteModal(false);
-    }
+export default function DeleteButtonModal({ setDeleteModal, deleteModal, selectRow }) {
+  // console.log("deklt", selectRow);
+  const handleClose = () => {
+    setDeleteModal(false);
+  }
+
+  const [deleteUnit, setDeleteUnit] = useState('');
+ // console.log("sel del", selectRow);
+  const deleteUnitData = (UnitID) => {
+    console.log(UnitID,"uuuuuuu");
+    axios.delete('http://localhost:3001/unitlist/deleteUnit/' + UnitID)
+      .then((res) => {
+        console.log(res);
+        if (res.data.Status === 'Success') {
+          setDeleteModal(false);
+        //  alert("deleted successful")
+          toast.warn("Deleted Successful");
+          setTimeout(() => {
+
+            window.location.reload();
+      
+          }, 1000);
+         // window.location.reload();
+        } else {
+          alert("error");
+        }
+
+      })
+      .catch(err => (console.log("select unit")));
+
+  }
+
   return (
     <div>
       <Modal show={deleteModal} onHide={handleClose}>
@@ -13,14 +46,14 @@ setDeleteModal(false);
           <Modal.Title>magod_machine</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body> Do you wish to delete unitname ?
-           
-         </Modal.Body> 
+        <Modal.Body> Do you wish to delete {selectRow.UnitName} ?
+
+        </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="primary" 
-        >
-        Yes
+          <Button variant="primary" onClick={e => deleteUnitData(selectRow.UnitID)}
+          >
+            Yes
           </Button>
           <Button variant="secondary" onClick={handleClose}>
             No
