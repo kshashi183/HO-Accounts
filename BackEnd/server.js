@@ -3,13 +3,13 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 
-const dailyReportRouter = require("./routes/unitAccounts/Unit/DailyReport");
+const dailyReportRouter = require("./routes/HOAccounts/Unit/DailyReport");
 
 
 require('dotenv').config();
 
 const dailyReport = require('./helpers/dbconn.js');
-const monthlyReportRouter = require("./routes/unitAccounts/Unit/MonthlyReport");
+const monthlyReportRouter = require("./routes/HOAccounts/Unit/MonthlyReport");
 
 
 app.use(cors())
@@ -41,29 +41,29 @@ app.listen(process.env.PORT, () => {
 
 // const unitlist = require('./routes/unitAccounts/SetUp/UnitList');
 
-const unitlist = require('./routes/unitAccounts/SetUp/UnitList')
+const unitlist = require('./routes/HOAccounts/SetUp/UnitList')
 app.use('/unitlist', unitlist)
 
  
 
-const taxMaster=require('./routes/unitAccounts/SetUp/TaxMaster')
+const taxMaster=require('./routes/HOAccounts/SetUp/TaxMaster')
 app.use('/taxMaster', taxMaster)
 
  
 
-const billingDetails= require('./routes/unitAccounts/Invoice/Daily/Billing_Details')
+const billingDetails= require('./routes/HOAccounts/Invoice/Daily/Billing_Details')
 app.use('/billingDetails', billingDetails)
 
  
 
-const customerOutstanding=require('./routes/unitAccounts/Unit/Customer_OutStanding')
+const customerOutstanding=require('./routes/HOAccounts/Unit/Customer_OutStanding')
 app.use('/customerOutstanding',customerOutstanding)
 
  
 
  
 
-const vendorList=require('./routes/unitAccounts/Unit/Purchase/Vendor_List')
+const vendorList=require('./routes/HOAccounts/Unit/Purchase/Vendor_List')
 app.use('/vendorList', vendorList)
 
 app.use('/dailyReport', dailyReportRouter)
