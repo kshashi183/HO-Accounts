@@ -68,3 +68,11 @@ app.use('/vendorList', vendorList)
 
 app.use('/dailyReport', dailyReportRouter)
 app.use('/monthlyReportData', monthlyReportRouter)
+
+
+
+const unitRV_Adjustment=require('./routes/HOAccounts/HO/Unit_Rv_Adjustment')
+app.use('/unitRV_Adjustment',unitRV_Adjustment)
+
+const unitReceiptList=require('./routes/HOAccounts/HO/Unit_ReceiptList/Unit_Receiptlist');
+app.use('/unitReceiptList', unitReceiptList)
