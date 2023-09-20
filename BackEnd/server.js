@@ -4,12 +4,11 @@ const cors = require('cors');
 const app = express();
 
 const dailyReportRouter = require("./routes/HOAccounts/Unit/DailyReport");
+const monthlyReportRouter = require("./routes/HOAccounts/Ho/MonthlyReportHO")
 
 
 require('dotenv').config();
 
-const dailyReport = require('./helpers/dbconn.js');
-const monthlyReportRouter = require("./routes/HOAccounts/Unit/MonthlyReport");
 
 
 app.use(cors())
@@ -41,30 +40,30 @@ app.listen(process.env.PORT, () => {
 
 // const unitlist = require('./routes/unitAccounts/SetUp/UnitList');
 
-const unitlist = require('./routes/HOAccounts/SetUp/UnitList')
-app.use('/unitlist', unitlist)
+// const unitlist = require('./routes/HOAccounts/SetUp/UnitList')
+// app.use('/unitlist', unitlist)
 
  
 
-const taxMaster=require('./routes/HOAccounts/SetUp/TaxMaster')
-app.use('/taxMaster', taxMaster)
+// const taxMaster=require('./routes/HOAccounts/SetUp/TaxMaster')
+// app.use('/taxMaster', taxMaster)
 
  
 
-const billingDetails= require('./routes/HOAccounts/Invoice/Daily/Billing_Details')
-app.use('/billingDetails', billingDetails)
+// const billingDetails= require('./routes/HOAccounts/Invoice/Daily/Billing_Details')
+// app.use('/billingDetails', billingDetails)
 
  
 
-const customerOutstanding=require('./routes/HOAccounts/Unit/Customer_OutStanding')
-app.use('/customerOutstanding',customerOutstanding)
+// const customerOutstanding=require('./routes/HOAccounts/Unit/Customer_OutStanding')
+// app.use('/customerOutstanding',customerOutstanding)
 
  
 
  
 
-const vendorList=require('./routes/HOAccounts/Unit/Purchase/Vendor_List')
-app.use('/vendorList', vendorList)
+// const vendorList=require('./routes/HOAccounts/Unit/Purchase/Vendor_List')
+// app.use('/vendorList', vendorList)
 
 app.use('/dailyReport', dailyReportRouter)
 app.use('/monthlyReportData', monthlyReportRouter)

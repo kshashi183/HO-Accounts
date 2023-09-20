@@ -14,7 +14,7 @@ export default function Export() {
         </button>
       </div>
 
-      <Tabs>
+      <Tabs style={{fontSize: "13px"}}>
         <Tab eventKey="openInvoice" title="Open Invoice">
           <OpenInvoice/>
         </Tab>

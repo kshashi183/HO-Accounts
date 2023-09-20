@@ -45,10 +45,10 @@ export default function Sync() {
         }}
       />
       <div className="row">
-        <div className="col-md-5 col-sm-12" >
+        <div className="col-md-5" >
           <Export />
         </div>
-        <div className="col-md-7 col-sm-12" >
+        <div className="col-md-7" >
           <Import />
         </div>
       </div>

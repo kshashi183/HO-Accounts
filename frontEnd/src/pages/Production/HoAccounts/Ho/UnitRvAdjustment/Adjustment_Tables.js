@@ -1,7 +1,11 @@
 import React from 'react'
 import { Table } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom';
 
 export default function Adjustment_Tables() {
+
+    const navigate = useNavigate();
+
     return (
         <div>
 
