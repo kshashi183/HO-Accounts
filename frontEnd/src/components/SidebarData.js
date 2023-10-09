@@ -58,7 +58,7 @@ export const customerSidebar = [
     iconOpened: <RiIcons.RiArrowUpSFill />,
     subNav: [
       {
-        title: "Unit_List",
+        title: "Unit List",
         icon: <SlBag />,
         path: "/HOAccounts/SetUp/UnitList",
       },
@@ -82,43 +82,43 @@ export const customerSidebar = [
     iconOpened: <RiIcons.RiArrowUpSFill />,
     subNav: [
       {
-        title: "Unit_Invoice_List",
+        title: "Unit Invoice List",
         icon: <BsReverseLayoutTextSidebarReverse />,
         path: "/HOAccounts/HO/UnitInvoiceList",
       },
       {
-        title: "Monthly_Report",
+        title: "Monthly Report",
         icon: <BsFillClipboardFill />,
         path: "/HOAccounts/HO/MonthlyReport",
       },
       {
-        title: "Unit_Rv_Adjustment",
+        title: "Unit Rv Adjustment",
         icon: <SiHackthebox />,
         path: "/HOAccounts/HO/RvAdjustment",
       },
       {
-        title: "Tally_Export",
+        title: "Tally Export",
         icon: <BsFillEvFrontFill />,
         path: "/HOAccounts/HO/TallyExport",
       },
       {
-        title: "Unit_Recipt_List",
+        title: "Unit Recipt List",
         icon: <BsCreditCard2BackFill />,
         path: "/HOAccounts/HO/UnitReciptList",
       },
       {
-        title: "Unit_Sync",
+        title: "Unit Sync",
         icon: <BsCloudPlus />,
         path: "/HOAccounts/HO/UnitSync",
       },
       {
-        title: "HO_PRV",
+        title: "HO PRV",
         icon: <ImLink />,
         iconClosed: <RiIcons.RiArrowDownSFill />,
         iconOpened: <RiIcons.RiArrowUpSFill />,
         subNav: [
           {
-            title: "Create_New",
+            title: "Create New",
             icon: <SiArtstation />,
             path: "/HOAccounts/HO/HOPrv/CreateNew",
           },
@@ -134,7 +134,7 @@ export const customerSidebar = [
     iconOpened: <RiIcons.RiArrowUpSFill />,
     subNav: [
       {
-        title: "Show_Sync_status-",
+        title: "Show Sync Status",
         icon: <FiCloudSnow />,
         path: "/HOAccounts/Sync/ShowSync",
       },
@@ -148,7 +148,7 @@ export const customerSidebar = [
     iconOpened: <RiIcons.RiArrowUpSFill />,
     subNav: [
       {
-        title: "Company_List",
+        title: "Company List",
         icon: <SiReacthookform />,
         path: "/HOAccounts/Tally/CompanyList",
       },

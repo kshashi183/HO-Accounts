@@ -4,7 +4,8 @@ const cors = require('cors');
 const app = express();
 
 const dailyReportRouter = require("./routes/HOAccounts/Unit/DailyReport");
-const monthlyReportRouter = require("./routes/HOAccounts/Ho/MonthlyReportHO")
+const monthlyReportRouter = require("./routes/HOAccounts/Ho/MonthlyReportHO");
+const createNewRouter = require("./routes/HOAccounts/Ho/HOprvCreateNew");
 
 
 require('dotenv').config();
@@ -67,3 +68,4 @@ app.listen(process.env.PORT, () => {
 
 app.use('/dailyReport', dailyReportRouter)
 app.use('/monthlyReportData', monthlyReportRouter)
+app.use('/hoCreateNew', createNewRouter)

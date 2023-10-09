@@ -163,8 +163,11 @@ var hqConnection = mysql.createConnection({
   let setupQuery = (q, callback) => {
     setupConn.connect();
     setupConn.query(q, (err, res, fields) => {
-      if (err) throw err;
-      callback(res);
+      if (err) {
+        callback(err, null); // Pass the error to the callback
+      } else {
+        callback(null, res); // Pass the result to the callback
+      }
     });
   };
   
