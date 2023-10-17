@@ -28,6 +28,8 @@ import UnitSyncForm from "./pages/HoAccounts/Ho/UnitSync/UnitSyncForm";
 import AdjustmentVoucherForm from "./pages/HoAccounts/Ho/UnitRvAdjustment/AdjustmentVoucherForm";
 import AdjustmentCallFile from "./pages/HoAccounts/Ho/UnitRvAdjustment/AdjustmentCallFile";
 import { ToastContainer } from "react-toastify";
+import VendorList from "./pages/HoAccounts/Purchase/VenderList/VendorList";
+import PurchaseInvoiceList from "./pages/HoAccounts/Purchase/PurchaseInvoices/PurchaseInvoiceList";
 
 // import SyncCall from "./pages/HoAccounts/Ho/Sync/SyncCall";
 
@@ -66,7 +68,7 @@ function App() {
               <Route index={true} element={<HoAccounts />} />
               <Route path="UnitInvoiceList" element={<HoUnitInvoices />} />
               <Route path="MonthlyReport" element={<MonthlyReport />} />
-              <Route path="RvAdjustment" element={<RvAdjustmentForm />} />
+              <Route path="RVAdjustment" element={<RvAdjustmentForm />} />
               <Route path="AdjustmentVoucher" element={<AdjustmentCallFile/>} />
               <Route path="TallyExport" element={<TallyExportCall />} />
               <Route path="UnitReciptList" element={<OpenVoucher />} />
@@ -87,6 +89,12 @@ function App() {
             <Route path="Tally">
               <Route index={true} element={<HoAccounts />} />
               <Route path="CompanyList" element={<CompanyListFormTables />} />
+            </Route>
+
+            <Route path="Purchase">
+              <Route index={true} element={<HoAccounts />} />
+              <Route path="VendorList" element={<VendorList />} />
+              <Route path="PurchaseList" element={<PurchaseInvoiceList />} />
             </Route>
 
 

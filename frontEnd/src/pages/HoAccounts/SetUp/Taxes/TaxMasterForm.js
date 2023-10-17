@@ -9,6 +9,8 @@ import { toast } from 'react-toastify';
 
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
+import { format, parse } from 'date-fns';
+
 
 
 
@@ -18,21 +20,7 @@ const initial = {
     TallyAcctCreated: 0, UnderGroup: '', Service: 0, Sales: 0, JobWork: 0, IGST: 0
 }
 
-// function formatDateToMMDDYY(dateString) {
-//     // Step 1: Convert the input date string to a Date object
-//     const dateObject = new Date(dateString);
 
-//     // Step 2: Extract the month, day, and year components from the Date object
-
-//     const month = String(dateObject.getMonth() + 1).padStart(2, '0');
-//     const day = String(dateObject.getDate()).padStart(2, '0');
-//     const year = dateObject.getFullYear(); // Use % 100 to get the last two digits of the year
-
-//     // Step 3: Format the date components in the desired format (mm/dd/yy)
-//     const formattedDate = `${month}-${day}-${year}`;
-
-//     return formattedDate;
-// }
 export default function TaxMasterForm() {
     const navigate = useNavigate();
 
@@ -199,6 +187,18 @@ export default function TaxMasterForm() {
 
     console.log("eff from", selectRow.EffectiveFrom);
     console.log("POST", taxPostData);
+
+   
+    
+    // In your component:
+
+    
+    
+    
+    
+    
+    
+    
     return (
 
         <div>
@@ -315,7 +315,7 @@ export default function TaxMasterForm() {
                         <div className='col-md-3 '>
                             <button className="button-style mt-2 group-button" type='button'
                                 style={{ width: "70px" }}
-                                onClick={e => navigate("/UnitAccounts")}
+                                onClick={e => navigate("/HOAccounts")}
                             >
                                 Close
                             </button>
@@ -366,10 +366,11 @@ export default function TaxMasterForm() {
 
                             <div className="col-md-12 ">
                                 <label className="form-label">Effective From</label>
-                                <input className=" " name='EffectiveFrom'
+                                <input  name='EffectiveFrom'
                                     type='date'
                                     value={selectRow.EffectiveFrom || taxPostData.EffectiveFrom}
-
+                                    pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" id="dateInput"
+                                   // value={formatDate(selectRow.EffectiveFrom || taxPostData.EffectiveFrom)}
                                     onChange={handleOnChange}
                                 />
 

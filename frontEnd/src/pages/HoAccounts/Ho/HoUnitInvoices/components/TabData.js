@@ -138,7 +138,7 @@ export default function TabData() {
             placeholder="Search Invoice Number"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ marginTop: '8px' }}
+          
           ></input>
         </div>
 

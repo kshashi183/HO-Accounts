@@ -51,7 +51,10 @@ unitReceiptList.get('/getInvoices', (req, res) => {
 const sql=`SELECT *, DATE_FORMAT(Inv_date, '%d-%m-%Y') AS Formatted_Inv_date
 FROM magod_hq_mis.unit_payment_recd_voucher_details
 WHERE Unitname = 'Jigani' AND RecdPVID = '${RecdPVID}';
+
 `
+
+
     setupQueryMod(sql, (err, result) => {
         if (err) {
             console.log("error", err);
@@ -93,7 +96,7 @@ setupQueryMod(sql, (err, result) => {
         return res.json({ Error: " error in sql" })
     }
     else {
-    // console.log("openinvoice", result);
+    //console.log("openinvoice", result);
         return res.json({ Status: 'Success', Result: result })
     }
 })

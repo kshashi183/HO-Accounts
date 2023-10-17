@@ -123,6 +123,13 @@ const handleSubmit = async () => {
         }
       }
     } 
+
+
+
+
+    
+
+
     else {
       // Validation for PIN and GST number
       if (postData.PIN !== '' && !validatePIN(postData.PIN)) {
@@ -324,7 +331,7 @@ const handleSubmit = async () => {
             <div className="col-md-3 col-sm-12">
               <button
                 className="button-style  group-button"
-                onClick={e => navigate("/UnitAccounts")}
+                onClick={e => navigate("/HOAccounts")}
               >
                 Close
               </button>

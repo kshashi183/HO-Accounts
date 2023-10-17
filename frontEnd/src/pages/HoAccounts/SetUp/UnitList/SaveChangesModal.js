@@ -65,7 +65,8 @@ export default function SaveChangesModal(
       if (validateGstNumber(selectRow.Unit_GSTNo) && validatePIN(selectRow.PIN)) {
         
         insertData(); 
-      } else {
+      } 
+      else {
         if (!validatePIN(selectRow.PIN)) {
           toast.warn('Invalid PIN');
         } else if (!validateGstNumber(selectRow.Unit_GSTNo)) {
