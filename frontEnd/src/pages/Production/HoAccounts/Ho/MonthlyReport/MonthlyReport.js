@@ -26,9 +26,18 @@ export default function MonthlyReport() {
   const [getCollectionValues, setGetCollectionValues] = useState([]);
   const [getAdditionValues, setGetAdditionValues] = useState([]);
   const [getAllOutStandingValues, setGetAllOutStandingValues] = useState([]);
-  const [getSalesOutStandingValues, setGetSalesOutStandingValues] = useState([]);
+  const [getSalesOutStandingValues, setGetSalesOutStandingValues] = useState(
+    []
+  );
   const [getCustNames, setGetCustNames] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
+
+  // const [selectedMonth, setSelectedMonth] = useState(1);
+  // const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
+
+  // const handleMonthChange = (event) => {
+  //   setSelectedMonth(parseInt(event.target.value));
+  // };
 
   const monthNames = [
     "January",
@@ -153,7 +162,6 @@ export default function MonthlyReport() {
       console.error("Error in table", error);
     }
 
-
     try {
       const response = await axios.post(
         `http://localhost:3001/monthlyReportData/allOutStandingBills`,
@@ -169,7 +177,6 @@ export default function MonthlyReport() {
       console.error("Error in table", error);
     }
 
-
     try {
       const response = await axios.post(
         `http://localhost:3001/monthlyReportData/salesOutStandingBills`,
@@ -184,10 +191,10 @@ export default function MonthlyReport() {
     } catch (error) {
       console.error("Error in table", error);
     }
-
   };
 
-  console.log("Addition", getAdditionValues);
+  // console.log("Addition", getAdditionValues);
+  
 
   return (
     <div>
@@ -303,6 +310,14 @@ export default function MonthlyReport() {
                   min="1"
                   max="12"
                 />
+
+                {/* <select value={selectedMonth} onChange={handleMonthChange}>
+                  {monthOptions.map((month) => (
+                    <option key={month} value={month}>
+                      {month}
+                    </option>
+                  ))}
+                </select> */}
               </div>
 
               <div className="col-md-7">
@@ -360,13 +375,17 @@ export default function MonthlyReport() {
             <CollectionSummary getCollectionValues={getCollectionValues} />
           </Tab>
           <Tab eventKey="customerValueAddition" title="Customer Value Addition">
-            <CustomerValueAddition getAdditionValues={getAdditionValues}/>
+            <CustomerValueAddition getAdditionValues={getAdditionValues} />
           </Tab>
           <Tab eventKey="salesOutstandingBills" title="Sales Outstanding Bills">
-            <SalesOutstandingBills getSalesOutStandingValues={getSalesOutStandingValues}/>
+            <SalesOutstandingBills
+              getSalesOutStandingValues={getSalesOutStandingValues}
+            />
           </Tab>
           <Tab eventKey="allOutstandingBills" title="All Outstanding Bills">
-            <AllOutstandingBills getAllOutStandingValues={getAllOutStandingValues}/>
+            <AllOutstandingBills
+              getAllOutStandingValues={getAllOutStandingValues}
+            />
           </Tab>
           <Tab eventKey="machineUtilisation" title="Machine Utilisation">
             <MachineUtilisation />
