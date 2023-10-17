@@ -313,7 +313,7 @@ export default function UnitReceiptListForm() {
                                             <td><input type='checkBox' /></td>
                                             <td>{item.DC_InvType}</td>
                                             <td>{item.DC_Inv_No}</td>
-                                            <td>{item.Formatted_Inv_Date}</td>
+                                            <td style={{whiteSpace:'nowrap'}}>{item.Formatted_Inv_Date}</td>
                                             <td>{item.GrandTotal}</td>
                                             <td>{item.PymtAmtRecd}</td>
                                             <td>{item.Balance}</td>

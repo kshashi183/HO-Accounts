@@ -18,13 +18,13 @@ export default function AdjustmentCallFile() {
     <hr className="horizontal-line mt-3" />
 </div>
       <div className='row '>
-        <div className='col-md-6'>
+        <div className='col-md-12'>
             <AdjustmentVoucherForm/>
         </div>
 
-        <div className='col-md-6'>
+        {/* <div className='col-md-6'>
            <Adjustment_Tables/>
-        </div>
+        </div> */}
       </div>
     </div>
   )

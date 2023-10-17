@@ -6,7 +6,7 @@ export default function TallyExportCall() {
   return (
     <div>
       <TallyExportForm/>
-      <TallyExportTabs/>
+      {/* <TallyExportTabs/> */}
     </div>
   );
 }

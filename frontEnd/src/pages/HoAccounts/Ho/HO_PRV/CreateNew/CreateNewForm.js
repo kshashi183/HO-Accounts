@@ -12,16 +12,15 @@ export default function CreateNewForm() {
             <div className="">
 
                 <div className="d-flex ms-3" style={{gap:'10px'}}>
-                    <div className=" col-md-5">
-                        <label className="form-label">Href No</label>
-                        <input className="in-field" />
-                    </div>
-                    
-                    <div className=" col-md-6">
-                        <label className="form-label">Date</label>
-                        <input className="in-field mt-0" type="text" />
-                    </div>
+                <div className=" col-md-5">
+                                <label className="form-label ">Href No</label>
+                                <input className="in-field  " style={{marginTop:'-5px'}} />
+                            </div>
 
+                            <div className=" col-md-6">
+                                <label className="form-label">Date</label>
+                                <input className="in-field" type="date" style={{marginTop:'-5px'}} />
+                            </div>
 
                     
 

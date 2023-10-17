@@ -13,7 +13,7 @@ export default function RvAdjustmentForm() {
     const [rvAdjustmentData, setRvAdjustmentData] = useState([]);
     const [getCustomer, setGetCustomer] = useState([])
     //const [searchQuery, setSearchQuery] = useState('')
-    const [selectedCustCode, setSelectedCustCode] = useState("");
+    const [selectedCustCode, setSelectedCustCode] = useState("0000");
     const [showAll, setShowAll] = useState(false);
 
     useEffect(() => {
@@ -26,12 +26,14 @@ export default function RvAdjustmentForm() {
             axios.get('http://localhost:3001/unitRV_Adjustment/rvAdjustment',)
                 .then((res) => {
                     setRvAdjustmentData(res.data.Result)
+                    console.log("111 all customers");
                 })
                 .catch((err) => {
                     console.log("err");
                 })
         }
         else {
+          console.log("custcode", selectedCustCode);
             axios.get('http://localhost:3001/unitRV_Adjustment/rvAdjustment', {
                 params: {
                     selectedCustCode: selectedCustCode
@@ -39,6 +41,7 @@ export default function RvAdjustmentForm() {
             })
                 .then((res) => {
                     setRvAdjustmentData(res.data.Result)
+                    console.log("based on customers");
                 })
                 .catch((err) => {
                     console.log("err");
@@ -135,7 +138,7 @@ export default function RvAdjustmentForm() {
                         onClick={() => 
                             
                             {
-                            console.log('data', selectRow);
+                       
                             handleButtonClick(selectRow);}
                         }
                         >
@@ -144,7 +147,7 @@ export default function RvAdjustmentForm() {
                 </div>
                 <div className="col-md-2 mt-2">
                     <button className="button-style mt-2 group-button"
-                        onClick={e => navigate("/home")}  >
+                        onClick={e => navigate("/HOAccounts")}  >
                         Close
                     </button>
                 </div>

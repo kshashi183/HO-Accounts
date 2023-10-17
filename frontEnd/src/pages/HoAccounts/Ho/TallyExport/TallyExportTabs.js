@@ -5,8 +5,8 @@ import InvoiceList from './InvoiceListTab/InvoiceList';
 import PaymentReceiptFormTable from './PaymentReceiptTab/PaymentReceiptFormTable';
 import HOPaymentReceipt from './HOPaymentReceiptTab/HOPaymentReceipt';
 
-export default function TallyExportTabs() {
-    const [key, setKey] = useState("");
+export default function TallyExportTabs({selectedDate ,setFlag, flag, exportTally}) {
+    const [key, setKey] = useState("Inv");
   return (
     <div>
       <div className='row'>
@@ -16,17 +16,17 @@ export default function TallyExportTabs() {
       onSelect={(k) => setKey(k)}
       className="mb-2 tab_font "
     >
-      <Tab eventKey="Inv" title="Invoices">
-    <InvoiceList/>
+      <Tab eventKey="Inv" title="Invoices List">
+    <InvoiceList selectedDate={selectedDate} flag={flag} setFlag={setFlag} exportTally={exportTally}/>
        
       </Tab>
 
       <Tab eventKey="PR" title="Payment Recepients">
-       <PaymentReceiptFormTable/>
+       <PaymentReceiptFormTable selectedDate={selectedDate}  flag={flag} setFlag={setFlag}/>
       </Tab>
 
-      <Tab eventKey="HOR" title=" Ho Payment Receipnts">
-       <HOPaymentReceipt/>
+      <Tab eventKey="HOR" title=" HO Payment Receipnts">
+       <HOPaymentReceipt selectedDate={selectedDate}/>
        </Tab>
 
       
