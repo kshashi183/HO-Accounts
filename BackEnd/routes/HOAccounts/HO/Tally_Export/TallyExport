@@ -1,0 +1,100 @@
+const tally_Export = require("express").Router();
+// const cors = require('cors');
+// const { dbco, dbco1, dbgetData, deleteUnitData, updateUnitData } = require("../../../helpers/dbconn")
+const { setupQueryMod, misQuery } = require("../../../../helpers/dbconn")
+
+
+tally_Export.get('/getInvoiceData', (req,res)=>{
+    const date=req.query.date
+  //  console.log("date", date);
+const sql=`SELECT u.*, t.voucher_type, t.PreFix, t.LedgerName
+FROM magod_hq_mis.tally_voucher_ref t
+JOIN magod_hq_mis.unit_invoices_list u
+ON t.inv_type = u.dc_invType
+WHERE u.UnitName='Jigani' AND u.Inv_Date = '${date}'
+ORDER BY t.voucher_type, u.Inv_no;`
+
+setupQueryMod(sql, (err, result) => {
+   // console.log("hiii");
+    if (err) {
+        console.log("error", err);
+        return res.json({ Error: " error in sql" })
+    }
+    else {
+   //console.log("invoice", result);
+        return res.json({ Status: 'Success', Result: result })
+    }
+})
+
+});
+
+tally_Export.get('/getInvoiceTaxDetails',(req,res)=>{
+    const dcNo=req.query.DC_Inv_No
+    const sql=`SELECT m2.*, m2.Unit_Uid AS dc_invTaxId
+    FROM magod_hq_mis.unit_invoices_list m1
+    JOIN magod_hq_mis.unit_inv_taxtable m2
+    ON m1.DC_inv_no = m2.DC_inv_no AND m1.UnitName = m2.UnitName
+    WHERE m1.UnitName = 'Jigani'  AND m1.DC_Inv_No='${dcNo}';`
+
+    setupQueryMod(sql, (err, result) => {
+       
+        if (err) {
+            console.log("error", err);
+            return res.json({ Error: " error in sql" })
+        }
+        else {
+       //console.log("invoice", result);
+            return res.json({ Status: 'Success', Result: result })
+        }
+    })
+
+})
+
+
+tally_Export.get('/getPaymentReceipntData',(req,res)=>{
+    const date=req.query.date
+      console.log("dateeeeeeeeeeee", date);
+      const sql=`SELECT p.* FROM magod_hq_mis.unit_payment_recd_voucher_register p 
+      WHERE p.Unitname='Jigani' AND p.Recd_PV_Date='${date}'`;
+
+      setupQueryMod(sql, (err, result) => {
+       // console.log("hiii");
+        if (err) {
+            console.log("error", err);
+            return res.json({ Error: " error in sql" })
+        }
+        else {
+      // console.log("paymnet", result);
+            return res.json({ Status: 'Success', Result: result })
+        }
+    })
+
+})
+
+
+tally_Export.get('/getPayment',(req,res)=>{
+
+    const Recd_PVNo=req.query.Recd_PVNo;
+
+    const sql=`SELECT p1.*, t.voucher_type, t.PreFix, t.LedgerName
+    FROM magod_hq_mis.unit_payment_recd_voucher_register p
+    JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID
+    JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
+    WHERE p.Unitname = 'Jigani' AND p.Recd_PVNo='${Recd_PVNo}' `;
+    
+
+    setupQueryMod(sql, (err, result) => {
+        // console.log("hiii");
+         if (err) {
+             console.log("error", err);
+             return res.json({ Error: " error in sql" })
+         }
+         else {
+       // console.log("paymnet", result);
+             return res.json({ Status: 'Success', Result: result })
+         }
+     })
+
+
+})
+module.exports = tally_Export;

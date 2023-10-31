@@ -28,21 +28,15 @@ customerOutstanding.get('/unitOutstandingData', (req, res) => {
     // Both queries are same i make some changes based on my requriment
 
     const UnitNameQuery=`
-    SELECT 'Jigani' AS UnitName, u.*, a.OutStandingInvoiceCount, a.OutStandingAmount
-    FROM magodmis.cust_data u
-    INNER JOIN (
-        SELECT
-            COUNT(u.\`Cust_Code\`) AS OutStandingInvoiceCount,
-            SUM(u.\`GrandTotal\` - u.\`PymtAmtRecd\`) AS OutStandingAmount,
-            u.\`Cust_Code\`
-        FROM magodmis.draft_Dc_Inv_Register u
-        WHERE u.\`GrandTotal\` - u.\`PymtAmtRecd\` > 0
-            AND u.\`DCStatus\` NOT LIKE 'Closed'
-            AND u.\`Inv_No\` IS NOT NULL 
-              
-        GROUP BY u.\`Cust_Code\`
-    ) AS a ON a.\`Cust_Code\` = u.\`Cust_Code\` 
-    WHERE   'Jigani' = (SELECT UnitName FROM magod_setup.magodlaser_units WHERE UnitName = 'Jigani');
+    SELECT u.*, a.OutStandingInvoiceCount, a.OutStandingAmount
+      FROM magod_hq_mis.unit_cust_data u
+      INNER JOIN (
+        SELECT COUNT(u.Cust_Code) AS OutStandingInvoiceCount, SUM(u.GrandTotal - u.PymtAmtRecd) AS OutStandingAmount, u.Cust_Code
+        FROM magod_hq_mis.unit_invoices_list u
+        WHERE u.GrandTotal - u.PymtAmtRecd > 0 AND u.DCStatus NOT LIKE 'Closed' AND u.Inv_No IS NOT NULL AND u.UnitName = 'Jigani'
+        GROUP BY u.Cust_Code
+      ) AS a ON a.Cust_Code = u.Cust_Code
+      WHERE u.UnitName = 'Jigani'
     
 `;
 
@@ -78,42 +72,19 @@ setupQueryMod(sql, (err, result)=>{
 customerOutstanding.get('/getDataBasedOnCustomer', (req,res)=>{
     const custcode=req.query.selectedCustCode;
    // console.log("cust_code backend 33333333333 ", custcode);
-    const sql=`SELECT
-    u.dc_Inv_No AS Id,
-    @UnitName AS UnitName,
-    u.*,
-    u.GrandTotal - u.PymtAmtRecd AS Balance,
-    DATEDIFF(CURRENT_DATE(), u.inv_date) AS duedays
-FROM magodmis.draft_dc_inv_register u
-WHERE
-    u.Cust_Code = '${custcode}'
-    AND u.Inv_No IS NOT NULL
-    AND u.dcstatus NOT LIKE 'Closed';`;
+    const sql=`     SELECT *,
+    GrandTotal-  PymtAmtRecd AS Balance, DATEDIFF(CURRENT_DATE(),inv_date) AS duedays,
+    IF(LENGTH(DC_Date) = 8, DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DC_Date,
+      IF(LENGTH(Inv_Date) = 8, DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_Inv_Date,
+        IF(LENGTH(DespatchDate) = 8, DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DespatchDate,
+    IF(TIME(OrderDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_OrderDate,
+      IF(TIME(PaymentDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_PaymentDate
+FROM magod_hq_mis.unit_invoices_list
+WHERE UnitName = 'Jigani' AND Cust_Code = '${custcode}';`;
 
-    const sql2=`SELECT
-    u.dc_Inv_No AS Id,
-    @UnitName AS UnitName,
-    u.*,
-    u.GrandTotal - u.PymtAmtRecd AS Balance,
-    DATEDIFF(CURRENT_DATE(), u.inv_date) AS duedays,
-    DATE_FORMAT(DATE(u.DC_inv_Date), '%d-%m-%Y') AS Formatted_DC_inv_Date,
-    DATE_FORMAT(DATE(u.OrderDate), '%d-%m-%Y') AS Formatted_OrderDate,
-    DATE_FORMAT(DATE(u.DC_Date), '%d-%m-%Y') AS Formatted_DC_Date,
-    DATE_FORMAT(DATE(u.Inv_Date), '%d-%m-%Y') AS Formatted_Inv_Date,
-    DATE_FORMAT(DATE(u.PaymentDate), '%d-%m-%Y') AS Formatted_PaymentDate,
-    DATE_FORMAT(DATE(u.DespatchDate), '%d-%m-%Y') AS Formatted_DespatchDate,
-    DATE_FORMAT(DATE(u.PO_Date), '%d-%m-%Y') AS Formatted_PO_Date,
-    DATE_FORMAT(DATE(u.DespatchTime), '%d-%m-%Y') AS Formatted_DespatchTime,
-    (SELECT SUM(GrandTotal) FROM magodmis.draft_dc_inv_register WHERE Cust_Code = '${custcode}' AND Inv_No IS NOT NULL AND dcstatus NOT LIKE 'Closed') AS Amount_Due
-FROM magodmis.draft_dc_inv_register u
-WHERE
-    u.Cust_Code = '${custcode}'
-    AND u.Inv_No IS NOT NULL
-    AND u.dcstatus NOT LIKE 'Closed';
-
-`
     
-    setupQueryMod(sql2, (err, result)=>{
+    
+    setupQueryMod(sql, (err, result)=>{
         if(err){
             console.log("err in query", err);
         }
@@ -128,16 +99,18 @@ WHERE
     customerOutstanding.get('/getDataTable2', (req,res)=>{
         const DC_Inv_No=req.query.selectedDCInvNo;
         console.log("DC_INV_NO", DC_Inv_No);
-        const sql=`SELECT CONCAT('HO/', h1.HORef) AS VrRef, h.Receive_Now, h1.TxnType, h1.Status AS VrStatus
-        FROM magodmis.ho_paymentrv_details h
-        JOIN magodmis.ho_paymentrv_register h1 ON h.HOPrvId = h1.HOPrvId
-        WHERE h.Dc_inv_no = '${DC_Inv_No}'
+        
+
+
+        const sql=` SELECT CONCAT('HO/', h1.HORef) AS VrRef, h.Receive_Now, h1.TxnType, h1.Status AS VrStatus
+        FROM magod_hq_mis.ho_paymentrv_details h
+        INNER JOIN magod_hq_mis.ho_paymentrv_register h1 ON h.HOPrvId = h1.HOPrvId
+        WHERE h.Unitname = @Unitname AND h.Dc_inv_no = '${DC_Inv_No}'
         UNION
-        SELECT u1.Recd_PVNo AS VrRef, u.Receive_Now, u1.TxnType, u1.ReceiptStatus AS VrStatus
-        FROM magodmis.payment_recd_voucher_details u
-        JOIN magodmis.payment_recd_voucher_register u1 ON u1.RecdPVID = u.RecdPVID
-        WHERE u.Dc_inv_no = '${DC_Inv_No}';
-        `;
+        SELECT CONCAT(u.Unitname, ' /', u1.Recd_PVNo) AS VrRef, u.Receive_Now, u1.TxnType, u1.PRV_Status AS VrStatus
+        FROM magod_hq_mis.unit_payment_recd_voucher_details u
+        INNER JOIN magod_hq_mis.unit_payment_recd_voucher_register u1 ON u.PvrId = u1.Id
+        WHERE u.Unitname = @Unitname AND u.Dc_inv_no = '${DC_Inv_No}';`
         
         setupQueryMod(sql, (err, result)=>{
             if(err){

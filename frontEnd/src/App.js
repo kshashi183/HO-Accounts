@@ -9,33 +9,36 @@ import Home from "./pages/Home";
 // import HoUnitInvoices from "./pages/Production/HoAccounts/HoUnitInvoices/HoUnitInvoices";
 
 
-import UnitDetails from "./pages/Production/HoAccounts/SetUp/UnitList/UnitDetails";
-import TaxMasterCall from "./pages/Production/HoAccounts/SetUp/Taxes/TaxMasterCall";
-import Sync from "./pages/Production/HoAccounts/SetUp/Sync/Sync";
-import HoAccounts from "./pages/Production/HoAccounts/Ho/HoAccounts";
-import HoUnitInvoices from "./pages/Production/HoAccounts/Ho/HoUnitInvoices/HoUnitInvoices";
-import MonthlyReport from "./pages/Production/HoAccounts/Ho/MonthlyReport/MonthlyReport";
-import RvAdjustmentForm from "./pages/Production/HoAccounts/Ho/UnitRvAdjustment/RvAdjustmentForm";
+import UnitDetails from "./pages/HoAccounts/SetUp/UnitList/UnitDetails";
+import TaxMasterCall from "./pages/HoAccounts/SetUp/Taxes/TaxMasterCall";
+import Sync from "./pages/HoAccounts/SetUp/Sync/Sync";
+import HoAccounts from "./pages/HoAccounts/Ho/HoAccounts";
+import HoUnitInvoices from "./pages/HoAccounts/Ho/HoUnitInvoices/HoUnitInvoices";
+import MonthlyReport from "./pages/HoAccounts/Ho/MonthlyReport/MonthlyReport";
+import RvAdjustmentForm from "./pages/HoAccounts/Ho/UnitRvAdjustment/RvAdjustmentForm";
 
-import CreateNewCallFile from "./pages/Production/HoAccounts/Ho/HO_PRV/CreateNew/CreateNewCallFile";
-import SyncCall from "./pages/Production/HoAccounts/Sync/SyncCall";
-// import TallyExportForm from "./pages/Production/HoAccounts/Ho/TallyExport/TallyExportForm";
-import TallyExportCall from "./pages/Production/HoAccounts/Ho/TallyExport/TallyExportCall";
-import UnitReceiptListForm from "./pages/Production/HoAccounts/Ho/UnitReciptList/UnitReceiptListForm";
-import OpenVoucher from "./pages/Production/HoAccounts/Ho/UnitReciptList/OpenVoucher";
-import CompanyListFormTables from "./pages/Production/HoAccounts/Tally/CompanyList/CompanyListFormTables";
-import UnitSyncForm from "./pages/Production/HoAccounts/Ho/UnitSync/UnitSyncForm";
-import AdjustmentVoucherForm from "./pages/Production/HoAccounts/Ho/UnitRvAdjustment/AdjustmentVoucherForm";
-import AdjustmentCallFile from "./pages/Production/HoAccounts/Ho/UnitRvAdjustment/AdjustmentCallFile";
+import CreateNewCallFile from "./pages/HoAccounts/Ho/HO_PRV/CreateNew/CreateNewCallFile";
+import SyncCall from "./pages/HoAccounts/Sync/SyncCall";
+// import TallyExportForm from "./pages/HoAccounts/Ho/TallyExport/TallyExportForm";
+import TallyExportCall from "./pages/HoAccounts/Ho/TallyExport/TallyExportCall";
+import UnitReceiptListForm from "./pages/HoAccounts/Ho/UnitReciptList/UnitReceiptListForm";
+import OpenVoucher from "./pages/HoAccounts/Ho/UnitReciptList/OpenVoucher";
+import CompanyListFormTables from "./pages/HoAccounts/Tally/CompanyList/CompanyListFormTables";
+import UnitSyncForm from "./pages/HoAccounts/Ho/UnitSync/UnitSyncForm";
+import AdjustmentVoucherForm from "./pages/HoAccounts/Ho/UnitRvAdjustment/AdjustmentVoucherForm";
+import AdjustmentCallFile from "./pages/HoAccounts/Ho/UnitRvAdjustment/AdjustmentCallFile";
+import { ToastContainer } from "react-toastify";
+import VendorList from "./pages/HoAccounts/Purchase/VenderList/VendorList";
+import PurchaseInvoiceList from "./pages/HoAccounts/Purchase/PurchaseInvoices/PurchaseInvoiceList";
 
-
-// import SyncCall from "./pages/Production/HoAccounts/Ho/Sync/SyncCall";
+// import SyncCall from "./pages/HoAccounts/Ho/Sync/SyncCall";
 
 
 
 function App() {
   return (
     <BrowserRouter>
+     <ToastContainer position="top-center"/>
       <Routes>
         <Route element={<Login />} path="/" />
         <Route path="/home" element={<Home />} />
@@ -65,11 +68,13 @@ function App() {
               <Route index={true} element={<HoAccounts />} />
               <Route path="UnitInvoiceList" element={<HoUnitInvoices />} />
               <Route path="MonthlyReport" element={<MonthlyReport />} />
-              <Route path="RvAdjustment" element={<RvAdjustmentForm />} />
+              <Route path="RVAdjustment" element={<RvAdjustmentForm />} />
               <Route path="AdjustmentVoucher" element={<AdjustmentCallFile/>} />
               <Route path="TallyExport" element={<TallyExportCall />} />
               <Route path="UnitReciptList" element={<OpenVoucher />} />
+              
               <Route path="Openvoucher" element={<UnitReceiptListForm />} />
+             
               <Route path="UnitSync" element={<UnitSyncForm />} />
               <Route path="HOPrv">
                 <Route path="CreateNew" element={<CreateNewCallFile />} />
@@ -86,22 +91,13 @@ function App() {
               <Route path="CompanyList" element={<CompanyListFormTables />} />
             </Route>
 
-
-
-
+            <Route path="Purchase">
+              <Route index={true} element={<HoAccounts />} />
+              <Route path="VendorList" element={<VendorList />} />
+              <Route path="PurchaseList" element={<PurchaseInvoiceList />} />
+            </Route>
 
             {/* <Route path="TallyExport" element={<TallyExportForm/>} /> */}
-
-
-
-
-
-
-
-
-
-
-
 
           </Route>
         </Route>

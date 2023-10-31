@@ -1,0 +1,105 @@
+const unitReceiptList = require("express").Router();
+// const cors = require('cors');
+// const { dbco, dbco1, dbgetData, deleteUnitData, updateUnitData } = require("../../../helpers/dbconn")
+const { setupQueryMod, misQuery } = require("../../../../helpers/dbconn")
+
+
+unitReceiptList.get("/getcustomerdata", (req, res) => {
+    const sql = "SELECT Cust_Code, Cust_name FROM magodmis.cust_data";
+    setupQueryMod(sql, (err, result) => {
+        if (err) {
+            console.log("error", err);
+            return res.json({ Error: " error in sql" })
+        }
+
+        else {
+            //  console.log("result", result);
+            return res.json({ Status: 'Success', Result: result })
+
+        }
+    })
+})
+
+unitReceiptList.get('/receiptBasedOnCustomer', (req, res) => {
+    const custcode = req.query.selectedCustCode;
+    //console.log(" ------",custcode);
+    const sql = `SELECT * ,DATE_FORMAT(Recd_PV_Date, '%d-%m-%Y') AS Formatted_Recd_PV_Date
+FROM magod_hq_mis.unit_payment_recd_voucher_register u 
+WHERE u.Unitname = 'Jigani'
+  AND u.Cust_Code = '${custcode}'
+ORDER BY u.Recd_PV_Date DESC;`
+
+    setupQueryMod(sql, (err, result) => {
+        if (err) {
+            console.log("error", err);
+            return res.json({ Error: " error in sql" })
+        }
+        else {
+            // console.log("result", result);
+            return res.json({ Status: 'Success', Result: result })
+        }
+    })
+})
+
+
+unitReceiptList.get('/getInvoices', (req, res) => {
+    
+    const RecdPVID = req.query.RecdPVID;
+    //console.log(" ------", RecdPVID);
+    // const sql = `SELECT * FROM magod_hq_mis.unit_payment_recd_voucher_details WHERE  Unitname='Jigani' AND RecdPVID='${RecdPVID}';`
+
+const sql=`SELECT *, DATE_FORMAT(Inv_date, '%d-%m-%Y') AS Formatted_Inv_date
+FROM magod_hq_mis.unit_payment_recd_voucher_details
+WHERE Unitname = 'Jigani' AND RecdPVID = '${RecdPVID}';
+
+`
+
+
+    setupQueryMod(sql, (err, result) => {
+        if (err) {
+            console.log("error", err);
+            return res.json({ Error: " error in sql" })
+        }
+        else {
+        // console.log("result", result);
+            return res.json({ Status: 'Success', Result: result })
+        }
+    })
+})
+
+
+unitReceiptList.get('/getOpenInvoices', (req,res)=>{
+    const Cust_code= req.query.Cust_code;
+    console.log("CUSTCODE",Cust_code);
+    const sql=`SELECT 
+    'Jigani' as UnitName,
+    d.DC_Inv_No, 
+    d.DC_InvType, 
+    d.Inv_No, 
+    DATE_FORMAT(d.Inv_Date, '%d-%m-%Y') as Formatted_Inv_Date,
+    d.Cust_Code, 
+    d.Cust_Name,
+    d.GrandTotal, 
+    d.PymtAmtRecd,
+    d.GrandTotal - d.PymtAmtRecd as Balance,
+    d.Inv_Fin_Year 
+FROM 
+    magodmis.draft_dc_inv_register d 
+WHERE 
+    d.Cust_Code ='${Cust_code}'
+    AND d.DCStatus = 'Despatched' 
+    AND d.GrandTotal <> d.PymtAmtRecd;
+`
+setupQueryMod(sql, (err, result) => {
+    if (err) {
+        console.log("error", err);
+        return res.json({ Error: " error in sql" })
+    }
+    else {
+    //console.log("openinvoice", result);
+        return res.json({ Status: 'Success', Result: result })
+    }
+})
+})
+
+module.exports = unitReceiptList;
