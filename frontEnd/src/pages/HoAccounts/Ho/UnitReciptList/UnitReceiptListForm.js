@@ -4,6 +4,7 @@ import { Table } from 'react-bootstrap';
 import { useLocation } from 'react-router-dom';
 import ReactToPrint from 'react-to-print';
 import PaymentReceiptVoucherPdf from '../../../../PDF/PaymentReceiptVoucher';
+import { useNavigate, } from 'react-router-dom';
 
 export default function UnitReceiptListForm() {
 
@@ -15,8 +16,9 @@ export default function UnitReceiptListForm() {
     const [openInvoices, setOpenInvoices] = useState([])
     const [printButtonClicked, setPrintButtonClicked] = useState(false);
     const location = useLocation();
-    const selectRow = location.state.selectRow || '';
-    console.log("se", selectRow);
+  //  const selectRow = location.state.selectRow || '';
+  const selectRow = location.state ? location.state.selectRow || '' : '';
+   
 
     useEffect(() => {
 
@@ -24,12 +26,13 @@ export default function UnitReceiptListForm() {
             getInvoiceList();
             handleOpenInvoice();
 
-            // handlePrintButtonClick();
+      
         }
 
     }, [selectRow])
 
-    console.log("custcode", selectRow.Cust_code);
+    const navigate = useNavigate();
+    
 
     const getInvoiceList = () => {
         axios.get('http://localhost:3001/unitReceiptList/getInvoices', {
@@ -206,14 +209,16 @@ export default function UnitReceiptListForm() {
                                         selectRow={selectRow}
                                /></div>}
                                         content={() => contentRef.current}
-                                        ref={printRef} // Attach the reference to the ReactToPrint component
+                                        ref={printRef} 
+                                        // Attach the reference to the ReactToPrint component
                                         documentTitle="Payment Receipt Voucher"
                                     />
                                     
                                 </div>
                                 <div className="row mt-3">
-                                    <button
-                                        className='button-style  group-button'>
+                                    <button type='button'
+                                        className='button-style  group-button' 
+                                        onClick={e => navigate("/HOAccounts")}>
                                         Close
                                     </button>
                                 </div>

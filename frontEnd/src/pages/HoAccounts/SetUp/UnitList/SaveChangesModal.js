@@ -17,34 +17,35 @@ export default function SaveChangesModal(
     setSaveChangesModal(false);
   }
 
-  const insertData=()=>{
+
+  const insertData = () => {
     Axios.put('http://localhost:3001/unitlist/updateData/' + selectRow.UnitID, selectRow)
-    .then((res) => {
-      if (res.data.status === 'fail') {
-        alert('Unit_Name must be Unique');
+      .then((res) => {
+        if (res.data.status === 'fail') {
+          alert('Unit_Name must be Unique');
 
-      }
-      else if (res.data.status === 'query') {
-        alert('data does not exist');
-      }
-      else if (res.data.status === 'success') {
-        console.log('res in frontend', res.data);
-        // alert("data updated")
-        toast.success(" Updated Successfully");
+        }
+        else if (res.data.status === 'query') {
+          alert('data does not exist');
+        }
+        else if (res.data.status === 'success') {
+          console.log('res in frontend', res.data);
+          // alert("data updated")
+          toast.success(" Jigani Unit Updated Successfully");
 
-        setTimeout(() => {
+          setTimeout(() => {
 
-          window.location.reload();
+            window.location.reload();
 
-        }, 1000); 
+          }, 1000);
 
-        setSaveChangesModal(false);
+          setSaveChangesModal(false);
 
-      }
+        }
 
-    }).catch((err) => {
-      console.log('eroor in fromntend', err);
-    })
+      }).catch((err) => {
+        console.log('eroor in frontend', err);
+      })
   }
 
   const unitlistSubmit = () => {
@@ -58,36 +59,53 @@ export default function SaveChangesModal(
 
     else if (selectRow.PIN === '' && selectRow.Unit_GSTNo === '') {
 
-     insertData();
+      insertData();
     }
 
     else if (selectRow.PIN !== '' && selectRow.Unit_GSTNo !== '') {
       if (validateGstNumber(selectRow.Unit_GSTNo) && validatePIN(selectRow.PIN)) {
-        
-        insertData(); 
-      } 
-      else {
+
+        insertData();
+      } else {
         if (!validatePIN(selectRow.PIN)) {
           toast.warn('Invalid PIN');
         } else if (!validateGstNumber(selectRow.Unit_GSTNo)) {
           toast.warn('Invalid GST No');
         }
       }
-    } 
+    }
 
+
+    else if (selectRow.PIN === '' && selectRow.Unit_GSTNo !== '') {
+      if (validateGstNumber(selectRow.Unit_GSTNo)) {
+        insertData();
+      }
+      else {
+        toast.warn('Invalid GST No');
+      }
+    }
+
+    else if (selectRow.Unit_GSTNo === '' && selectRow.PIN !== '') {
+      if (validatePIN(selectRow.PIN)) {
+        insertData();
+      }
+      else {
+        toast.warn('Invalid PIN');
+      }
+    }
     else {
       // Validation for PIN and GST number
       if (selectRow.PIN !== '' && !validatePIN(selectRow.PIN)) {
         toast.warn('Invalid PIN code');
       }
       if (selectRow.Unit_GSTNo !== '' && !validateGstNumber(selectRow.Unit_GSTNo)) {
-        toast.warn('Invalid GST number');
+        toast.warn('Invalid GST NO');
       }
-      
+
     }
   }
 
-  // const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({});
 
   const validatePIN = (PIN) => {
 
@@ -95,9 +113,29 @@ export default function SaveChangesModal(
   };
 
   //GST number validation function
-  const validateGstNumber = (Unit_GSTNo) => {
+  // const validateGstNumber = (Unit_GSTNo) => {
 
-    return /^(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1})$/.test(Unit_GSTNo);
+
+  //   return /^(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1})$/.test(Unit_GSTNo);
+
+  // };
+
+  const validateGstNumber = (Unit_GSTNo) => {
+    if (Unit_GSTNo.length === 15) {
+      const firstTwo = Unit_GSTNo.substring(0, 2);
+
+
+      if (!isNaN(firstTwo)) {
+        const middlePart = Unit_GSTNo.substring(2, 14);
+
+        return /^[A-Za-z0-9]+$/.test(middlePart);
+
+      }
+    }
+    // else{
+    //   toast.warn("Invalid GST NO")
+    // }
+
   };
 
   return (

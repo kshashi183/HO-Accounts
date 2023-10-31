@@ -78,7 +78,7 @@ unitRV_Adjustment.get('/getCustomers', (req, res) => {
 
 unitRV_Adjustment.get('/openInvoices', (req, res) => {
     const custcode = req.query.selectedCustCode;
-    console.log("custcodeeeee", custcode);
+    //console.log("custcodeeeee", custcode);
     const sql = `SELECT *,
     DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
     FROM magod_hq_mis.unit_invoices_list
