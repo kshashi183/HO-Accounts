@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
+import { baseURL } from "../../../../api/baseUrl";
 
 // import { Axios } from "axios";
 
@@ -38,7 +39,7 @@ export default function UnitDetails() {
 
   const [stateList, setStateList] = useState([]);
   const getStateList = () => {
-    axios.get('http://localhost:3001/unitlist/getStates').
+    axios.get(baseURL+'/unitlist/getStates').
       then((res) => {
         // console.log(res.data.Result);
         setStateList(res.data.Result)
