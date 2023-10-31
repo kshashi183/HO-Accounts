@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { Table } from 'react-bootstrap'
+import { Table, Toast } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import { Typeahead } from 'react-bootstrap-typeahead';
 
@@ -79,7 +79,7 @@ console.log("update ", tableData);
                     // toast.success(`updated Successfully`);
                     //   window.location.reload();
 
-                    toast.success("Updated successfully!");
+                    Toast.success("Updated successfully!");
 
                     setTimeout(() => {
                         window.location.reload();
