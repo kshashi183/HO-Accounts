@@ -2,8 +2,6 @@ const monthlyReportRouter = require("express").Router();
 const { hqQuery } = require("../../../helpers/dbconn");
 var bodyParser = require("body-parser");
 
-console.log("for tesing purposes");
-
 //Cust Names
 monthlyReportRouter.post("/custNames", async (req, res, next) => {
   const date = req.body.date;

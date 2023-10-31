@@ -12,6 +12,7 @@ import { Tab, Tabs } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Typeahead } from "react-bootstrap-typeahead";
+import { baseURL } from "../../../../api/baseUrl";
 
 export default function MonthlyReport() {
   const navigate = useNavigate();
@@ -38,8 +39,6 @@ export default function MonthlyReport() {
   // const handleMonthChange = (event) => {
   //   setSelectedMonth(parseInt(event.target.value));
   // };
-
-  console.log("for test");
 
   const monthNames = [
     "January",
@@ -79,7 +78,7 @@ export default function MonthlyReport() {
 
   useEffect(() => {
     axios
-      .post(`http://localhost:3001/monthlyReportData/custNames`)
+      .post(baseURL + `/monthlyReportData/custNames`)
       .then((res) => {
         setGetCustNames(res.data);
       })
@@ -91,7 +90,7 @@ export default function MonthlyReport() {
   const handleGetData = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3001/monthlyReportData/monthlyInvoiceSummary`,
+        baseURL + `/monthlyReportData/monthlyInvoiceSummary`,
         {
           getName: getName,
           month: month,
@@ -106,7 +105,7 @@ export default function MonthlyReport() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/monthlyReportData/monthlyClearanceSummary`,
+        baseURL + `/monthlyReportData/monthlyClearanceSummary`,
         {
           getName: getName,
           month: month,
@@ -121,7 +120,7 @@ export default function MonthlyReport() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/monthlyReportData/monthlyTaxSummary`,
+        baseURL + `/monthlyReportData/monthlyTaxSummary`,
         {
           getName: getName,
           month: month,
@@ -136,7 +135,7 @@ export default function MonthlyReport() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/monthlyReportData/monthlyCollectionSummary`,
+        baseURL + `/monthlyReportData/monthlyCollectionSummary`,
         {
           getName: getName,
           month: month,
@@ -151,7 +150,7 @@ export default function MonthlyReport() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/monthlyReportData/monthlyCutomerAddition`,
+        baseURL + `/monthlyReportData/monthlyCutomerAddition`,
         {
           getName: getName,
           month: month,
@@ -166,7 +165,7 @@ export default function MonthlyReport() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/monthlyReportData/allOutStandingBills`,
+        baseURL + `/monthlyReportData/allOutStandingBills`,
         {
           //getName: getName,
           month: month,
@@ -181,7 +180,7 @@ export default function MonthlyReport() {
 
     try {
       const response = await axios.post(
-        `http://localhost:3001/monthlyReportData/salesOutStandingBills`,
+        baseURL + `/monthlyReportData/salesOutStandingBills`,
         {
           //getName: getName,
           month: month,

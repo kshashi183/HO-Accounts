@@ -4,7 +4,7 @@ var dailyReport = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
-  database: 'magodmis',
+  database: "magodmis",
 });
 
 var setupConn = mysql.createConnection({
@@ -18,7 +18,7 @@ var hqConnection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
-  database: 'magod_hq_mis',
+  database: "magod_hq_mis",
 });
 
 // const setupConn = mysql.createConnection({
@@ -42,7 +42,7 @@ var hqConnection = mysql.createConnection({
 //             callback(null, res);
 //            // console.log(res);
 
-//         } 
+//         }
 //     })
 //  }
 
@@ -59,12 +59,12 @@ var hqConnection = mysql.createConnection({
 //            callback(null, res);
 //         //    console.log(res);
 
-//         } 
+//         }
 //     })
 //  }
 
 //  let dbgetData = (m,values, callback) => {
-    
+
 //     db.connect();
 //     db.query(m,values,(err, res, fields) => {
 //         if(err) {
@@ -76,12 +76,12 @@ var hqConnection = mysql.createConnection({
 //             callback(null, res);
 //           //  console.log(res);
 
-//         } 
+//         }
 //     })
 //  }
 
 //  let deleteUnitData = (m, uid,callback) => {
-    
+
 //     db.connect();
 //     db.query(m,[uid], (err, res, fields) => {
 //         if(err) {
@@ -93,12 +93,12 @@ var hqConnection = mysql.createConnection({
 //             callback(null, res);
 //           //  console.log(res);
 
-//         } 
+//         }
 //     })
 //  }
 
 //  let updateUnitData = (m, callback) => {
-    
+
 //     db.connect();
 //     db.query(m,(err, res, fields) => {
 //         if(err) {
@@ -110,12 +110,9 @@ var hqConnection = mysql.createConnection({
 //             callback(null, res);
 //             console.log("dbconn update" ,);
 
-//         } 
+//         }
 //     })
 //  }
-
-
-
 
 // let setupQueryMod = async (q, callback) => {
 //     setupConn.connect();
@@ -123,14 +120,12 @@ var hqConnection = mysql.createConnection({
 //         if(err){
 //             console.log("err",err);
 //             callback(err, null);
-//         } 
+//         }
 //         else {
 //          //   console.log("rersult", res);
 //             callback(null, res);}
 //     })
 // }
-
-
 
 // Assuming 'setupConn' is properly imported or declared
 // const setupQueryMod = async (q,values, callback) => {
@@ -150,35 +145,33 @@ var hqConnection = mysql.createConnection({
 //     }
 //   };
 
+//DailyReport
+let dailyReportQuery = async (q, callback) => {
+  dailyReport.connect();
+  dailyReport.query(q, (err, res, fields) => {
+    if (err) callback(err, null);
+    else callback(null, res);
+  });
+};
 
-  //DailyReport 
-  let dailyReportQuery = async (q, callback) => {
-    dailyReport.connect();
-    dailyReport.query(q, (err, res, fields) => {
-      if (err) callback(err, null);
-      else callback(null, res);
-    });
-  };
+let setupQuery = (q, callback) => {
+  setupConn.connect();
+  setupConn.query(q, (err, res, fields) => {
+    if (err) {
+      callback(err, null); // Pass the error to the callback
+    } else {
+      callback(null, res); // Pass the result to the callback
+    }
+  });
+};
 
-  let setupQuery = (q, callback) => {
-    setupConn.connect();
-    setupConn.query(q, (err, res, fields) => {
-      if (err) {
-        callback(err, null); // Pass the error to the callback
-      } else {
-        callback(null, res); // Pass the result to the callback
-      }
-    });
-  };
-  
-  let hqQuery = async (q, callback) => {
-    hqConnection.connect();
-    hqConnection.query(q, (err, res, fields) => {
-      if (err) callback(err, null);
-      else callback(null, res);
-    });
-  };
-
+let hqQuery = async (q, callback) => {
+  hqConnection.connect();
+  hqConnection.query(q, (err, res, fields) => {
+    if (err) callback(err, null);
+    else callback(null, res);
+  });
+};
 
 // const setupConn = mysql.createConnection({
 //     host: "localhost",
@@ -195,13 +188,6 @@ const misConn= mysql.createConnection({
   database: 'magodmis',
   dateStrings: true,
 });
-
-
-
-
-
-
-
 
 const setupQueryMod = async (q,values, callback) => {
 
@@ -251,10 +237,6 @@ const setupQueryMod = async (q,values, callback) => {
 //     callback(error, null);
 //   }
 // };
-
-
-  
-
 
 // module.exports={dailyReportQuery, setupQuery,setupQueryMod,misQuery };
 module.exports={dailyReportQuery, setupQuery, hqQuery,setupQueryMod};
