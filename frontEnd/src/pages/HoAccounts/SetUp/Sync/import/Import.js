@@ -10,18 +10,18 @@ export default function Import() {
     <div>
       <div className="row">
         <div className="col-md-4 mb-3 col-sm-12">
-          <button className="button-style  group-button"style={{ width: "180px" }} >
+          <button className="button-style  group-button"style={{ width: "190px" }} >
             Import Open Sync File
           </button>
         </div>
         <div className="col-md-4 mb-3 col-sm-12" >
-          <button className="button-style  group-button" style={{ width: "100px" }} >
+          <button className="button-style  group-button" style={{ width: "110px" }} >
             Update Unit
           </button>
         </div>
       </div>
 
-      <Tabs>
+      <Tabs style={{fontSize: "13px"}}>
         <Tab eventKey="openInvoice" title="Open Invoice">
           <ImportOpenInvoice />
         </Tab>

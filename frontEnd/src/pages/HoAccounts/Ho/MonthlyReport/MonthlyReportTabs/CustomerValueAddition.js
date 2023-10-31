@@ -1,37 +1,63 @@
-import React from 'react'
-import { Table } from 'react-bootstrap'
+import React, { useState } from "react";
+import { Table } from "react-bootstrap";
 
-export default function CustomerValueAddition() {
+export default function CustomerValueAddition({ getAdditionValues }) {
+  const [selectRow, setSelectRow] = useState([]);
+
+  const selectedRowFun = (item, index) => {
+    let list = { ...item, index: index };
+    setSelectRow(list);
+  };
+
   return (
     <div>
-        <div style={{height:"400px",overflowY: "scroll",overflowX: "scroll",marginTop:"20px"}}>
-           <Table striped className="table-data border" style={{border:"1px"}}>
-                <thead className="tableHeaderBGColor">
-                <tr>
-                       <th style={{whiteSpace:"nowrap"}}>Customer Code</th>
-                       <th style={{whiteSpace:"nowrap"}}>Customer Name</th>
-                       <th style={{whiteSpace:"nowrap"}}>Total Billing</th>
-                       <th style={{whiteSpace:"nowrap"}}>Amount Received</th>
-                       <th>Balance</th>
-                       <th style={{whiteSpace:"nowrap"}}>Value Added</th>
-                       <th style={{whiteSpace:"nowrap"}}>Material Value</th>
-                       <th style={{whiteSpace:"nowrap"}}>Unit Name</th>
-                       <th>Cust_Code</th>
-                       <th>Cust_Name</th>
-                       <th style={{whiteSpace:"nowrap"}}>Total Billing</th>
-                       <th style={{whiteSpace:"nowrap"}}>Amount Received</th>
-                       <th style={{whiteSpace:"nowrap"}}>Value Added</th>
-                       <th style={{whiteSpace:"nowrap"}}>Material Value</th>
-                       <th>Period</th>
-                       <th>Outstanding</th>
-                        
+      <div
+        style={{
+          height: "260px",
+          overflowY: "scroll",
+          overflowX: "scroll",
+          marginTop: "20px",
+        }}
+      >
+        <Table striped className="table-data border" style={{ border: "1px" }}>
+          <thead className="tableHeaderBGColor">
+            <tr style={{ whiteSpace: "nowrap" }}>
+              <th>Customer Code</th>
+              <th>Customer Name</th>
+              <th>Total Billing</th>
+              <th>Amount Received</th>
+              <th>Balance</th>
+              <th>Value Added</th>
+              <th>Material Value</th>
+              <th>Unit Name</th>
+              <th>Period</th>
+              <th>Outstanding</th>
+            </tr>
+          </thead>
+          <tbody className="tablebody">
+            {getAdditionValues?.map((item, key) => {
+              return (
+                <tr
+                  style={{ whiteSpace: "nowrap" }}
+                  onClick={() => selectedRowFun(item, key)}
+                  className={key === selectRow?.index ? "selcted-row-clr" : ""}
+                >
+                  <td>{item.Cust_Code}</td>
+                  <td>{item.Cust_Name}</td>
+                  <td>{item.totalBilling}</td>
+                  <td>{item.AmountReceived}</td>
+                  <td></td>
+                  <td>{item.ValueAdded}</td>
+                  <td>{item.MaterialValue}</td>
+                  <td>{item.UnitName}</td>
+                  <td></td>
+                  <td></td>
                 </tr>
-                </thead>
-                 <tbody className='tablebody'>
-                  </tbody>
-          </Table>
-         </div>
-      
+              );
+            })}
+          </tbody>
+        </Table>
+      </div>
     </div>
-  )
+  );
 }

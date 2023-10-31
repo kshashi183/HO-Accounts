@@ -1,18 +1,25 @@
 var mysql = require("mysql2");
 
-// var dailyReport = mysql.createConnection({
-//   host: "localhost",
-//   user: "test",
-//   password: "test",
-//   database: 'magodmis',
-// });
+var dailyReport = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: 'magodmis',
+});
 
-// var setupConn = mysql.createConnection({
-//   host: "localhost",
-//   user: "test",
-//   password: "test",
-//   database: "magod_setup",
-// });
+var setupConn = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: "magod_setup",
+});
+
+var hqConnection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: 'magod_hq_mis',
+});
 
 // const setupConn = mysql.createConnection({
 //     host: "localhost",
@@ -156,14 +163,22 @@ var mysql = require("mysql2");
   let setupQuery = (q, callback) => {
     setupConn.connect();
     setupConn.query(q, (err, res, fields) => {
-      if (err) throw err;
-      callback(res);
+      if (err) {
+        callback(err, null); // Pass the error to the callback
+      } else {
+        callback(null, res); // Pass the result to the callback
+      }
     });
   };
   
+  let hqQuery = async (q, callback) => {
+    hqConnection.connect();
+    hqConnection.query(q, (err, res, fields) => {
+      if (err) callback(err, null);
+      else callback(null, res);
+    });
+  };
 
-
-  // const mysql = require("mysql2");
 
 // const setupConn = mysql.createConnection({
 //     host: "localhost",
@@ -173,13 +188,13 @@ var mysql = require("mysql2");
 //     dateStrings: true,
 // });
 
-const misConn= mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: 'magodmis',
-  dateStrings: true,
-});
+// const misConn= mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "root",
+//   database: 'magodmis',
+//   dateStrings: true,
+// });
 
 
 
@@ -188,57 +203,58 @@ const misConn= mysql.createConnection({
 
 
 
-const setupQueryMod = async (q,values, callback) => {
+// const setupQueryMod = async (q,values, callback) => {
 
-  try {
+//   try {
 
-    misConn.connect();
+//     misConn.connect();
 
-    misConn.query(q, values,(err, res, fields) => {
+//     misConn.query(q, values,(err, res, fields) => {
 
-      if (err) {
+//       if (err) {
 
-        console.log("err", err);
+//         console.log("err", err);
 
-        callback(err, null);
+//         callback(err, null);
 
-      } else {
+//       } else {
 
-       // console.log("result", res);
+//        // console.log("result", res);
 
-      callback(null, res);
+//       callback(null, res);
 
-      }
+//       }
 
-    });
+//     });
 
-  } catch (error) {
+//   } catch (error) {
 
-    callback(error, null);
+//     callback(error, null);
 
-  }
+//   }
 
-};
+// };
 
-const misQuery = async (q,values, callback) => {
-  try {
-    misConn.connect();
-    misConn.query(q, values,(err, res, fields) => {
-      if (err) {
-        console.log("err", err);
-        callback(err, null);
-      } else {
-       // console.log("result", res);
-      callback(null, res);
-      }
-    });
-  } catch (error) {
-    callback(error, null);
-  }
-};
+// const misQuery = async (q,values, callback) => {
+//   try {
+//     misConn.connect();
+//     misConn.query(q, values,(err, res, fields) => {
+//       if (err) {
+//         console.log("err", err);
+//         callback(err, null);
+//       } else {
+//        // console.log("result", res);
+//       callback(null, res);
+//       }
+//     });
+//   } catch (error) {
+//     callback(error, null);
+//   }
+// };
 
 
   
 
 
-module.exports={dailyReportQuery, setupQuery,setupQueryMod,misQuery };
+// module.exports={dailyReportQuery, setupQuery,setupQueryMod,misQuery };
+module.exports={dailyReportQuery, setupQuery, hqQuery};
