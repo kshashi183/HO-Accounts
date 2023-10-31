@@ -104,13 +104,13 @@ code {
   height: 60px !important;
 }
 
-.link-default {
-  /* background-color: #707075 !important; */
+/* .link-default {
+  background-color: #707075 !important;
   background: rgba(111, 115, 126, 0.3);
 
   text-decoration: none;
   color: white;
-}
+} */
 
 .active-link-url {
   height: 35px;
