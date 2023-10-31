@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap';
 import { Form } from 'react-bootstrap'
+import { baseURL } from '../../../../../api/baseUrl';
 
 export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag }) {
     const [paymentReceiptDetails, setPaymentReceiptDetails] = useState([])
@@ -17,7 +18,7 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
 
     const PaymentReceiptSubmit = () => {
         console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-        axios.get('http://localhost:3001/tallyExport/getPaymentReceipntData',
+        axios.get(baseURL+'/tallyExport/getPaymentReceipntData',
             {
                 params: {
                     date: selectedDate
@@ -34,7 +35,7 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
     }
 
     const paymentReceipt = (Recd_PVNo) => {
-        axios.get('http://localhost:3001/tallyExport/getPayment',
+        axios.get(baseURL+'/tallyExport/getPayment',
             {
                 params: {
                     Recd_PVNo: Recd_PVNo

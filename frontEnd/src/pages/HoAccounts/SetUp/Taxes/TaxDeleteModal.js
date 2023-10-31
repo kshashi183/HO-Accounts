@@ -3,13 +3,14 @@ import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { baseURL } from '../../../../api/baseUrl';
 
 export default function TaxDeleteModal({deleteID, setDeleteID, selectRow}) {
     const handleClose = () => {
         setDeleteID(false)
       }
       const deleteTaxID=(TaxID)=>{
-        axios.delete('http://localhost:3001/taxMaster/deleteTaxID/' + TaxID)
+        axios.delete(baseURL+'/taxMaster/deleteTaxID/' + TaxID)
         .then((res) => {
           console.log(res);
           if (res.data.Status === 'Success') {

@@ -181,45 +181,45 @@ let hqQuery = async (q, callback) => {
 //     dateStrings: true,
 // });
 
-// const misConn= mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "root",
-//   database: 'magodmis',
-//   dateStrings: true,
-// });
+const misConn= mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: 'magodmis',
+  dateStrings: true,
+});
 
-// const setupQueryMod = async (q,values, callback) => {
+const setupQueryMod = async (q,values, callback) => {
 
-//   try {
+  try {
 
-//     misConn.connect();
+    misConn.connect();
 
-//     misConn.query(q, values,(err, res, fields) => {
+    misConn.query(q, values,(err, res, fields) => {
 
-//       if (err) {
+      if (err) {
 
-//         console.log("err", err);
+        console.log("err", err);
 
-//         callback(err, null);
+        callback(err, null);
 
-//       } else {
+      } else {
 
-//        // console.log("result", res);
+       // console.log("result", res);
 
-//       callback(null, res);
+      callback(null, res);
 
-//       }
+      }
 
-//     });
+    });
 
-//   } catch (error) {
+  } catch (error) {
 
-//     callback(error, null);
+    callback(error, null);
 
-//   }
+  }
 
-// };
+};
 
 // const misQuery = async (q,values, callback) => {
 //   try {
@@ -239,4 +239,4 @@ let hqQuery = async (q, callback) => {
 // };
 
 // module.exports={dailyReportQuery, setupQuery,setupQueryMod,misQuery };
-module.exports = { dailyReportQuery, setupQuery, hqQuery };
+module.exports={dailyReportQuery, setupQuery, hqQuery,setupQueryMod};

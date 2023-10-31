@@ -4,6 +4,7 @@ import { Form } from 'react-bootstrap'
 import axios from 'axios';
 import xmljs from 'xml-js';
 import { useGlobalContext } from '../../../Context/Context';
+import { baseURL } from '../../../../../api/baseUrl';
 
 export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, setExportTally }) {
     const [invoiceListData, setInvoiceListData] = useState([]);
@@ -20,7 +21,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
 
 
     const invoiceListSubmit = () => {
-        axios.get('http://localhost:3001/tallyExport/getInvoiceData',
+        axios.get(baseURL+'/tallyExport/getInvoiceData',
             {
                 params: {
                     date: selectedDate
@@ -45,7 +46,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
 
     const invoiceTaxDetails = (dcNo) => {
         if (dcNo) {
-            axios.get('http://localhost:3001/tallyExport/getInvoiceTaxDetails',
+            axios.get(baseURL+'/tallyExport/getInvoiceTaxDetails',
                 {
                     params: {
                         DC_Inv_No: dcNo

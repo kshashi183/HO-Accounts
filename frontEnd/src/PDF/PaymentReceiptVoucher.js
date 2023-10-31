@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import MagodLogo from '../Logo/MagodLogo.png'
+import { baseURL } from '../api/baseUrl';
 
 const styles = {
     heading: {
@@ -56,10 +57,8 @@ const PaymentReceiptVoucherPdf = React.forwardRef((props, ref) => {
   const [Tabledata, setTabledata] = useState([]);
  
   useEffect(() => {
-    // axios
-    //   .get("http://localhost:9006/paymentreceiptvoucher")
-    //   .then((res) => setTabledata(res.data));
-    axios.get('http://localhost:3001/unitReceiptList/getInvoices', {
+    
+    axios.get(baseURL+'/unitReceiptList/getInvoices', {
       params: {
           RecdPVID: props.selectRow.RecdPVID
       },

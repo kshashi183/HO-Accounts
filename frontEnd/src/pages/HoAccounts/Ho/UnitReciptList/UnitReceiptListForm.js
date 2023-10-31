@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import ReactToPrint from 'react-to-print';
 import PaymentReceiptVoucherPdf from '../../../../PDF/PaymentReceiptVoucher';
 import { useNavigate, } from 'react-router-dom';
+import { baseURL } from '../../../../api/baseUrl';
 
 export default function UnitReceiptListForm() {
 
@@ -35,7 +36,7 @@ export default function UnitReceiptListForm() {
     
 
     const getInvoiceList = () => {
-        axios.get('http://localhost:3001/unitReceiptList/getInvoices', {
+        axios.get(baseURL+'/unitReceiptList/getInvoices', {
             params: {
                 RecdPVID: selectRow.RecdPVID
             },
@@ -51,7 +52,7 @@ export default function UnitReceiptListForm() {
     }
 
     const handleOpenInvoice = () => {
-        axios.get('http://localhost:3001/unitReceiptList/getOpenInvoices', {
+        axios.get(baseURL+'/unitReceiptList/getOpenInvoices', {
             params: {
                 Cust_code: selectRow.Cust_code
             },

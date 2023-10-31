@@ -6,6 +6,7 @@ import {toast} from 'react-toastify';
  
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
+import { baseURL } from '../../../../api/baseUrl';
 
 export default function DeleteButtonModal({ setDeleteModal, deleteModal, selectRow }) {
   // console.log("deklt", selectRow);
@@ -17,13 +18,13 @@ export default function DeleteButtonModal({ setDeleteModal, deleteModal, selectR
  // console.log("sel del", selectRow);
   const deleteUnitData = (UnitID) => {
     console.log(UnitID,"uuuuuuu");
-    axios.delete('http://localhost:3001/unitlist/deleteUnit/' + UnitID)
+    axios.delete(baseURL+'/unitlist/deleteUnit/' + UnitID)
       .then((res) => {
         console.log(res);
         if (res.data.Status === 'Success') {
           setDeleteModal(false);
         //  alert("deleted successful")
-          toast.warn("Deleted Successful");
+          toast.warn("Unit Deleted Successfully");
           setTimeout(() => {
 
             window.location.reload();

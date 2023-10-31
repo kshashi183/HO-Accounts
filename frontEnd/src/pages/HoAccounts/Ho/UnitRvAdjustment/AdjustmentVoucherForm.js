@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import Adjustment_Tables from './Adjustment_Tables';
+import { baseURL } from '../../../../api/baseUrl';
 
 export default function AdjustmentVoucherForm() {
     const location = useLocation();
@@ -22,7 +23,7 @@ export default function AdjustmentVoucherForm() {
 
     const adjustmentVoucher = () => {
         if(selectRow && selectRow.Cust_code){
-            axios.get('http://localhost:3001/unitRV_Adjustment/openInvoices', {
+            axios.get(baseURL+'/unitRV_Adjustment/openInvoices', {
                 params: {
                     selectedCustCode: selectRow.Cust_code
                 },

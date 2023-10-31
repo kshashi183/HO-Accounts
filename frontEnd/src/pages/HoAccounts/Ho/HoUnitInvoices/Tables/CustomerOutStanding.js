@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap'
 import CustomerOutStandingTable02 from './CustomerOutStandingTable02'
 import axios from 'axios';
+import { baseURL } from '../../../../../api/baseUrl';
 
 export default function CustomerOutStanding({ selectedCustCode,searchQuery }) {
 
@@ -11,7 +12,7 @@ export default function CustomerOutStanding({ selectedCustCode,searchQuery }) {
     useEffect(() => {
         // basedOnCustomer();
         if (selectedCustCode) {
-            axios.get('http://localhost:3001/customerOutstanding/getDataBasedOnCustomer',
+            axios.get(baseURL+'/customerOutstanding/getDataBasedOnCustomer',
                 {
                     params: {
                         selectedCustCode: selectedCustCode

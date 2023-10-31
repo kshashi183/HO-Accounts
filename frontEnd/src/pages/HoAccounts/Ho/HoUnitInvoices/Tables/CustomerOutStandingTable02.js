@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap'
+import { baseURL } from '../../../../../api/baseUrl';
 
 export default function CustomerOutStandingTable02({selectedCustCode,selectedDCInvNo}) {
     const [table2Data, setTable2Data]=useState([]);
@@ -12,7 +13,7 @@ export default function CustomerOutStandingTable02({selectedCustCode,selectedDCI
     console.log("dc", selectedDCInvNo);
     const table2=()=>{
         if(selectedDCInvNo){
-        axios.get('http://localhost:3001/customerOutstanding/getDataTable2',
+        axios.get(baseURL+'/customerOutstanding/getDataTable2',
         {
             params: {
                 selectedDCInvNo: selectedDCInvNo

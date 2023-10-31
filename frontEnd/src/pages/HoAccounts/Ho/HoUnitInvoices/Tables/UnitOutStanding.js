@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap'
+import { baseURL } from '../../../../../api/baseUrl';
 
 export default function UnitOutStanding() {
 
@@ -12,7 +13,7 @@ export default function UnitOutStanding() {
 
     const getDataSubmit = () => {
 
-        axios.get('http://localhost:3001/customerOutstanding/unitOutstandingData',
+        axios.get(baseURL+'/customerOutstanding/unitOutstandingData',
 
         )
             .then((res) => {

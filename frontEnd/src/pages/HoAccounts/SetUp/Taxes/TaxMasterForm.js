@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
 import { format, parse } from 'date-fns';
+import { baseURL } from '../../../../api/baseUrl';
 
 
 
@@ -31,7 +32,7 @@ export default function TaxMasterForm() {
 
     useEffect(() => {
 
-        axios.get('http://localhost:3001/taxMaster/getTaxData')
+        axios.get(baseURL+'/taxMaster/getTaxData')
             .then((res) => {
                 // console.log("unitdata",res.data);
                 if (res.data.Status === 'Success') {
@@ -94,7 +95,7 @@ export default function TaxMasterForm() {
             }
 
             else {
-                axios.put('http://localhost:3001/taxMaster/taxDataUpdate/' + selectRow.TaxID, selectRow)
+                axios.put(baseURL+'/taxMaster/taxDataUpdate/' + selectRow.TaxID, selectRow)
                     .then((res) => {
                         console.log("hiiiiiiiiiii");
                         console.log("update tax", res.data.status);
@@ -135,7 +136,7 @@ export default function TaxMasterForm() {
             }
 
             else {
-                axios.post('http://localhost:3001/taxMaster/postTaxMaster', taxPostData)
+                axios.post(baseURL+'/taxMaster/postTaxMaster', taxPostData)
                     .then((res) => {
                         if (res.data.status === 'fail') {
 

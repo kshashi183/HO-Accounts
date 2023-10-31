@@ -3,6 +3,7 @@ import { Table } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Typeahead } from 'react-bootstrap-typeahead';
+import { baseURL } from '../../../../api/baseUrl';
 
 export default function OpenVoucher() {
 
@@ -27,7 +28,7 @@ export default function OpenVoucher() {
       }, [selectRow]);
 
     const customers = () => {
-        axios.get('http://localhost:3001/unitReceiptList/getcustomerdata')
+        axios.get(baseURL+'/unitReceiptList/getcustomerdata')
             .then((res) => {
                 setGetCustomers(res.data.Result)
             })
@@ -38,7 +39,7 @@ export default function OpenVoucher() {
 
 
     const basedOnCustomer=()=>{
-        axios.get('http://localhost:3001/unitReceiptList/receiptBasedOnCustomer', {
+        axios.get(baseURL+'/unitReceiptList/receiptBasedOnCustomer', {
             params: {
                 selectedCustCode: selectedCustCode
             },
