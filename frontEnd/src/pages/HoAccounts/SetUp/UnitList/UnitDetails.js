@@ -38,7 +38,7 @@ export default function UnitDetails() {
 
   const [stateList, setStateList] = useState([]);
   const getStateList = () => {
-    axios.get('http://localhost:3001/unitlist/getStates').
+    axios.get(baseURL+'/unitlist/getStates').
       then((res) => {
         // console.log(res.data.Result);
         setStateList(res.data.Result)
