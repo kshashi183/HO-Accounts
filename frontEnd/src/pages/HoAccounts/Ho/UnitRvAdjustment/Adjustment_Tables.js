@@ -19,7 +19,7 @@ export default function Adjustment_Tables({ openInvoice, selectRow }) {
         adjustmentVoucher();
         
         if (Array.isArray(openInvoice)) {
-            // Initialize the table data with the openInvoice data
+            
             setTableData(openInvoice);
         }
     }, [openInvoice,selectedCustCode,selectRow.Cust_code])
