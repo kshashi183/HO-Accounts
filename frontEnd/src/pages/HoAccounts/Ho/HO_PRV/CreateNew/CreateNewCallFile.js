@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "../../../../../api/baseUrl";
 
 export default function CreateNewCallFile() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function CreateNewCallFile() {
 
   const handleUnitNames = () => {
     axios
-      .post("http://localhost:3001/hoCreateNew/unitNames")
+      .post(baseURL + "/hoCreateNew/unitNames")
       .then((res) => {
         setGetUnitNames(res.data);
       })
@@ -61,7 +62,7 @@ export default function CreateNewCallFile() {
 
   const handleCustomerNames = () => {
     axios
-      .post("http://localhost:3001/hoCreateNew/customerNames")
+      .post(baseURL + "/hoCreateNew/customerNames")
       .then((res) => {
         setGetCustNames(res.data);
       })
