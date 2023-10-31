@@ -11,6 +11,7 @@ import ReactToPrint from 'react-to-print';
 // import PreviewReportPdf from '../../../../../PDF/PreviewReportPdf';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import PreviewReportPdf from '../../../../../PDF/PreviewReportPdf';
+import { baseURL } from '../../../../../api/baseUrl';
 // import PreviewReportPdf from '../../../../../../PDF/PreviewReportPdf';
 
 
@@ -71,7 +72,7 @@ export default function TabData() {
   // }
   const getCustomerData = () => {
    
-    axios.get('http://localhost:3001/customerOutstanding/getCustomers')
+    axios.get(baseURL+'/customerOutstanding/getCustomers')
       .then((res) => {
         console.log("get customers", res.data.Result);
         setCustomersData(res.data.Result)

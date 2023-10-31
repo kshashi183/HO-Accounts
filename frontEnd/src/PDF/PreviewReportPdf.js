@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
 import MagodLogo from '../Logo/MagodLogo.png'
+import { baseURL } from '../api/baseUrl';
 
 const styles = {
   heading: {
@@ -73,13 +74,13 @@ const PreviewReportPdf = React.forwardRef((props, ref) => {
 
   const pdfHeader = () => {
     axios
-      .get("http://localhost:9006/previewreportdata")
+      .get(baseURL+"/previewreportdata")
       .then((res) => setTabledata(res.data));
   }
 
   const pdfMainData = () => {
     if (selectedCustCode) {
-      axios.get('http://localhost:3001/customerOutstanding/getDataBasedOnCustomer',
+      axios.get(baseURL+'/customerOutstanding/getDataBasedOnCustomer',
         {
           params: {
             selectedCustCode: selectedCustCode

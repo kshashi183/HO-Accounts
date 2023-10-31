@@ -3,6 +3,7 @@ import { Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Typeahead } from 'react-bootstrap-typeahead';
+import { baseURL } from '../../../../api/baseUrl';
 
 const initial={
     HoRefDate:'', TxnType:'', Amount:'', Description:'',HORef:'', Status:''
@@ -23,7 +24,7 @@ export default function RvAdjustmentForm() {
 
     const AdjsutmentSubmit = () => {
         if (showAll) {
-            axios.get('http://localhost:3001/unitRV_Adjustment/rvAdjustment',)
+            axios.get(baseURL+'/unitRV_Adjustment/rvAdjustment',)
                 .then((res) => {
                     setRvAdjustmentData(res.data.Result)
                     console.log("111 all customers");
@@ -34,7 +35,7 @@ export default function RvAdjustmentForm() {
         }
         else {
           console.log("custcode", selectedCustCode);
-            axios.get('http://localhost:3001/unitRV_Adjustment/rvAdjustment', {
+            axios.get(baseURL+'/unitRV_Adjustment/rvAdjustment', {
                 params: {
                     selectedCustCode: selectedCustCode
                 },
@@ -51,7 +52,7 @@ export default function RvAdjustmentForm() {
     }
 
     const getCustomersSubmit = () => {
-        axios.get('http://localhost:3001/unitRV_Adjustment/getCustomers')
+        axios.get(baseURL+'/unitRV_Adjustment/getCustomers')
             .then((res) => {
                 setGetCustomer(res.data.Result)
                 //console.log("cust", res.data.Result);

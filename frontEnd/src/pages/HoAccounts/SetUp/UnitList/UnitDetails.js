@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
+import { baseURL } from "../../../../api/baseUrl";
 
 // import { Axios } from "axios";
 
@@ -53,7 +54,7 @@ export default function UnitDetails() {
 
 
   const insertData = () => {
-    axios.post('http://localhost:3001/unitlist/postUnitDetails', postData)
+    axios.post(baseURL+'/unitlist/postUnitDetails', postData)
       .then((res) => {
         if (res.data.status === 'fail') {
           setThreadModal(true);
@@ -93,7 +94,7 @@ export default function UnitDetails() {
       }
       else if (postData.PIN === '' && postData.Unit_GSTNo === '') {
         // Either PIN or GSTNo is empty, so insert data successfully
-        const response = await axios.post('http://localhost:3001/unitlist/postUnitDetails', postData);
+        const response = await axios.post(baseURL+'/unitlist/postUnitDetails', postData);
         if (response.data.status === 'success') {
           toast.success('Jigani Unit added Successfully');
           setTimeout(() => {
@@ -178,7 +179,7 @@ export default function UnitDetails() {
 
   const UnitGetDta = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/unitlist/getUnitData');
+      const response = await axios.get(baseURL+'/unitlist/getUnitData');
       if (response.data.Status === 'Success') {
        // console.log("dataaaa", response.data.Result);
         setGetUnit(response.data.Result);

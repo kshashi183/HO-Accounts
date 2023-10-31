@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Table, Toast } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import { baseURL } from '../../../../api/baseUrl';
 
 
 export default function Adjustment_Tables({ openInvoice, selectRow }) {
@@ -69,7 +70,7 @@ console.log("update ", tableData);
 
             // Make sure a DC_Inv_No is selected before sending the update request
 
-            axios.post(`http://localhost:3001/unitRV_Adjustment/invoiceInsert`, {
+            axios.post(baseURL+`/unitRV_Adjustment/invoiceInsert`, {
                 selectedDCInvNos,
                 tableData: selectedRows, // Send only the selected rows
             })
@@ -91,7 +92,7 @@ console.log("update ", tableData);
 
 
     const getCustomersSubmit = () => {
-        axios.get('http://localhost:3001/unitRV_Adjustment/getCustomers')
+        axios.get(baseURL+'/unitRV_Adjustment/getCustomers')
             .then((res) => {
                 setGetCustomer(res.data.Result)
                 //console.log("cust", res.data.Result);
@@ -123,7 +124,7 @@ console.log("update ", tableData);
 
 const[selectCustData, setSelectCustData]=useState([]);
     const adjustmentVoucher = () => {
-        axios.get('http://localhost:3001/unitRV_Adjustment/openInvoices', {
+        axios.get(baseURL+'/unitRV_Adjustment/openInvoices', {
             params: {
                 selectedCustCode: selectedCustCode
             },

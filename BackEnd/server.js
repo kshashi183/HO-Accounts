@@ -41,23 +41,23 @@ app.listen(process.env.PORT, () => {
 
 // const unitlist = require('./routes/unitAccounts/SetUp/UnitList');
 
-// const unitlist = require('./routes/HOAccounts/SetUp/UnitList')
-// app.use('/unitlist', unitlist)
+const unitlist = require('./routes/HOAccounts/SetUp/UnitList')
+app.use('/unitlist', unitlist)
 
  
 
-// const taxMaster=require('./routes/HOAccounts/SetUp/TaxMaster')
-// app.use('/taxMaster', taxMaster)
+const taxMaster=require('./routes/HOAccounts/SetUp/TaxMaster')
+app.use('/taxMaster', taxMaster)
 
  
 
-// const billingDetails= require('./routes/HOAccounts/Invoice/Daily/Billing_Details')
-// app.use('/billingDetails', billingDetails)
+const billingDetails= require('./routes/HOAccounts/Invoice/Daily/Billing_Details')
+app.use('/billingDetails', billingDetails)
 
  
 
-// const customerOutstanding=require('./routes/HOAccounts/Unit/Customer_OutStanding')
-// app.use('/customerOutstanding',customerOutstanding)
+const customerOutstanding=require('./routes/HOAccounts/Unit/Customer_OutStanding')
+app.use('/customerOutstanding',customerOutstanding)
 
  
 

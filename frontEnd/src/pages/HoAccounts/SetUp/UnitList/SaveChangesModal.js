@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
+import { baseURL } from '../../../../api/baseUrl';
 
 
 export default function SaveChangesModal(
@@ -19,7 +20,7 @@ export default function SaveChangesModal(
 
 
   const insertData = () => {
-    Axios.put('http://localhost:3001/unitlist/updateData/' + selectRow.UnitID, selectRow)
+    Axios.put(baseURL+'/unitlist/updateData/' + selectRow.UnitID, selectRow)
       .then((res) => {
         if (res.data.status === 'fail') {
           alert('Unit_Name must be Unique');
