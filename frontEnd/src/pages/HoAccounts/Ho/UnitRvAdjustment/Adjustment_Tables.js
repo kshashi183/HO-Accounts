@@ -24,8 +24,6 @@ export default function Adjustment_Tables({ openInvoice, selectRow }) {
         }
     }, [openInvoice,selectedCustCode,selectRow.Cust_code])
 
-
-
     const [tableData, setTableData] = useState([]);
 
 
