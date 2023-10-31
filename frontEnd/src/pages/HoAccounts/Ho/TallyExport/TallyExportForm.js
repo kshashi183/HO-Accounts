@@ -17,6 +17,7 @@ export default function TallyExportForm() {
   useEffect(() => {
 
   }, [])
+  
   const onLoadDataClick = () => {
     setFlag(true);
   }
@@ -66,38 +67,32 @@ export default function TallyExportForm() {
                
               </div>
 
-
-              <div className='row col-md-9 '>
-                <button className="button-style  group-button col-md-3 "
-                  onClick={onLoadDataClick}  >
+              <button className="button-style  group-button col-md-2 "
+                  onClick={onLoadDataClick} style={{ width: "140px" }} >
                   Load Data
                 </button>
 
-                <button className="button-style  group-button col-md-3"
-                  style={{ width: "150px" }}
+                <button className="button-style  group-button col-md-2"
+                  style={{ width: "140px" }}
                   onClick={tallyExportSubmit}
                 >
                   Export To Tally
                 </button>
-
-                {/* <button className="button-style  group-button col-md-3"
-               
-                >
-                  Sync Report
-                </button> */}
-                <button className="button-style  group-button col-md-3"
-                  style={{ width: '80px' }}
+                <button className="button-style  group-button col-md-2"
+                  style={{ width: '130px' }}
                   onClick={e => navigate("/home")}>
                   Close
                 </button>
-              </div>
+
+              
 
             </div>
           </div>
         </div>
       </div>
       <hr className="horizontal-line" />
-      <TallyExportTabs selectedDate={selectedDate} flag={flag} setFlag={setFlag} exportTally={exportTally} />
+      <TallyExportTabs selectedDate={selectedDate} flag={flag} setFlag={setFlag} 
+      exportTally={exportTally} setExportTally={setExportTally}/>
     </div>
   );
 }

@@ -27,22 +27,9 @@ export default function TaxMasterForm() {
     const [taxData, setTaxData] = useState([]);
     const [deleteID, setDeleteID] = useState(false);
     const [taxPostData, setTaxPostData] = useState(initial);
-    useEffect(() => {
 
-        // axios.get('http://localhost:3001/taxMaster/getTaxData')
-        //   .then((res) => {
-        //     // console.log("unitdata",res.data);
-        //     if (res.data.Status === 'Success') {
-        //        // console.log("dataaaa", res.data.Result);
-        //        const updatedData = res.data.Result.map(item => ({
-        //         ...item,
-        //         EffectiveFrom: format(parseISO(item.EffectiveFrom), 'MM-dd-yyyy'),
-        //         EffectiveTO: format(parseISO(item.EffectiveTO),'MM-dd-yyyy')
-        //       }));
-        //       setTaxData(updatedData)
-        //     }
-        //   })
-        //   .catch(err => console.log(err))
+
+    useEffect(() => {
 
         axios.get('http://localhost:3001/taxMaster/getTaxData')
             .then((res) => {
@@ -67,7 +54,7 @@ export default function TaxMasterForm() {
         setState(true);
 
     }
-    //   console.log("sel", selectRow);
+
 
     const handleOnChange = (e) => {
 
@@ -96,10 +83,10 @@ export default function TaxMasterForm() {
             }
         }
     }
-    //console.log("updata", selectRow);
+
     const updateTaxData = () => {
         if (selectRow.Tax_Percent === '') {
-        toast("Tax_Percent can not be empty")
+            toast("Tax_Percent can not be empty")
         }
         else
             if (selectRow.EffectiveFrom === '' || selectRow.EffectiveTO === '') {
@@ -111,11 +98,9 @@ export default function TaxMasterForm() {
                     .then((res) => {
                         console.log("hiiiiiiiiiii");
                         console.log("update tax", res.data.status);
-                        // toast.success(`updated Successfully`);
-                        //   window.location.reload();
-                        alert("fghj")
+                        
                         toast.success("Updated successfully!");
-                        // 3000 milliseconds = 3 seconds
+                      
                         setTimeout(() => {
 
                             window.location.reload();
@@ -136,6 +121,8 @@ export default function TaxMasterForm() {
     }
 
 
+
+
     const postTaxSubmit = () => {
         console.log("POST", taxPostData);
 
@@ -152,7 +139,7 @@ export default function TaxMasterForm() {
                     .then((res) => {
                         if (res.data.status === 'fail') {
 
-                            // alert('Threading Error:Column UnitName is constrained  to be Unique value UnitName is already present');
+                            
                         }
                         else if (res.data.status === 'query') {
                             console.log("22");
@@ -160,21 +147,15 @@ export default function TaxMasterForm() {
                             toast.warn("You must add TaxPercent and Date fields")
                         }
                         else if (res.data.status === 'success') {
-                            //  console.log("33");
+                            
                             toast.success("Posted Successfully");
-                            // 3000 milliseconds = 3 seconds
+                    
                             setTimeout(() => {
 
                                 window.location.reload();
 
                             }, 1000);
-                            //   alert("data posted successfuly ")
-                            // toast.success(" data posted successfully!");
-                            //  window.location.reload();
-
-                            //  console.log('res in frontend', res.data);
-
-
+                            
                         }
 
                     }).catch((err) => {
@@ -185,20 +166,8 @@ export default function TaxMasterForm() {
             }
     }
 
-    console.log("eff from", selectRow.EffectiveFrom);
-    console.log("POST", taxPostData);
 
-   
-    
-    // In your component:
 
-    
-    
-    
-    
-    
-    
-    
     return (
 
         <div>
@@ -256,7 +225,7 @@ export default function TaxMasterForm() {
                                                             <td>{item.FormattedEffectiveFrom}</td>
                                                             <td>{item.FormattedEffectiveTO}</td>
 
-                                                            <td style={{whiteSpace:'nowrap'}}>{item.AcctHead}</td>
+                                                            <td style={{ whiteSpace: 'nowrap' }}>{item.AcctHead}</td>
 
                                                             <td><input type="checkbox" checked={item.Service === 1} /></td>
                                                             <td><input type="checkbox" checked={item.Sales === 1} /></td>
@@ -366,23 +335,28 @@ export default function TaxMasterForm() {
 
                             <div className="col-md-12 ">
                                 <label className="form-label">Effective From</label>
-                                <input  name='EffectiveFrom'
+                                <input name='EffectiveFrom'
                                     type='date'
                                     value={selectRow.EffectiveFrom || taxPostData.EffectiveFrom}
-                                    pattern="\d{2}/\d{2}/\d{4}" placeholder="dd/mm/yyyy" id="dateInput"
-                                   // value={formatDate(selectRow.EffectiveFrom || taxPostData.EffectiveFrom)}
+                         
                                     onChange={handleOnChange}
                                 />
 
                             </div>
 
-                            <div className="col-md-12 ">
+
+                            <div className="col-md-12">
                                 <label className="form-label">Effective To</label>
-                                <input className=" " value={selectRow.EffectiveTO || taxPostData.EffectiveTO}
-                                    onChange={handleOnChange} name='EffectiveTO'
+                                <input
+                                    className=""
+                                    value={(selectRow.EffectiveTO || taxPostData.EffectiveTO)}
+                                    onChange={handleOnChange}
+                                    name='EffectiveTO'
                                     type='date'
+
                                 />
                             </div>
+
 
                             <div className="col-md-12 ">
                                 <label className="form-label">LedgerName</label>
@@ -399,7 +373,7 @@ export default function TaxMasterForm() {
                             </div>
 
                             <div className='row col-md-12'>
-                                <div className='row col-md-6 ' style={{}}>
+                                <div className='row col-md-6 ' >
 
                                     <input className="mt-3 col-md-3  custom-checkbox "
                                         type="checkbox"
@@ -407,13 +381,13 @@ export default function TaxMasterForm() {
                                         name='Service'
                                         id="flexCheckDefault" onChange={handleOnChange} />
 
-                                    <div className=' col-md-2' style={{}}>
+                                    <div className=' col-md-2' >
 
                                         <label className="form-label" style={{ whiteSpace: 'nowrap' }}>Service</label>
                                     </div>
                                 </div>
 
-                                <div className='row col-md-6' style={{}}>
+                                <div className='row col-md-6' >
 
                                     <input className="mt-3 col-md-3  custom-checkbox"
                                         type="checkbox"
@@ -421,14 +395,14 @@ export default function TaxMasterForm() {
                                         name='Sales'
                                         id="flexCheckDefault" onChange={handleOnChange} />
 
-                                    <div className=' col-md-2' style={{}}>
+                                    <div className=' col-md-2' >
 
                                         <label className="form-label" style={{ whiteSpace: 'nowrap' }}>Sales</label>
                                     </div>
                                 </div>
 
 
-                                <div className='row col-md-6' style={{}}>
+                                <div className='row col-md-6' >
 
                                     <input className="mt-3 col-md-3  custom-checkbox"
                                         type="checkbox"
@@ -436,14 +410,14 @@ export default function TaxMasterForm() {
                                         name='JobWork' onChange={handleOnChange}
                                         id="flexCheckDefault" />
 
-                                    <div className=' col-md-5' style={{}}>
+                                    <div className=' col-md-5' >
 
                                         <label className="form-label" style={{ whiteSpace: 'nowrap' }}>Job Work</label>
                                     </div>
                                 </div>
 
 
-                                <div className='row col-md-6' style={{}}>
+                                <div className='row col-md-6'>
 
                                     <input className="mt-3 col-md-3  custom-checkbox"
                                         type="checkbox"
@@ -459,7 +433,7 @@ export default function TaxMasterForm() {
 
 
 
-                                <div className='row col-md-12' style={{}}>
+                                <div className='row col-md-12' >
 
                                     <input className="mt-3 col-md-1 ms-1  custom-checkbox"
                                         type="checkbox"
@@ -467,7 +441,7 @@ export default function TaxMasterForm() {
                                         name='TallyAcctCreated' onChange={handleOnChange}
                                         id="flexCheckDefault" />
 
-                                    <div className=' col-md-6' style={{}}>
+                                    <div className=' col-md-6' >
 
                                         <label className="form-label" style={{ whiteSpace: 'nowrap' }}>Tally Updated</label>
                                     </div>
@@ -476,20 +450,14 @@ export default function TaxMasterForm() {
                                     <button type='button'
                                         className={selectRow.TaxName === '' ? 'disabled-button' : 'button-style  group-button'}
                                         disabled={selectRow.TaxName === ''}
-                                        style={{ width: '100px',  }} onClick={updateTaxData}>
+                                        style={{ width: '100px', }} onClick={updateTaxData}>
                                         Update
                                     </button>
                                 </div>
 
-                               
-
-
                                 <div>
 
-
-
                                 </div>
-
 
                             </div>
                         </div>

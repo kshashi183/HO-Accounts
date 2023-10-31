@@ -5,57 +5,55 @@ import axios from 'axios';
 import xmljs from 'xml-js';
 import { useGlobalContext } from '../../../Context/Context';
 
-export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }) {
+export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, setExportTally }) {
     const [invoiceListData, setInvoiceListData] = useState([]);
     const [taxInvoiceData, setTaxInvoiceData] = useState([]);
 
-   
+
     useEffect(() => {
+        setExportTally(false);
         if (selectedDate) {
             invoiceListSubmit();
         }
-
-
     }, [selectedDate, exportTally])
 
 
 
     const invoiceListSubmit = () => {
-        console.log("hiiiiiiiiiiiiii");
         axios.get('http://localhost:3001/tallyExport/getInvoiceData',
             {
                 params: {
                     date: selectedDate
                 }
-            } 
+            }
         )
             .then((res) => {
-                
+
                 setInvoiceListData(res.data.Result)
             })
             .catch((err) => {
                 console.log("err", err);
             })
 
-            if(exportTally){
-                handleExport();
-            }
+        // if(exportTally){
+        //     handleExport();
+        // }
     }
+
+
 
 
     const invoiceTaxDetails = (dcNo) => {
         if (dcNo) {
-            console.log("jjjjjjjjj");
-
             axios.get('http://localhost:3001/tallyExport/getInvoiceTaxDetails',
                 {
                     params: {
                         DC_Inv_No: dcNo
                     }
-                }  
+                }
             )
                 .then((res) => {
-                  
+
                     setTaxInvoiceData(res.data.Result)
                 })
                 .catch((err) => {
@@ -63,17 +61,11 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }
                 })
 
         }
-
-
-
     }
 
     const [selectRow, setSelectRow] = useState('');
     const selectedRowFun = (item, index) => {
         let list = { ...item, index: index }
-     
-
-
         setSelectRow(list);
 
         invoiceTaxDetails(item.DC_Inv_No)
@@ -85,7 +77,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }
             const parts = dateString.split('-');
             if (parts.length === 3) {
                 const [yy, dd, mm] = parts;
-                // Rearrange the parts to create the new format
+
                 return `${dd}/${mm}/${yy}`;
             }
         }
@@ -121,7 +113,6 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }
 
     const handleExport = () => {
         const xml = tableToXml();
-
         const blob = new Blob([xml], { type: 'application/xml' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -132,11 +123,15 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }
     };
 
 
+    if (exportTally) {
+        handleExport();
+    }
+
     return (
         <>
             <div className='row col-md-12'>
                 <div className='col-md-6' style={{ height: '700px', overflowX: 'scroll', overflowY: 'scroll' }}>
-                   
+
                     <Table striped className="table-data border">
                         <thead className="tableHeaderBGColor">
                             <tr style={{ whiteSpace: 'nowrap' }}>
@@ -163,7 +158,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }
                                         <tr
                                             onClick={() => selectedRowFun(item, key)}
                                             className={key === selectRow?.index ? 'selcted-row-clr' : ''}
-                                            style={{ whiteSpace: 'nowrap', backgroundColor:'#FF7F50'}}>
+                                            style={{ whiteSpace: 'nowrap', backgroundColor: '#FF7F50' }}>
 
                                             <td>{<input type='checkBox' disabled />}</td>
                                             <td>{item.BillType}</td>
@@ -216,8 +211,8 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }
 
                                     <div className=" col-md-6">
                                         <label className='form-label col-md-5'>PN Date</label>
-                                        <input class="" type="text" 
-                                        value={convertDateFormat(selectRow.Inv_Date)}
+                                        <input class="" type="text"
+                                            value={convertDateFormat(selectRow.Inv_Date)}
                                             disabled style={{ fontSize: "13px" }} />
                                     </div>
                                 </div>
@@ -249,11 +244,6 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally }
                                 </div>
 
                             </div>
-
-
-
-
-
 
 
                             <div className="row mt-1">

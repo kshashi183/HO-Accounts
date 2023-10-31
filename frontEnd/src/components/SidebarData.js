@@ -96,9 +96,9 @@ export const customerSidebar = [
         path: "/HOAccounts/HO/MonthlyReport",
       },
       {
-        title: "Unit_Rv_Adjustment",
+        title: "Unit_RV_Adjustment",
         icon: <SiHackthebox />,
-        path: "/HOAccounts/HO/RvAdjustment",
+        path: "/HOAccounts/HO/RVAdjustment",
       },
       {
         title: "Tally_Export",

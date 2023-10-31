@@ -51,6 +51,7 @@ export default function UnitDetails() {
   // })
   const [postData, setPostData] = useState(initial)
 
+
   const insertData = () => {
     axios.post('http://localhost:3001/unitlist/postUnitDetails', postData)
       .then((res) => {
@@ -66,7 +67,7 @@ export default function UnitDetails() {
         else if (res.data.status === 'success') {
 
 
-          toast.success(" Posted Successfully")
+          toast.success(" Jigani Unit added Successfully")
 
           setTimeout(() => {
 
@@ -81,77 +82,83 @@ export default function UnitDetails() {
         console.log('eroor in fromntend', err);
       })
   }
-
-
-  
-
-const handleSubmit = async () => {
-  try {
-    if (postData.UnitID === '' || postData.Name === '') {
-      toast.warn('Please add UnitId and UnitName');
-    } 
-    else if (postData.UnitIntial.length > 3) {
-      console.log(postData.UnitIntial.length, 'pos');
-      toast.warn('Unit_Intial Length must be less than 3');
-    }
-    else if (postData.PIN === '' && postData.Unit_GSTNo === '') {
-      // Either PIN or GSTNo is empty, so insert data successfully
-      const response = await axios.post('http://localhost:3001/unitlist/postUnitDetails', postData);
-      if (response.data.status === 'success') {
-        toast.success('Posted Successfully');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      } else if (response.data.status === 'fail') {
-        setThreadModal(true);
-      } else {
-       
-        toast.warn('Data is not posted');
+  const handleSubmit = async () => {
+    try {
+      if (postData.UnitID === '' || postData.Name === '') {
+        toast.warn('Please add UnitId and UnitName');
       }
-    } 
+      else if (postData.UnitIntial.length > 3) {
+        console.log(postData.UnitIntial.length, 'pos');
+        toast.warn('Unit_Intial Length must be less than 3');
+      }
+      else if (postData.PIN === '' && postData.Unit_GSTNo === '') {
+        // Either PIN or GSTNo is empty, so insert data successfully
+        const response = await axios.post('http://localhost:3001/unitlist/postUnitDetails', postData);
+        if (response.data.status === 'success') {
+          toast.success('Jigani Unit added Successfully');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } else if (response.data.status === 'fail') {
+          setThreadModal(true);
+        } else {
 
-    
-    else if (postData.PIN !== '' && postData.Unit_GSTNo !== '') {
-      if (validateGstNumber(postData.Unit_GSTNo) && validatePIN(postData.PIN)) {
-        // Both PIN and GSTNo have data and pass validation
-        insertData(); // You should implement this function to insert the data
-      } else {
-        if (!validatePIN(postData.PIN)) {
-          toast.warn('Invalid PIN');
-        } else if (!validateGstNumber(postData.Unit_GSTNo)) {
+          toast.warn('Data is not posted');
+        }
+      }
+
+
+      else if (postData.PIN !== '' && postData.Unit_GSTNo !== '') {
+        if (validateGstNumber(postData.Unit_GSTNo) && validatePIN(postData.PIN)) {
+          // Both PIN and GSTNo have data and pass validation
+          insertData(); // You should implement this function to insert the data
+        } else {
+          if (!validatePIN(postData.PIN)) {
+            toast.warn('Invalid PIN');
+          } else if (!validateGstNumber(postData.Unit_GSTNo)) {
+            toast.warn('Invalid GST No');
+          }
+        }
+      }
+
+
+
+      else if (postData.PIN === '' && postData.Unit_GSTNo !== '') {
+        if (validateGstNumber(postData.Unit_GSTNo)) {
+          insertData();
+        }
+        else {
           toast.warn('Invalid GST No');
         }
       }
-    } 
 
-
-
-
-    
-
-
-    else {
-      // Validation for PIN and GST number
-      if (postData.PIN !== '' && !validatePIN(postData.PIN)) {
-        toast.warn('Invalid PIN code');
+      else if (postData.Unit_GSTNo === '' && postData.PIN !== '') {
+        if (validatePIN(postData.PIN)) {
+          insertData();
+        }
+        else {
+          toast.warn('Invalid PIN');
+        }
       }
-      if (postData.Unit_GSTNo !== '' && !validateGstNumber(postData.Unit_GSTNo)) {
-        toast.warn('Invalid GST number');
+
+
+      else {
+        // Validation for PIN and GST number
+        if (postData.PIN !== '' && !validatePIN(postData.PIN)) {
+          toast.warn('Invalid PIN code');
+        }
+        if (postData.Unit_GSTNo !== '' && !validateGstNumber(postData.Unit_GSTNo)) {
+          toast.warn('Invalid GST number');
+        }
+
       }
-      
+    } catch (err) {
+      console.error('Error in frontend', err);
     }
-  } catch (err) {
-    console.error('Error in frontend', err);
-  }
-};
-
-
-  
-
+  };
 
 
   const saveChangeSubmit = () => {
-
 
     // console.log("save else", postData);
     setSaveChangesModal(true);
@@ -169,60 +176,80 @@ const handleSubmit = async () => {
     }
   }
 
-  const UnitGetDta = () => {
-    axios.get('http://localhost:3001/unitlist/getUnitData')
-      .then((res) => {
-        // console.log("unitdata",res.data);
-        if (res.data.Status === 'Success') {
-          //   console.log("dataaaa", res.data.Result);
-          setGetUnit(res.data.Result)
-        }
-      })
-      .catch(err => console.log(err))
-  }
-  //GET DATA
-  useEffect(() => {
-    UnitGetDta();
-    getStateList();
+  const UnitGetDta = async () => {
+    try {
+      const response = await axios.get('http://localhost:3001/unitlist/getUnitData');
+      if (response.data.Status === 'Success') {
+       // console.log("dataaaa", response.data.Result);
+        setGetUnit(response.data.Result);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  }, [])
+
+
+
+  // useEffect(() => {
+  //   UnitGetDta();
+  //   getStateList();
+
+  // }, [])
+  useEffect(() => {
+    async function fetchData() {
+     
+      await UnitGetDta();
+    }
+    fetchData()
+    getStateList();
+  }, []);
 
 
   const formRef = useRef(null);
+
+  useEffect(() => {
+    if (getUnit.length > 0) {
+      setSelectRow(getUnit[0]);
+    } else {
+      setSelectRow(initial);
+    }
+  }, [getUnit]);
+
+
   const [selectRow, setSelectRow] = useState(initial);
 
 
 
-  const [state, setState] = useState(false);
+  const [state, setState] = useState(true);
   const selectedRowFun = (item, index) => {
 
     let list = { ...item, index: index }
 
-    setSelectRow(initial)
+    // setSelectRow(initial)
     setSelectRow(list);
-    // setSelectRow({ ...initial, ...list, State: postState.State });
-    setPostData(initial)
+    // setSelectRow({ ...initial, ...list, State: postState.State });    //setPostData(initial)
     setState(true);
 
   }
 
-  console.log("selectrow", selectRow);
 
 
+ 
 
   const unitFormChange = (e) => {
 
     const { name, value, type, checked } = e.target;
     if (!state) {
       if (type === 'checkbox') {
-        console.log("111");
+
 
         setPostData({ ...postData, [name]: checked ? 1 : 0 })
 
       }
 
       else {
-
+        
         setPostData({ ...postData, [name]: value })
 
       }
@@ -242,6 +269,7 @@ const handleSubmit = async () => {
       }
 
       else {
+        
         setSelectRow({ ...selectRow, [name]: value })
       }
 
@@ -253,7 +281,7 @@ const handleSubmit = async () => {
   }
 
 
-  const [errors, setErrors] = useState({});
+
 
 
 
@@ -264,12 +292,38 @@ const handleSubmit = async () => {
   };
 
   //GST number validation function
-  const validateGstNumber = (Unit_GSTNo) => {
+  // const validateGstNumber = (Unit_GSTNo) => {
 
-    return /^(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}Z[A-Z\d]{1})$/.test(Unit_GSTNo);
+   
+  //  return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/.test(Unit_GSTNo)
+   
+  // };
+  const validateGstNumber = (Unit_GSTNo) => {
+    if (Unit_GSTNo.length === 15) {
+      const firstTwo = Unit_GSTNo.substring(0, 2);
+     
+
+      if (!isNaN(firstTwo) ) {
+        const middlePart = Unit_GSTNo.substring(2, 14);
+       
+        return  /^[A-Za-z0-9]+$/.test(middlePart);
+          
+      }
+    }
+    // else{
+    //   toast.warn("Invalid GST NO")
+    // }
+    
   };
 
 
+  const addNewUnit = () => {
+    setSelectRow(initial);
+    setPostData(initial)
+    setState(false);
+  }
+
+  console.log("posttt", postData);
   return (
     <div>
       {
@@ -291,26 +345,42 @@ const handleSubmit = async () => {
 
       <div className="col-md-12">
         <div className="row">
-          <h4 className="title">Unit List</h4>
+          <h4 className="title">Unit Details</h4>
         </div>
       </div>
 
 
       <div className="row">
 
-        <div className="col-md-8 col-sm-12">
-          <div className="row">
-            <div className="col-md-3 col-sm-12">
+        <div className="col-md-11 col-sm-12">
+          <div className="row" style={{ gap: '50px' }}>
+
+            <div className="col-md-1 col-sm-12 ">
               <button
                 // className="button-style  group-button"
-                style={{ width: "100px" }} onClick={handleSubmit}
+                style={{ width: "120px" }}
+                className={'button-style  group-button '}
+                // disabled={selectRow.UnitID === ''}
+                onClick={addNewUnit}
+              >
+                Add Unit
+              </button>
+            </div>
+            <div className="col-md-1 col-sm-12">
+              <button
+                // className="button-style  group-button"
+                style={{ width: "120px" }} onClick={handleSubmit}
                 disabled={selectRow.UnitID !== ''}
+
+
                 className={selectRow.UnitID !== '' ? 'disabled-button' : 'button-style  group-button'}
               >
                 Save Unit
               </button>
             </div>
-            <div className="col-md-3 col-sm-12">
+
+
+            <div className="col-md-1 col-sm-12">
               <button
                 className="button-style  group-button"
                 style={{ width: "120px" }} onClick={deleteSubmit}
@@ -318,20 +388,23 @@ const handleSubmit = async () => {
                 Delete Unit
               </button>
             </div>
-            <div className="col-md-3 col-sm-12">
+            <div className="col-md-1 col-sm-12">
               <button
                 className={selectRow.UnitID === '' ? 'disabled-button' : 'button-style  group-button'}
                 disabled={selectRow.UnitID === ''}
                 onClick={saveChangeSubmit}
+                style={{ width: '120px' }}
               >
                 Update Unit
               </button>
             </div>
 
-            <div className="col-md-3 col-sm-12">
+
+            <div className="col-md-2 col-sm-12">
               <button
                 className="button-style  group-button"
-                onClick={e => navigate("/HOAccounts")}
+                onClick={e => navigate("/UnitAccounts")}
+                style={{ width: "120px", marginLeft: '405px' }}
               >
                 Close
               </button>
@@ -362,9 +435,13 @@ const handleSubmit = async () => {
               style={{ marginLeft: "5px", border: "1px" }}
             >
               <thead className="tableHeaderBGColor">
-                <tr>
-                  <th style={{ whiteSpace: "nowrap" }}>Unit Id</th>
-                  <th style={{ whiteSpace: "nowrap" }}>Unit Name</th>
+                <tr style={{ whiteSpace: "nowrap" }}>
+                  <th >Unit Id</th>
+                  <th >Unit Name</th>
+                  <th>Unit_Address</th>
+                  <th>Place</th>
+                  <th>State</th>
+                  <th>Country</th>
 
 
                 </tr>
@@ -376,26 +453,23 @@ const handleSubmit = async () => {
                     return (
                       <>
                         <tr onClick={() => selectedRowFun(item, key)}
-
+                          style={{ whiteSpace: "nowrap" }}
                           className={key === selectRow?.index ? 'selcted-row-clr' : ''}
                         >
 
                           <td>{item.UnitID} </td>
                           <td>{item.UnitName} </td>
+                          <td>{item.Unit_Address}</td>
+                          <td>{item.Place}</td>
+                          <td>{item.State}</td>
+                          <td>{item.Country}</td>
                         </tr>
 
                       </>
                     )
                   })
                 }
-                {/* {
-
-                  // showUnitId &&
-                  <tr onClick={unitSubmit}>
-                    <td>UnitID</td>
-                    <td>UnitName</td></tr>
-
-                } */}
+                
               </tbody>
             </Table>
           </div>
@@ -410,34 +484,34 @@ const handleSubmit = async () => {
             <div className='row col-md-12 ip-box form-bg mt-2' style={{ overflowY: 'scroll', height: '400px' }}>
               <div className='col-md-6' >
                 <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>Unit Id</label>
+                  <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>Unit Id<span style={{ color: 'red' }}>*</span></label>
                   <input class="form-control " type="text" name='UnitID' id='UnitID' required
 
-                    // defaultValue={selectRow?.UnitID}
+
                     value={selectRow?.UnitID || postData.UnitID}
                     disabled={selectRow.UnitID !== ''}
                     onChange={unitFormChange} />
                 </div>
 
                 <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  '>Unit Name</label>
+                  <label className='form-label col-md-6  '>Unit Name<span style={{ color: 'red' }}>*</span></label>
                   <input class="form-control  " type="text" placeholder=" " name='UnitName' id='UnitName'
                     onChange={unitFormChange}
 
-                    // defaultValue={selectRow?.UnitName}
+
                     value={selectRow?.UnitName || postData.UnitName}
                   />
                 </div>
 
                 <div className=" col-md-12">
 
-                  <label className="form-label">Unit Address</label>
+                  <label className="form-label ms-3">Unit Address</label>
 
                   <textarea className="form-control sticky-top" rows='2' id="" name='Unit_Address'
                     style={{ height: '143px', resize: 'none' }}
 
                     onChange={unitFormChange}
-                    // defaultValue={selectRow.Unit_Address }
+
                     value={selectRow.Unit_Address || postData.Unit_Address}
 
                   >
@@ -453,7 +527,7 @@ const handleSubmit = async () => {
                     <label className='form-label'>Place</label>
                     <input class="form-control" type="text" placeholder=" " name='Place'
 
-                      //  defaultValue={selectRow.Place}
+
                       value={selectRow.Place || postData.Place}
                       onChange={unitFormChange} />
                   </div>
@@ -461,22 +535,22 @@ const handleSubmit = async () => {
                     <label className='form-label'>PIN</label>
                     <input class=" form-control " type="text" placeholder=" " name='PIN'
 
-                      // defaultValue={selectRow.PIN}
+                      maxLength={6}
                       value={selectRow.PIN || postData.PIN}
                       onChange={unitFormChange} />
-                    {/* {errors.PIN && <span style={{ color: 'red' }}>{errors.PIN}</span>} */}
+
                   </div>
 
                 </div>
 
 
                 <div className="col-md-12">
-                  <label className="form-label"> State</label>
+                  <label className="form-label ms-3"> State</label>
                   <select style={{ height: '38px', borderRadius: '5px' }}
                     className="ip-select mt-1"
-                    value={state ? selectRow.State : postData.State} // Set the selected value based on state or selectRow
-                    onChange={unitFormChange} // Use your existing change handler
-                    name="State" // Make sure the name matches the field in postData and selectRow
+                    value={state ? selectRow.State : postData.State}
+                    onChange={unitFormChange}
+                    name="State"
                   >
                     {stateList.map((i) => (
                       <option key={i.State} value={i.State}   >
@@ -493,17 +567,17 @@ const handleSubmit = async () => {
                   <label className='form-label col-md-6  '>Country</label>
                   <input class="form-control  " type="text" placeholder=" " name='Country'
 
-                    // defaultValue={selectRow.Country}
+
                     value={selectRow.Country || postData.Country}
                     onChange={unitFormChange} />
                 </div>
 
                 <div className=" col-md-12">
 
-                  <label className="form-label">Contact details</label>
+                  <label className="form-label ms-3">Contact details</label>
 
                   <textarea className="form-control sticky-top" rows='2' id="" name='Unit_contactDetails'
-                    // defaultValue={selectRow.Unit_contactDetails}
+
                     value={selectRow.Unit_contactDetails || postData.Unit_contactDetails}
                     onChange={unitFormChange}
                     style={{ height: '143px', resize: 'none' }}
@@ -519,37 +593,30 @@ const handleSubmit = async () => {
                 <div className=' col-md-12 '>
                   <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>GST No</label>
                   <input class="form-control " type="text" placeholder=" " name='Unit_GSTNo'
+                    maxLength={15}
 
-                    // defaultValue={selectRow.Unit_GSTNo}
                     value={selectRow.Unit_GSTNo || postData.Unit_GSTNo}
 
                     onChange={unitFormChange} />
-                  {/* {errors.gstNumber && <span style={{ color: 'red' }}>{errors.gstNumber}</span>} */}
+
                 </div>
 
                 <div className=' col-md-12 '>
                   <label className='form-label col-md-6  ' style={{ whiteSpace: 'nowrap' }}>Tally Account Name</label>
                   <input class=" form-control " type="text" placeholder=" " name='Tally_account_Name'
 
-                    // defaultValue={selectRow.Tally_account_Name}
+
                     value={selectRow.Tally_account_Name || postData.Tally_account_Name}
                     onChange={unitFormChange} />
                 </div>
 
 
-                {/* <div className=' col-md-12 '>
-                  <label className='form-label col-md-6  '>Cash in Hand</label>
-                  <input class=" form-control " type="text" placeholder=" " name='Cash_in_Hand'
 
-                 
-                    value={selectRow.Cash_in_Hand || postData.Cash_in_Hand}
-                    onChange={unitFormChange} />
-                </div> */}
                 <div className=' col-md-12 '>
                   <label className='form-label col-md-6  '>Mail Id</label>
                   <input class=" form-control " type="text" placeholder=" " name='Mail_Id'
 
-                    // defaultValue={selectRow.Mail_Id}
+
                     value={selectRow.Mail_Id || postData.Mail_Id}
                     onChange={unitFormChange} />
                 </div>
@@ -557,7 +624,7 @@ const handleSubmit = async () => {
                   <label className='form-label col-md-6  '>Unit Initials</label>
                   <input class="form-control  " type="text" placeholder=" " name='UnitIntial'
 
-                    // defaultValue={selectRow.UnitIntial}
+
                     value={selectRow.UnitIntial || postData.UnitIntial}
                     onChange={unitFormChange} />
                 </div>

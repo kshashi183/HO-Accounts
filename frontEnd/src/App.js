@@ -97,22 +97,7 @@ function App() {
               <Route path="PurchaseList" element={<PurchaseInvoiceList />} />
             </Route>
 
-
-
-
-
             {/* <Route path="TallyExport" element={<TallyExportForm/>} /> */}
-
-
-
-
-
-
-
-
-
-
-
 
           </Route>
         </Route>
