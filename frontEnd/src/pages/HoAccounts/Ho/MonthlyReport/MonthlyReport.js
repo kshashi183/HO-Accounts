@@ -39,6 +39,8 @@ export default function MonthlyReport() {
   //   setSelectedMonth(parseInt(event.target.value));
   // };
 
+  console.log("for test");
+
   const monthNames = [
     "January",
     "February",
