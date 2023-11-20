@@ -80,7 +80,7 @@ export default function TallyExportForm() {
                 </button>
                 <button className="button-style  group-button col-md-2"
                   style={{ width: '130px' }}
-                  onClick={e => navigate("/home")}>
+                  onClick={e => navigate("/HOAccounts")}>
                   Close
                 </button>
 

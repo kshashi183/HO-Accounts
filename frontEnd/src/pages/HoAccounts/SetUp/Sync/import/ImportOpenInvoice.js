@@ -1,7 +1,9 @@
 import React from "react";
 import { Table } from "react-bootstrap";
 
-export default function ImportOpenInvoice() {
+export default function ImportOpenInvoice({data}) {
+
+  console.log("import data", data);
   return (
     <div className="mt-4" style={{height:"400px",overflowY: "scroll",overflowX:"scroll"}}>
       <Table striped className="table-data border">
@@ -21,7 +23,29 @@ export default function ImportOpenInvoice() {
             <th>Remarks</th>
           </tr>
         </thead>
-        <tbody className="tablebody"></tbody>
+        <tbody className="tablebody">
+
+          {
+            data.map((item,index)=>{
+              return(
+                <tr   key={item.DC_Inv_No} 
+                style={{
+                  background: item.Remarks === 'Value Different' ? 'red' : 'green',
+                  whiteSpace: 'nowrap', // Add the whitespace: nowrap property
+                }}
+                // style={item.Remarks==='Value Different' ? {background : 'red'}:{background : 'green'} }
+       >
+                  <td>{item.Unitname}</td>
+                  <td>{item.DC_InvType}</td>
+                  <td>{item.Cust_Name}</td>
+                  <td>{item.Inv_No}</td>
+                  <td>{item.DC_Date}</td>
+                  <td>{item.Unit_GrandTotal}</td>
+                </tr>
+              )
+            })
+          }
+        </tbody>
       </Table>
     </div>
   );

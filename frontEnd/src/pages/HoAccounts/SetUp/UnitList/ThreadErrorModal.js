@@ -11,7 +11,7 @@ export default function ThreadErrorModal({threadModal, setThreadModal,unitDetail
     
   return (
     <div>
-      <Modal show={threadModal} onHide={handleClose}>
+      <Modal show={threadModal} onHide={handleClose} >
         <Modal.Header closeButton>
           <Modal.Title>magod_machine</Modal.Title>
         </Modal.Header>

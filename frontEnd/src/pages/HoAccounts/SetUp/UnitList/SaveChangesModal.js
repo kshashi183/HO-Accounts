@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
@@ -13,6 +17,10 @@ import { baseURL } from '../../../../api/baseUrl';
 export default function SaveChangesModal(
   { setSaveChangesModal, saveChangeModal, selectRow, setSelectRow }) {
 
+    const coolDownDuration = 6000; // 5 seconds (adjust as needed)
+    const [lastToastTimestamp, setLastToastTimestamp] = useState(0)
+    let test = 0;
+
   const nav = useNavigate();
   const handleClose = () => {
     setSaveChangesModal(false);
@@ -20,18 +28,32 @@ export default function SaveChangesModal(
 
 
   const insertData = () => {
+
+    let t=0;
+     const now = Date.now();
+  
+
+    if (now - lastToastTimestamp >= coolDownDuration) {
+     t++;
+      setLastToastTimestamp(now);
+
+    }
     Axios.put(baseURL+'/unitlist/updateData/' + selectRow.UnitID, selectRow)
       .then((res) => {
         if (res.data.status === 'fail') {
-          alert('Unit_Name must be Unique');
-
+          if(t>0){
+          toast.error('Unit_Name must be Unique');
+          }
         }
         else if (res.data.status === 'query') {
-          alert('data does not exist');
+          if(t>0){
+          toast.error('Unit_Name must be Unique');
+          }
         }
         else if (res.data.status === 'success') {
           console.log('res in frontend', res.data);
           // alert("data updated")
+
           toast.success(" Jigani Unit Updated Successfully");
 
           setTimeout(() => {
@@ -50,63 +72,107 @@ export default function SaveChangesModal(
   }
 
   const unitlistSubmit = () => {
+    const now = Date.now();
+  
+
+    if (now - lastToastTimestamp >= coolDownDuration) {
+      test++;
+      setLastToastTimestamp(now);
+
+    }
     if (selectRow.UnitName === '') {
-      toast.warn("Add UnitName")
+      if(test>0){
+      toast.error("Add UnitName")
+      }
     }
     else if (selectRow.UnitIntial.length > 3) {
-      console.log(selectRow.UnitIntial.length, 'pos');
-      toast.warn('Unit_Intial Length must be less than 3');
+      if(test>0){
+      toast.error('Unit_Intial Length must be less than 3');
+      }
     }
 
-    else if (selectRow.PIN === '' && selectRow.Unit_GSTNo === '') {
+    else if (selectRow.PIN === '' && selectRow.Unit_GSTNo === '' && selectRow.Mail_Id) {
 
       insertData();
     }
 
-    else if (selectRow.PIN !== '' && selectRow.Unit_GSTNo !== '') {
-      if (validateGstNumber(selectRow.Unit_GSTNo) && validatePIN(selectRow.PIN)) {
+   
 
-        insertData();
-      } else {
-        if (!validatePIN(selectRow.PIN)) {
-          toast.warn('Invalid PIN');
-        } else if (!validateGstNumber(selectRow.Unit_GSTNo)) {
-          toast.warn('Invalid GST No');
-        }
-      }
-    }
-
-
-    else if (selectRow.PIN === '' && selectRow.Unit_GSTNo !== '') {
-      if (validateGstNumber(selectRow.Unit_GSTNo)) {
-        insertData();
-      }
-      else {
-        toast.warn('Invalid GST No');
-      }
-    }
-
-    else if (selectRow.Unit_GSTNo === '' && selectRow.PIN !== '') {
-      if (validatePIN(selectRow.PIN)) {
-        insertData();
-      }
-      else {
-        toast.warn('Invalid PIN');
-      }
-    }
     else {
-      // Validation for PIN and GST number
-      if (selectRow.PIN !== '' && !validatePIN(selectRow.PIN)) {
-        toast.warn('Invalid PIN code');
+      console.log("hiiiiiiiiiiiiiiiii");
+      let flag = 0;
+      const unitdata = {};
+
+      if (selectRow.PIN !== '') {
+        console.log("uuuuuuuuuuuuuuuuuu");
+        unitdata.PIN = selectRow.PIN;
       }
-      if (selectRow.Unit_GSTNo !== '' && !validateGstNumber(selectRow.Unit_GSTNo)) {
-        toast.warn('Invalid GST NO');
+      if (selectRow.Unit_GSTNo !== '') {
+        unitdata.Unit_GSTNo = selectRow.Unit_GSTNo;
+      }
+      if (selectRow.Mail_Id !== '') {
+        unitdata.Mail_Id = selectRow.Mail_Id;
+      }
+      console.log("unitdata", unitdata);
+
+      for (const key in unitdata) {
+
+        if (key == 'PIN') {
+          
+          if (!validatePIN(unitdata[key])) {
+            flag++;
+            if(test>0){
+            toast.error("Invalid PIN")
+            }
+            break;
+          }
+        }
+
+        if (key == 'Unit_GSTNo') {
+         
+          if (!validateGstNumber(unitdata[key])) {
+            flag++;
+            if(test>0){
+            toast.error("Invalid GST")
+            }
+            break;
+          }
+        }
+
+        if (key == 'Mail_Id') {
+         
+          if (!validateGmail(unitdata[key])) {
+            flag++;
+            if(test>0){
+            toast.error('Invalid Gmail')
+            }
+            break;
+          }
+        }
+
+
       }
 
+     if(flag==0){
+      insertData();
+
+     }
+
+
     }
+
+  
+   
   }
 
   const [errors, setErrors] = useState({});
+
+  const validateGmail = (Mail_Id) => {
+
+   
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(Mail_Id)
+
+  }
 
   const validatePIN = (PIN) => {
 
