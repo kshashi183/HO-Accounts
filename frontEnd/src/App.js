@@ -17,7 +17,8 @@ import HoUnitInvoices from "./pages/HoAccounts/Ho/HoUnitInvoices/HoUnitInvoices"
 import MonthlyReport from "./pages/HoAccounts/Ho/MonthlyReport/MonthlyReport";
 import RvAdjustmentForm from "./pages/HoAccounts/Ho/UnitRvAdjustment/RvAdjustmentForm";
 
-import CreateNewCallFile from "./pages/HoAccounts/Ho/HO_PRV/CreateNew/CreateNewCallFile";
+// import CreateNewCallFile from "./pages/HoAccounts/Ho/HO_PRV/CreateNew/CreateNewCallFile";
+import CreateNewForm from "./pages/HoAccounts/Ho/HO_PRV/CreateNew/CreateNewForm";
 import SyncCall from "./pages/HoAccounts/Sync/SyncCall";
 // import TallyExportForm from "./pages/HoAccounts/Ho/TallyExport/TallyExportForm";
 import TallyExportCall from "./pages/HoAccounts/Ho/TallyExport/TallyExportCall";
@@ -77,7 +78,7 @@ function App() {
              
               <Route path="UnitSync" element={<UnitSyncForm />} />
               <Route path="HOPrv">
-                <Route path="CreateNew" element={<CreateNewCallFile />} />
+                <Route path="CreateNew" element={<CreateNewForm/>} />
               </Route>
             </Route>
 

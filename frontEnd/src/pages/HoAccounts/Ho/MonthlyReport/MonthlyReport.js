@@ -55,6 +55,21 @@ export default function MonthlyReport() {
     "December",
   ];
 
+  const monthNumbers = [
+    { value: "1" },
+    { value: "2" },
+    { value: "3" },
+    { value: "4" },
+    { value: "5" },
+    { value: "6" },
+    { value: "7" },
+    { value: "8" },
+    { value: "9" },
+    { value: "10" },
+    { value: "11" },
+    { value: "12" },
+  ];
+
   const convertToMonthName = (month) => {
     if (month >= 1 && month <= 12) {
       setWordMonth(monthNames[month - 1]); // Set the "month" state directly
@@ -72,8 +87,15 @@ export default function MonthlyReport() {
     convertToMonthName(e.target.value);
   };
 
+  const getCurrentYear = () => {
+    return new Date().getFullYear();
+  };
+
   const handleYear = (e) => {
-    setYear(e.target.value);
+    const inputYear = e.target.value;
+    if (inputYear <= getCurrentYear()) {
+      setYear(inputYear);
+    }
   };
 
   useEffect(() => {
@@ -195,7 +217,6 @@ export default function MonthlyReport() {
   };
 
   // console.log("Addition", getAdditionValues);
-  
 
   return (
     <div>
@@ -279,7 +300,7 @@ export default function MonthlyReport() {
           </div>
 
           <div className="row col-md-6">
-            <div className="col-md-6" style={{ marginLeft: "60px" }}>
+            <div className="col-md-5" style={{ marginLeft: "60px" }}>
               <label
                 className="form-label"
                 style={{ whiteSpace: "nowrap", zIndex: "2" }}
@@ -299,10 +320,10 @@ export default function MonthlyReport() {
               />
             </div>
 
-            <div className="d-flex col-md-4" style={{ gap: "30px" }}>
-              <div className="col-md-6">
-                <label className="form-label">Month</label>
-                <input
+            <div className="d-flex col-md-4" style={{ gap: "60px" }}>
+              <div className="col-md-4">
+                <label className="form-label"style={{ marginBottom: "10px" }}>Month</label>
+                {/* <input
                   className="no-spinner"
                   onChange={(e) => handleMonth(e)}
                   type="text"
@@ -310,7 +331,20 @@ export default function MonthlyReport() {
                   name="quantity"
                   min="1"
                   max="12"
-                />
+                /> */}
+
+                <select
+                  className="defdrop"
+                  onChange={(e) => handleMonth(e)}
+                  placeholder="MM"
+                >
+                  <option value="">Select Month</option>
+                  {monthNumbers.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.value}
+                    </option>
+                  ))}
+                </select>
 
                 {/* <select value={selectedMonth} onChange={handleMonthChange}>
                   {monthOptions.map((month) => (
@@ -321,13 +355,14 @@ export default function MonthlyReport() {
                 </select> */}
               </div>
 
-              <div className="col-md-7">
+              <div className="col-md-5 ms-3">
                 <label className="form-label">Year</label>
                 <input
                   onChange={(e) => handleYear(e)}
                   className=""
-                  id="quantity"
-                  name="quantity"
+                  type="number"
+                  value={year}
+                  max={getCurrentYear()}
                 />
               </div>
             </div>
