@@ -11,7 +11,7 @@ export default function CreateNewCallFile() {
   const [getCustomer, setGetCustomer] = useState("");
   const [getCustCode, setGetCustCode] = useState("");
   // const [getInputCustName, setGetInputCustName] = useState("");
-  const [selectedTxntType, setSelectedTxntType] = useState('');
+  const [selectedTxntType, setSelectedTxntType] = useState("");
   const [getUnitNames, setGetUnitNames] = useState([]);
   const [getCustNames, setGetCustNames] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
@@ -108,7 +108,7 @@ export default function CreateNewCallFile() {
   console.log(selectedTxntType);
 
   return (
-    <div>
+    <>
       <div className="col-md-12">
         <div className="row">
           <h4 className="title">Head Office Payment Receipt Register </h4>
@@ -119,8 +119,8 @@ export default function CreateNewCallFile() {
         <label className="form-label ms-4">Create New Payment Receipt</label>
         <div className="form horizantal-line"></div>
       </div>
-      <div className="row ">
-        <div className="col-md-6">
+      <div className="row col-md-12">
+        <div className="col-md-8">
           <div className="mt-2">
             <form className="">
               <div className="">
@@ -193,7 +193,11 @@ export default function CreateNewCallFile() {
                   <div className="box col-md-6">
                     <div className="">
                       <label className="form-label">Transaction Type</label>
-                      <select className="ip-select" onChange={handleTxnTYpeChange} value={selectedTxntType}>
+                      <select
+                        className="ip-select"
+                        onChange={handleTxnTYpeChange}
+                        value={selectedTxntType}
+                      >
                         {options.map((option) => (
                           <option key={option.label} value={option.label}>
                             {option.label}
@@ -247,7 +251,7 @@ export default function CreateNewCallFile() {
                     </div>
                   </div>
 
-                  <div className="row col-md-12 ms-4">
+                  {/* <div className="row col-md-12 ms-4">
                     <div className="col-md-2">
                       <button
                         className="button-style mt-2 group-button"
@@ -290,25 +294,13 @@ export default function CreateNewCallFile() {
                         Cancel
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </form>
           </div>
 
-          <div className="row col-md-12 mt-2">
-            <div className="col-md-6 mt-2">
-              <label className="form-label">Against Invoices</label>
-            </div>
-
-            <div className=" col-md-6">
-              <button className="button-style mt-1 mb-2 group-button">
-                Remove Invoice
-              </button>
-            </div>
-          </div>
-
-          <div
+          {/* <div
             style={{
               height: "250px",
               overflowY: "scroll",
@@ -362,11 +354,40 @@ export default function CreateNewCallFile() {
                 </tr>
               </tbody>
             </Table>
-          </div>
+          </div> */}
         </div>
 
-        <div className="col-md-6">
-          <div>
+        <div className="col-md-4 mt-5">
+          <div className="col-md-12 " style={{ marginLeft: "100px" }}>
+            <div className="col-md-2 mb-5">
+              <button
+                className="button-style group-button"
+                onClick={() => navigate("/HOAccounts")}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="col-md-2">
+              <button className="button-style group-button">Save</button>
+            </div>
+
+            <div className="col-md-2 mt-2">
+              <button className="button-style group-button">Post</button>
+            </div>
+
+            <div className=" col-md-2 mt-2">
+              <button className="button-style group-button">Print</button>
+            </div>
+            <div className=" col-md-2 mt-2">
+              <button className="button-style group-button">Delete</button>
+            </div>
+            <div className=" col-md-2 mt-2">
+              <button className="button-style group-button">Cancel</button>
+            </div>
+          </div>
+
+          {/* <div>
             <div className="row col-md-12 mb-2">
               <label
                 className="form-label col-md-3 mt-1"
@@ -434,9 +455,141 @@ export default function CreateNewCallFile() {
                 </tbody>
               </Table>
             </div>
+          </div> */}
+        </div>
+      </div>
+
+      <div className="row col-md-12">
+        <div className="col-md-6">
+          <div className="row col-md-12 mt-2">
+            <div className="col-md-6 mt-2">
+              <label className="form-label">Against Invoices</label>
+            </div>
+
+            <div className="col-md-6">
+              <button className="button-style mt-1 mb-2 group-button ms-5">
+                Remove Invoice
+              </button>
+            </div>
+          </div>
+
+          <div
+            style={{
+              height: "250px",
+              overflowY: "scroll",
+              overflowX: "scroll",
+            }}
+          >
+            <Table className="table-data border">
+              <thead
+                className="tableHeaderBGColor"
+                style={{ textAlign: "center" }}
+              >
+                <tr style={{ whiteSpace: "nowrap" }}>
+                  <th style={{ whiteSpace: "nowrap" }}>Srl no</th>
+                  <th>Amount</th>
+                  <th>Invoice No</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Account</th>
+                  <th>Received</th>
+                  <th>Receive Now</th>
+                  <th>Id</th>
+                  <th>Unitname</th>
+                  <th>PVSrlID</th>
+                  <th>Unit_UId</th>
+                  <th>HOPrvId</th>
+                  <th>RecdPvSrl</th>
+                  <th>HO_Uid</th>
+                  <th>Dc_inv_no</th>
+                  <th>Inv_No</th>
+                  <th>Inv_Type</th>
+                  <th>Inv_Amount</th>
+                  <th>Amt_received</th>
+                  <th>Receive_Now</th>
+                  <th>InvUpdated</th>
+                  <th>Inv_date</th>
+                  <th>Updated</th>
+                  <th>RefNo</th>
+                  <th>UnitId</th>
+                </tr>
+              </thead>
+
+              <tbody className="tablebody">
+                <tr style={{ whiteSpace: "nowrap" }} className="">
+                  {/* <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td> 
+                  <td></td>
+                  <td></td> */}
+                </tr>
+              </tbody>
+            </Table>
+          </div>
+        </div>
+        <div className="col-md-6">
+          <div className="row col-md-12 mb-2">
+            <label
+              className="form-label col-md-3"
+              style={{ whiteSpace: "nowrap", marginTop: "10px" }}
+            >
+              Select Invoices
+            </label>
+
+            <div className="col-md-3 mt-3">
+              <select className="ip-select">
+                <option value="option 1">MAGOD LASER</option>
+                <option value="option 2"></option>
+                <option value="option 3"></option>
+              </select>
+            </div>
+
+            <div className=" col-md-4 ms-5">
+              <button className="button-style group-button ">
+                Add Invoice
+              </button>
+            </div>
+          </div>
+
+          <div
+            style={{
+              height: "250px",
+              overflowY: "scroll",
+              overflowX: "scroll",
+            }}
+          >
+            <Table className="table-data border">
+              <thead
+                className="tableHeaderBGColor"
+                style={{ textAlign: "center" }}
+              >
+                <tr style={{ whiteSpace: "nowrap" }}>
+                  <th>Select</th>
+                  <th>Type</th>
+                  <th>Invoice No</th>
+                  <th>Rate</th>
+                  <th>Grand Total</th>
+                  <th>Amount Received</th>
+                </tr>
+              </thead>
+
+              <tbody className="tablebody">
+                <tr style={{ whiteSpace: "nowrap" }} className="">
+                  {/* <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td> */}
+                </tr>
+              </tbody>
+            </Table>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
