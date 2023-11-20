@@ -165,7 +165,7 @@ export default function TabData() {
         <div className='col-md-3 '>
           <button className="button-style mt-2 group-button" type='button'
 
-            onClick={e => navigate("/UnitAccounts")}
+            onClick={e => navigate("/HOAccounts")}
           >
             Close
           </button>

@@ -1,3 +1,6 @@
+
+
+
 import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
@@ -10,6 +13,10 @@ import { baseURL } from '../../../../api/baseUrl';
 
 export default function DeleteButtonModal({ setDeleteModal, deleteModal, selectRow }) {
   // console.log("deklt", selectRow);
+
+  const coolDownDuration = 6000; // 5 seconds (adjust as needed)
+  const [lastToastTimestamp, setLastToastTimestamp] = useState(0)
+  let test = 0;
   const handleClose = () => {
     setDeleteModal(false);
   }
@@ -17,6 +24,15 @@ export default function DeleteButtonModal({ setDeleteModal, deleteModal, selectR
   const [deleteUnit, setDeleteUnit] = useState('');
  // console.log("sel del", selectRow);
   const deleteUnitData = (UnitID) => {
+
+    const now = Date.now();
+  
+
+    if (now - lastToastTimestamp >= coolDownDuration) {
+      test++;
+      setLastToastTimestamp(now);
+
+    }
     console.log(UnitID,"uuuuuuu");
     axios.delete(baseURL+'/unitlist/deleteUnit/' + UnitID)
       .then((res) => {
@@ -24,16 +40,20 @@ export default function DeleteButtonModal({ setDeleteModal, deleteModal, selectR
         if (res.data.Status === 'Success') {
           setDeleteModal(false);
         //  alert("deleted successful")
-          toast.warn("Unit Deleted Successfully");
+        if(test>0){
+          toast.success("Deleted Successfully");
+          
+        }
           setTimeout(() => {
 
             window.location.reload();
       
           }, 1000);
-         // window.location.reload();
+       
         } else {
           alert("error");
         }
+        
 
       })
       .catch(err => (console.log("select unit")));

@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useEffect, useRef, useState } from "react";
 import { Table } from "react-bootstrap";
 // import UnitDetailsForm from "./UnitDetailsForm";
@@ -25,6 +29,12 @@ const initial_state = { State: '' }
 export default function UnitDetails() {
 
 
+
+
+  const coolDownDuration = 6000; // 2 seconds (adjust as needed)
+  const [lastToastTimestamp, setLastToastTimestamp] = useState(0)
+  let test = 0;
+
   const [threadModal, setThreadModal] = useState(false);
   const [saveChangeModal, setSaveChangesModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -34,12 +44,22 @@ export default function UnitDetails() {
   const navigate = useNavigate();
 
   //  const [postState, setPostState] = useState(initial_state);
+  useEffect(() => {
+    async function fetchData() {
+      console.log("werg");
+      await UnitGetDta();
+    }
+    fetchData()
+    getStateList();
 
+
+
+  }, []);
 
 
   const [stateList, setStateList] = useState([]);
   const getStateList = () => {
-    axios.get(baseURL+'/unitlist/getStates').
+    axios.get(baseURL + '/unitlist/getStates').
       then((res) => {
         // console.log(res.data.Result);
         setStateList(res.data.Result)
@@ -53,28 +73,48 @@ export default function UnitDetails() {
   const [postData, setPostData] = useState(initial)
 
 
-  const insertData = () => {
-    axios.post(baseURL+'/unitlist/postUnitDetails', postData)
+  const insertData = (e, test) => {
+    let t = 0;
+    const now = Date.now();
+
+
+    if (now - lastToastTimestamp >= coolDownDuration) {
+      t++;
+      setLastToastTimestamp(now);
+
+    }
+
+
+
+    axios.post(baseURL + '/unitlist/postUnitDetails', postData)
       .then((res) => {
         if (res.data.status === 'fail') {
-          setThreadModal(true);
+          // setThreadModal(true);
+          if (t > 0) {
 
+            setThreadModal(true);
+          }
         }
         else if (res.data.status === 'query') {
           console.log("22");
 
-          toast.warn("Data is not posted")
+          toast.error("Data is not posted")
         }
         else if (res.data.status === 'success') {
 
+          if (t > 0) {
+            console.log("qwertyuio");
+            toast.success(" Jigani Unit added Successfully")
 
-          toast.success(" Jigani Unit added Successfully")
+          }
+
 
           setTimeout(() => {
 
             window.location.reload();
 
-          }, 1000); // 2000 milliseconds = 5 seconds
+          }, 1000);
+          //2000 milliseconds = 5 seconds
 
         }
 
@@ -83,105 +123,157 @@ export default function UnitDetails() {
         console.log('eroor in fromntend', err);
       })
   }
-  const handleSubmit = async () => {
+
+
+  const handleSubmit = async (e) => {
+
+    const now = Date.now();
+
+
+    if (now - lastToastTimestamp >= coolDownDuration) {
+      test++;
+      setLastToastTimestamp(now);
+
+    }
     try {
       if (postData.UnitID === '' || postData.Name === '') {
-        toast.warn('Please add UnitId and UnitName');
+        if (test > 0) {
+          toast.error('Please add UnitId and UnitName');
+        }
+
       }
       else if (postData.UnitIntial.length > 3) {
         console.log(postData.UnitIntial.length, 'pos');
-        toast.warn('Unit_Intial Length must be less than 3');
-      }
-      else if (postData.PIN === '' && postData.Unit_GSTNo === '') {
-        // Either PIN or GSTNo is empty, so insert data successfully
-        const response = await axios.post(baseURL+'/unitlist/postUnitDetails', postData);
-        if (response.data.status === 'success') {
-          toast.success('Jigani Unit added Successfully');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        } else if (response.data.status === 'fail') {
-          setThreadModal(true);
-        } else {
 
-          toast.warn('Data is not posted');
+        if (test > 0) {
+          toast.error('Unit_Intial Length must be less than 3');
         }
       }
 
+      else if (postData.PIN === '' && postData.Unit_GSTNo === '' && postData.Mail_Id == '') {
 
-      else if (postData.PIN !== '' && postData.Unit_GSTNo !== '') {
-        if (validateGstNumber(postData.Unit_GSTNo) && validatePIN(postData.PIN)) {
-          // Both PIN and GSTNo have data and pass validation
-          insertData(); // You should implement this function to insert the data
-        } else {
-          if (!validatePIN(postData.PIN)) {
-            toast.warn('Invalid PIN');
-          } else if (!validateGstNumber(postData.Unit_GSTNo)) {
-            toast.warn('Invalid GST No');
-          }
-        }
-      }
-
-
-
-      else if (postData.PIN === '' && postData.Unit_GSTNo !== '') {
-        if (validateGstNumber(postData.Unit_GSTNo)) {
-          insertData();
-        }
-        else {
-          toast.warn('Invalid GST No');
-        }
-      }
-
-      else if (postData.Unit_GSTNo === '' && postData.PIN !== '') {
-        if (validatePIN(postData.PIN)) {
-          insertData();
-        }
-        else {
-          toast.warn('Invalid PIN');
-        }
+        console.log("jjjjj");
+        insertData(e, test);
       }
 
 
       else {
-        // Validation for PIN and GST number
-        if (postData.PIN !== '' && !validatePIN(postData.PIN)) {
-          toast.warn('Invalid PIN code');
+
+        let flag = 0;
+        const unitdata = {};
+
+        if (postData.PIN !== '') {
+
+          unitdata.PIN = postData.PIN;
         }
-        if (postData.Unit_GSTNo !== '' && !validateGstNumber(postData.Unit_GSTNo)) {
-          toast.warn('Invalid GST number');
+        if (postData.Unit_GSTNo !== '') {
+          unitdata.Unit_GSTNo = postData.Unit_GSTNo;
+        }
+        if (postData.Mail_Id !== '') {
+          unitdata.Mail_Id = postData.Mail_Id;
+        }
+        console.log("unitdata", unitdata);
+
+        for (const key in unitdata) {
+
+          if (key == 'PIN') {
+
+            if (!validatePIN(unitdata[key])) {
+              flag++;
+              if (test > 0) {
+                toast.error("Invalid PIN")
+              }
+              break;
+            }
+          }
+
+          if (key == 'Unit_GSTNo') {
+
+            if (!validateGstNumber(unitdata[key])) {
+              flag++;
+              if (test > 0) {
+                toast.error("Invalid GST")
+              }
+              break;
+            }
+          }
+
+          if (key == 'Mail_Id') {
+
+            if (!validateGmail(unitdata[key])) {
+              flag++;
+              if (test > 0) {
+                toast.error('Invalid Gmail')
+              }
+
+              break;
+            }
+          }
+
+
         }
 
+        if (flag == 0) {
+          insertData();
+
+        }
+
+
       }
+
+
     } catch (err) {
       console.error('Error in frontend', err);
     }
   };
 
 
+
+
   const saveChangeSubmit = () => {
 
     // console.log("save else", postData);
-    setSaveChangesModal(true);
+    const now = Date.now();
 
+
+    if (now - lastToastTimestamp >= coolDownDuration) {
+      test++;
+      setLastToastTimestamp(now);
+
+    }
+
+    if (test > 0) {
+      setSaveChangesModal(true);
+    }
   }
 
 
   const deleteSubmit = () => {
-    if (!selectRow.UnitID) {
-      toast('Empty data canot be Deleted');
+    const now = Date.now();
+
+
+    if (now - lastToastTimestamp >= coolDownDuration) {
+      test++;
+      setLastToastTimestamp(now);
 
     }
+    if (!selectRow.UnitID) {
+      if (test > 0) {
+        toast.error('Select Unit for Deletion');
+      }
+    }
     else {
-      setDeleteModal(true);
+      if (selectRow.UnitID && test>0) {
+        setDeleteModal(true);
+      }
     }
   }
 
   const UnitGetDta = async () => {
     try {
-      const response = await axios.get(baseURL+'/unitlist/getUnitData');
+      const response = await axios.get(baseURL + '/unitlist/getUnitData');
       if (response.data.Status === 'Success') {
-       // console.log("dataaaa", response.data.Result);
+        // console.log("dataaaa", response.data.Result);
         setGetUnit(response.data.Result);
       }
     } catch (err) {
@@ -197,14 +289,7 @@ export default function UnitDetails() {
   //   getStateList();
 
   // }, [])
-  useEffect(() => {
-    async function fetchData() {
-     
-      await UnitGetDta();
-    }
-    fetchData()
-    getStateList();
-  }, []);
+
 
 
   const formRef = useRef(null);
@@ -236,7 +321,23 @@ export default function UnitDetails() {
 
 
 
- 
+
+
+
+
+  const pincodehandleChange = (e) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (!state) {
+      setPostData({
+        ...postData,
+        PIN: value,
+      });
+    }
+
+    else {
+      setSelectRow({ ...selectRow, PIN: value })
+    }
+  }
 
   const unitFormChange = (e) => {
 
@@ -250,7 +351,7 @@ export default function UnitDetails() {
       }
 
       else {
-        
+
         setPostData({ ...postData, [name]: value })
 
       }
@@ -270,7 +371,7 @@ export default function UnitDetails() {
       }
 
       else {
-        
+
         setSelectRow({ ...selectRow, [name]: value })
       }
 
@@ -284,37 +385,37 @@ export default function UnitDetails() {
 
 
 
+  const validateGmail = (Mail_Id) => {
 
+
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(Mail_Id)
+
+  }
 
   // PIN number validation function
+
   const validatePIN = (PIN) => {
 
     return /^[1-9][0-9]{5}$/.test(PIN);
   };
 
-  //GST number validation function
-  // const validateGstNumber = (Unit_GSTNo) => {
 
-   
-  //  return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/.test(Unit_GSTNo)
-   
-  // };
   const validateGstNumber = (Unit_GSTNo) => {
     if (Unit_GSTNo.length === 15) {
       const firstTwo = Unit_GSTNo.substring(0, 2);
-     
 
-      if (!isNaN(firstTwo) ) {
+
+      if (!isNaN(firstTwo)) {
         const middlePart = Unit_GSTNo.substring(2, 14);
-       
-        return  /^[A-Za-z0-9]+$/.test(middlePart);
-          
+
+        return /^[A-Za-z0-9]+$/.test(middlePart);
+
       }
     }
     // else{
     //   toast.warn("Invalid GST NO")
     // }
-    
+
   };
 
 
@@ -324,7 +425,9 @@ export default function UnitDetails() {
     setState(false);
   }
 
-  console.log("posttt", postData);
+
+
+
   return (
     <div>
       {
@@ -351,68 +454,78 @@ export default function UnitDetails() {
       </div>
 
 
-      <div className="row">
-
-        <div className="col-md-11 col-sm-12">
-          <div className="row" style={{ gap: '50px' }}>
-
-            <div className="col-md-1 col-sm-12 ">
-              <button
-                // className="button-style  group-button"
-                style={{ width: "120px" }}
-                className={'button-style  group-button '}
-                // disabled={selectRow.UnitID === ''}
-                onClick={addNewUnit}
-              >
-                Add Unit
-              </button>
-            </div>
-            <div className="col-md-1 col-sm-12">
-              <button
-                // className="button-style  group-button"
-                style={{ width: "120px" }} onClick={handleSubmit}
-                disabled={selectRow.UnitID !== ''}
+      <div className="row col-md-12">
 
 
-                className={selectRow.UnitID !== '' ? 'disabled-button' : 'button-style  group-button'}
-              >
-                Save Unit
-              </button>
-            </div>
 
+        <div className=" col-md-10 row" style={{}}>
 
-            <div className="col-md-1 col-sm-12">
-              <button
-                className="button-style  group-button"
-                style={{ width: "120px" }} onClick={deleteSubmit}
-              >
-                Delete Unit
-              </button>
-            </div>
-            <div className="col-md-1 col-sm-12">
-              <button
-                className={selectRow.UnitID === '' ? 'disabled-button' : 'button-style  group-button'}
-                disabled={selectRow.UnitID === ''}
-                onClick={saveChangeSubmit}
-                style={{ width: '120px' }}
-              >
-                Update Unit
-              </button>
-            </div>
+          <div className="col-md-2 col-sm-12 ">
+            <button
 
+              style={{ width: "120px" }}
+              className={'button-style  group-button '}
 
-            <div className="col-md-2 col-sm-12">
-              <button
-                className="button-style  group-button"
-                onClick={e => navigate("/UnitAccounts")}
-                style={{ width: "120px", marginLeft: '405px' }}
-              >
-                Close
-              </button>
-            </div>
+              onClick={addNewUnit}
+            >
+              Add Unit
+            </button>
           </div>
+          <div className="col-md-2  col-sm-12">
+            <button
+              type="submit"
+              style={{ width: "120px" }}
+              //onClick={handleSubmit}
+              onClick={(e) => handleSubmit(e)}
+              disabled={selectRow.UnitID !== ''}
+
+
+              className={selectRow.UnitID !== '' ? 'disabled-button' : 'button-style  group-button'}
+            >
+              Save Unit
+            </button>
+          </div>
+
+
+          <div className="col-md-2 col-sm-12">
+            <button
+              className="button-style  group-button"
+              style={{ width: "120px" }} onClick={deleteSubmit}
+            >
+              Delete Unit
+            </button>
+          </div>
+          <div className="col-md-2  col-sm-12">
+            <button
+              className={selectRow.UnitID === '' ? 'disabled-button' : 'button-style  group-button'}
+              disabled={selectRow.UnitID === ''}
+              onClick={saveChangeSubmit}
+              style={{ width: '120px' }}
+            >
+              Update Unit
+            </button>
+          </div>
+
+
+
+        </div>
+
+
+        <div className="col-md-2 col-sm-12">
+          <button
+            className="button-style  group-button"
+            onClick={e => navigate("/UnitAccounts")}
+            style={{ width: "120px" }}
+          >
+            Close
+          </button>
         </div>
       </div>
+
+
+
+
+
 
 
 
@@ -470,7 +583,14 @@ export default function UnitDetails() {
                     )
                   })
                 }
-                
+                {/* {
+
+                  // showUnitId &&
+                  <tr onClick={unitSubmit}>
+                    <td>UnitID</td>
+                    <td>UnitName</td></tr>
+
+                } */}
               </tbody>
             </Table>
           </div>
@@ -538,7 +658,9 @@ export default function UnitDetails() {
 
                       maxLength={6}
                       value={selectRow.PIN || postData.PIN}
-                      onChange={unitFormChange} />
+                      // onChange={unitFormChange} 
+                      onChange={pincodehandleChange}
+                    />
 
                   </div>
 
@@ -572,6 +694,10 @@ export default function UnitDetails() {
                     value={selectRow.Country || postData.Country}
                     onChange={unitFormChange} />
                 </div>
+
+
+
+
 
                 <div className=" col-md-12">
 
@@ -615,7 +741,7 @@ export default function UnitDetails() {
 
                 <div className=' col-md-12 '>
                   <label className='form-label col-md-6  '>Mail Id</label>
-                  <input class=" form-control " type="text" placeholder=" " name='Mail_Id'
+                  <input class=" form-control " type="email" placeholder=" " name='Mail_Id'
 
 
                     value={selectRow.Mail_Id || postData.Mail_Id}
@@ -634,7 +760,7 @@ export default function UnitDetails() {
 
                 <div className=' row col-md-12 mt-1'>
                   <label className="form-label col-md-2">Current</label>
-                  <input className="mt-3 col-md-3  custom-checkbox" type="checkbox" name='Current'
+                  <input className="mt-3 col-md-3 ms-4  custom-checkbox" type="checkbox" name='Current'
                     onChange={unitFormChange} id="flexCheckDefault"
                     checked={selectRow.Current === 1 ? true : false || postData.Current === 1 ? true : false}
 
