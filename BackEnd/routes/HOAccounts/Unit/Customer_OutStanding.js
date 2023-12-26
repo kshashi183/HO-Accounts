@@ -69,18 +69,55 @@ setupQueryMod(sql, (err, result)=>{
 })
 })
 
+// customerOutstanding.get('/getDataBasedOnCustomer', (req,res)=>{
+//     const custcode=req.query.selectedCustCode;
+//    // console.log("cust_code backend 33333333333 ", custcode);
+//     const sql=`     SELECT *,
+//     GrandTotal-  PymtAmtRecd AS Balance, DATEDIFF(CURRENT_DATE(),inv_date) AS duedays,
+//     IF(LENGTH(DC_Date) = 8, DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DC_Date,
+//       IF(LENGTH(Inv_Date) = 8, DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_Inv_Date,
+//         IF(LENGTH(DespatchDate) = 8, DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DespatchDate,
+//     IF(TIME(OrderDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_OrderDate,
+//       IF(TIME(PaymentDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_PaymentDate
+// FROM magod_hq_mis.unit_invoices_list
+// WHERE UnitName = 'Jigani' AND Cust_Code = '${custcode}';`;
+
+    
+    
+//     setupQueryMod(sql, (err, result)=>{
+//         if(err){
+//             console.log("err in query", err);
+//         }
+//         else{
+//         // console.log("cust code result", result);
+//             return res.json({Result:result});
+//         }
+//     })
+//     })
+
 customerOutstanding.get('/getDataBasedOnCustomer', (req,res)=>{
-    const custcode=req.query.selectedCustCode;
-   // console.log("cust_code backend 33333333333 ", custcode);
-    const sql=`     SELECT *,
-    GrandTotal-  PymtAmtRecd AS Balance, DATEDIFF(CURRENT_DATE(),inv_date) AS duedays,
-    IF(LENGTH(DC_Date) = 8, DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DC_Date,
-      IF(LENGTH(Inv_Date) = 8, DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_Inv_Date,
-        IF(LENGTH(DespatchDate) = 8, DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DespatchDate,
-    IF(TIME(OrderDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_OrderDate,
-      IF(TIME(PaymentDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_PaymentDate
-FROM magod_hq_mis.unit_invoices_list
-WHERE UnitName = 'Jigani' AND Cust_Code = '${custcode}';`;
+    const custcode = req.query.selectedCustCode;
+    const selectedDCType = req.query.selectedDCType;
+    const invoiceFor = req.query.flag;
+    console.log("custcode, ", custcode,);
+    console.log("dctype",  selectedDCType);
+     console.log("invoiceFor, ", invoiceFor,);
+
+    const sql=`SELECT 
+    u.PO_No,
+    u.Inv_No,
+    @UnitName AS UnitName,
+    u.GrandTotal - u.PymtAmtRecd AS Balance,
+    DATEDIFF(CURRENT_DATE(), u.Inv_Date) AS duedays,
+    u.InvoiceFor,  
+    u.DCStatus, 
+    u.DC_InvType,
+    u.Inv_Date, 
+    u.GrandTotal,
+    u.Cust_Name,
+    u.PymtAmtRecd,u.PIN_Code,u.DC_Inv_No
+    FROM magod_hq_mis.unit_invoices_list u
+    WHERE  u.Cust_Code = ${custcode}`
 
     
     
@@ -89,12 +126,15 @@ WHERE UnitName = 'Jigani' AND Cust_Code = '${custcode}';`;
             console.log("err in query", err);
         }
         else{
-        //  console.log("cust code result", result);
+        // console.log("cust code result", result);
             return res.json({Result:result});
         }
     })
     })
 
+
+
+    
 
     customerOutstanding.get('/getDataTable2', (req,res)=>{
         const DC_Inv_No=req.query.selectedDCInvNo;
@@ -121,6 +161,22 @@ WHERE UnitName = 'Jigani' AND Cust_Code = '${custcode}';`;
                 return res.json({Result:result});
             }
         })
+        })
+
+
+        customerOutstanding.get('/getDCTypes', (req, res) => {
+
+
+            const sql = `SELECT  DISTINCT DC_InvType FROM magod_hq_mis.unit_invoices_list `
+            setupQueryMod(sql, (err, result) => {
+                if (err) {
+                    console.log("err in query", err);
+                }
+                else {
+                    //console.log("DC_Inv_type", result);
+                    return res.json({ Result: result });
+                }
+            })
         })
 
 module.exports = customerOutstanding;

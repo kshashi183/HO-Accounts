@@ -201,55 +201,7 @@ const[selectCustData, setSelectCustData]=useState([]);
 
                     <tbody className='tablebody'>
                        
-                        {/* {
-                            openInvoice.map((item, rowIndex) => {
-                                return (
-
-                                    <tr key={rowIndex} >
-                                        <td><input type='checkbox'
-                                            checked={rowChecked[rowIndex]} // Use the checked state for this row
-                                            onChange={() => handleCheckboxChange(rowIndex)}
-                                        /></td>
-                                        <td>
-                                            <input style={{ border: 'none', width: '70px' }}
-                                                type='text'
-                                                value={item.DC_InvType}
-                                                onChange={(e) => handleChange(rowIndex, 'DC_InvType', e.target.value)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input style={{ border: 'none', width: '70px' }}
-                                                type='text'
-                                                value={item.Inv_No}
-                                                onChange={(e) => handleChange(rowIndex, 'Inv_No', e.target.value)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input style={{ border: 'none', width: '90px' }}
-                                                type='text'
-                                                value={item.Formatted_Inv_Date}
-                                                onChange={(e) => handleChange(rowIndex, 'Inv_Date', e.target.value)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input style={{ border: 'none', width: '70px' }}
-                                                type='text'
-                                                value={item.GrandTotal}
-                                                onChange={(e) => handleChange(rowIndex, 'GrandTotal', e.target.value)}
-                                            />
-                                        </td>
-                                       
-                                        <td>
-                                            <input style={{ border: 'none', width: '70px' }}
-                                                type='text'
-                                                value={item.PymtAmtRecd}
-                                                onChange={(e) => handleChange(rowIndex, 'PymtAmtRecd', e.target.value)}
-                                            />
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        } */}
+                        
 
                         {
                             

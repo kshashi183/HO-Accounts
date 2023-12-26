@@ -239,4 +239,17 @@ const setupQueryMod = async (q,values, callback) => {
 // };
 
 // module.exports={dailyReportQuery, setupQuery,setupQueryMod,misQuery };
-module.exports={dailyReportQuery, setupQuery, hqQuery,setupQueryMod};
+
+
+
+
+let misQuery = (q, values) => {
+  return new Promise((resolve, reject) => {
+    misConn.connect();
+    misConn.query(q, values, (err, res, fields) => {
+      if (err) reject(err);
+      else resolve(res);
+    });
+  });
+};
+module.exports={dailyReportQuery, setupQuery, hqQuery,setupQueryMod,misQuery};
