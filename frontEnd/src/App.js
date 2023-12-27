@@ -6,7 +6,7 @@ import Parentroute from "./Layout/Parentroute";
 import Login from "./pages/Auth/Login";
 import Home from "./pages/Home";
 
-// import HoUnitInvoices from "./pages/Production/HoAccounts/HoUnitInvoices/HoUnitInvoices";
+
 
 
 import UnitDetails from "./pages/HoAccounts/SetUp/UnitList/UnitDetails";
@@ -17,22 +17,24 @@ import HoUnitInvoices from "./pages/HoAccounts/Ho/HoUnitInvoices/HoUnitInvoices"
 import MonthlyReport from "./pages/HoAccounts/Ho/MonthlyReport/MonthlyReport";
 import RvAdjustmentForm from "./pages/HoAccounts/Ho/UnitRvAdjustment/RvAdjustmentForm";
 
-// import CreateNewCallFile from "./pages/HoAccounts/Ho/HO_PRV/CreateNew/CreateNewCallFile";
 import CreateNewForm from "./pages/HoAccounts/Ho/HO_PRV/CreateNew/CreateNewForm";
 import SyncCall from "./pages/HoAccounts/Sync/SyncCall";
-// import TallyExportForm from "./pages/HoAccounts/Ho/TallyExport/TallyExportForm";
+
 import TallyExportCall from "./pages/HoAccounts/Ho/TallyExport/TallyExportCall";
 import UnitReceiptListForm from "./pages/HoAccounts/Ho/UnitReciptList/UnitReceiptListForm";
 import OpenVoucher from "./pages/HoAccounts/Ho/UnitReciptList/OpenVoucher";
-import CompanyListFormTables from "./pages/HoAccounts/Tally/CompanyList/CompanyListFormTables";
+
 import UnitSyncForm from "./pages/HoAccounts/Ho/UnitSync/UnitSyncForm";
-import AdjustmentVoucherForm from "./pages/HoAccounts/Ho/UnitRvAdjustment/AdjustmentVoucherForm";
+//import AdjustmentVoucherForm from "./pages/HoAccounts/Ho/UnitRvAdjustment/AdjustmentVoucherForm";
 import AdjustmentCallFile from "./pages/HoAccounts/Ho/UnitRvAdjustment/AdjustmentCallFile";
 import { ToastContainer } from "react-toastify";
 import VendorList from "./pages/HoAccounts/Purchase/VenderList/VendorList";
 import PurchaseInvoiceList from "./pages/HoAccounts/Purchase/PurchaseInvoices/PurchaseInvoiceList";
+import Draft_List from "./pages/HoAccounts/Ho/HO_PRV/DraftList/Draft_List";
+import PRV_List from "./pages/HoAccounts/Ho/HO_PRV/PRVList/PRV_List";
+import On_AccountList from "./pages/HoAccounts/Ho/HO_PRV/OnAccountList/On_AccountList";
 
-// import SyncCall from "./pages/HoAccounts/Ho/Sync/SyncCall";
+
 
 
 
@@ -77,8 +79,11 @@ function App() {
               <Route path="Openvoucher" element={<UnitReceiptListForm />} />
              
               <Route path="UnitSync" element={<UnitSyncForm />} />
-              <Route path="HOPrv">
+              <Route path="HOPRV">
                 <Route path="CreateNew" element={<CreateNewForm/>} />
+                <Route path="DraftList" element={<Draft_List/>} />
+                <Route path="PRVList" element={<PRV_List/>} />
+                <Route path="OnAccountList" element={<On_AccountList/>} />
               </Route>
             </Route>
 
@@ -87,10 +92,7 @@ function App() {
               <Route path="ShowSync" element={<SyncCall />} />
             </Route>
 
-            <Route path="Tally">
-              <Route index={true} element={<HoAccounts />} />
-              <Route path="CompanyList" element={<CompanyListFormTables />} />
-            </Route>
+           
 
             <Route path="Purchase">
               <Route index={true} element={<HoAccounts />} />

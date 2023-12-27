@@ -1,282 +1,301 @@
+
+
+
+
+
 import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap'
 import CustomerOutStandingTable02 from './CustomerOutStandingTable02'
 import axios from 'axios';
 import { baseURL } from '../../../../../api/baseUrl';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function CustomerOutStanding({ selectedCustCode,searchQuery }) {
+export default function CustomerOutStanding({
+    selectedCustCode, searchQuery,
+    setFlag,
+    selectedDCType, setSelectedDCType, flag, filterData, setFilterData
+}) {
 
     const [dataBasedOnCust, setDataBasedOnCust] = useState([]);
 
-    console.log(selectedCustCode, "cust cosssde");
+
+
+    console.log("salessssssss", selectedDCType);
+
+    const coolDownDuration = 6000; // 2 seconds (adjust as needed)
+    const [lastToastTimestamp, setLastToastTimestamp] = useState(0)
+    let test = 0;
+
+
+
+
     useEffect(() => {
-        // basedOnCustomer();
-        if (selectedCustCode) {
-            axios.get(baseURL+'/customerOutstanding/getDataBasedOnCustomer',
-                {
-                    params: {
-                        selectedCustCode: selectedCustCode
-                    },
-                }
-            )
-                .then((res) => {
-                  //  console.log("cust code data", res.data.Result);
-                    setDataBasedOnCust(res.data.Result)
-                }).catch((err) => {
-                    console.log("errin cust cosde", err);
-                })
+
+        const fetchData = async () => {
+            try {
+                // Call your asynchronous function here
+                await basedOnCustomer();
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, [selectedDCType, flag, selectedCustCode]);
+
+
+
+
+
+
+    // const basedOnCustomer = async () => {
+
+
+    //     if (selectedDCType === '' && flag !== '') {
+
+
+    //             toast.error("Select DC Invoice Type")
+    //         }
+
+
+
+    //     else {
+
+    //         console.log("dc type ", selectedDCType, flag);
+    //         try {
+    //             await axios.get(baseURL + '/customerOutstanding/getDataBasedOnCustomer',
+    //                 {
+    //                     params: {
+    //                         selectedCustCode: selectedCustCode, selectedDCType: selectedDCType, flag: flag
+    //                     },
+    //                 }
+    //             )
+    //                 .then((res) => {
+    //                     console.log("resjjjjj",res.data.Result);
+
+    //                     if (res.data.Result==='customer err') {
+    //                         toast.error("Select Suitable Customer")
+    //                     }
+
+    //                     else if (res.data.Result.length === 0) {
+    //                         setDataBasedOnCust([])
+
+    //                             // toast.error("Select Suitable Process for Invoice Type ")
+    //                             toast.error("Select Suitable DC Invoice Type ")
+
+    //                     }
+    //                     else {
+    //                         setDataBasedOnCust(res.data.Result);
+    //                     }
+    //                     console.log("salessssss123", res.data.Result);
+    //                 }).catch((err) => {
+    //                     console.log("errin cust cosde", err);
+    //                 })
+
+    //         }
+    //         catch (error) {
+
+    //         }
+    //     }
+
+    // }
+
+
+    // const allTypes=()=>{
+    //     axios.get(baseURL + '/customerOutstanding/getDataBasedOnCustomer',
+    //             {
+    //                 params: {
+    //                     selectedCustCode: selectedCustCode, selectedDCType:selectedDCType, flag:flag
+    //                 },
+    //             }
+    //         )
+    //             .then((res) => {
+
+    //                 setDataBasedOnCust(res.data.Result);
+
+    //                 // console.log("sales", salesType);
+    //             }).catch((err) => {
+    //                 console.log("errin cust cosde", err);
+    //             })
+    // }
+
+    const basedOnCustomer = async () => {
+
+
+
+        console.log("cust codeeeeee", selectedCustCode);
+
+        let updatedFlag = flag; // Set the initial value of updatedFlag to the current value of flag
+
+        if (selectedDCType === 'ALL') {
+            // If selectedCustCode is 'ALL', set updatedFlag to an empty string
+            updatedFlag = '';
+        }
+
+        if (selectedCustCode === '' &&(selectedDCType!=='' || flag!=='')) {
+            console.log("cust codeeeeee", selectedCustCode);
+            toast.error("Select Customer")
+        }
+
+  else     if (selectedDCType === '' && flag !== '') {
+
+
+            toast.error("Select DC Invoice Type")
+
 
         }
+
+     
+
         else {
-            console.log("not fetch");
+
+            console.log("dc type ", selectedDCType, flag);
+            try {
+                await axios.get(baseURL + '/customerOutstanding/getDataBasedOnCustomer',
+                    {
+                        params: {
+                            selectedCustCode: selectedCustCode, selectedDCType: selectedDCType, flag: updatedFlag
+                        },
+                    }
+                )
+                    .then((res) => {
+                        console.log("resjjjjj", res.data.Result);
+
+                        if (res.data.Result === 'customer err') {
+                            setDataBasedOnCust([])
+                            toast.error("Select  Customer")
+                        }
+                        else if (res.data.Result === "error in invoice for") {
+                            console.log("customer", res.data.Result);
+                            setDataBasedOnCust([])
+                            toast.error("Select Suitable Invoice For")
+                        }
+                        else if (res.data.Result === "select dc type") {
+                            setDataBasedOnCust([])
+                            toast.error("Select Suitable DC Inv Type")
+                        }
+
+                        else if (res.data.Result === "cust dont have dc") {
+                            toast.error("Customer dont have  DC Inv Type")
+                        }
+
+
+                        else {
+                            setDataBasedOnCust(res.data.Result);
+                        }
+                        console.log("salessssss123", res.data.Result);
+                    }).catch((err) => {
+                        console.log("errin cust cosde", err);
+                    })
+
+            }
+            catch (error) {
+
+            }
         }
-    }, [selectedCustCode])
-
-
-    const basedOnCustomer = () => {
 
     }
 
-    const filteredInvoiceNumbers = dataBasedOnCust.filter((row) =>
-    row['Inv_No'].includes(searchQuery)
-  );
-  
+    // const filteredInvoiceNumbers = dataBasedOnCust.filter((row) => 
+    //     row['Inv_No'].includes(searchQuery)
 
-  const [selectedDCInvNo, setSelectedDCInvNo] = useState('');
-  const [selectedRow, setSelectedRow] = useState(null);
+    //     );
+
+    useEffect(() => {
+        const filteredInvoiceNumbers = dataBasedOnCust.filter((row) =>
+            row['Inv_No'].includes(searchQuery)
+        );
 
 
-// Function to handle row selection
-const handleRowSelect = (dcInvNo) => {
-  setSelectedDCInvNo(dcInvNo);
-  setSelectedRow(dcInvNo);
-  
-};
+        setFilterData(filteredInvoiceNumbers);
+    }, [dataBasedOnCust, searchQuery, setFilterData]);
+
+
+    console.log("FilteredData", filterData)
+
+    // Function to fetch invoices based on PO_No
+    function getInvoicesByPO(poNumber) {
+        return filterData.filter((invoice) => invoice.PO_No === poNumber);
+    }
+
+    const po = filterData.map((item, index) => {
+        const invoicesForPO = getInvoicesByPO(item.PO_No);
+        console.log("in", invoicesForPO);
+
+    })
+
+
+    const [selectedDCInvNo, setSelectedDCInvNo] = useState('');
+    const [selectedRow, setSelectedRow] = useState(null);
+
+
+    // Function to handle row selection
+    const handleRowSelect = (dcInvNo) => {
+
+        setSelectedDCInvNo(dcInvNo);
+        setSelectedRow(dcInvNo);
+
+    };
+
+
+
+    function formatAmount(amount) {
+        // Assuming amount is a number
+        const formattedAmount = new Intl.NumberFormat('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(amount);
+
+        return formattedAmount;
+    }
     return (
         <div className='row col-md-12'>
             <div className='mt-3 col-md-6'>
                 <div style={{ height: "250px", overflowY: "scroll", overflowX: 'scroll' }}>
-                    <Table className='table-data border'  striped>
-                        <thead className='tableHeaderBGColor' style={{ textAlign: "center" }}>
+                    <Table className='table-data border' striped>
+                        <thead className='tableHeaderBGColor' >
                             <tr>
-                               <th>Select</th>
                                 <th>Type</th>
                                 <th>Inv_No</th>
+                                <th>InvoiceFor</th>
                                 <th style={{ whiteSpace: 'nowrap' }}>Invoice_Date</th>
                                 <th>Total</th>
-                                <th>Balance</th>
-                                <th>Due_Days</th>
+                                <th style={{textAlign:'right'}}>Balance</th>
+                                <th style={{textAlign:'center'}}>Due_Days</th>
                                 <th>Status</th>
-{/*                                
-                                <th style={{ whiteSpace: 'nowrap' }}>Sync_HoId</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Unit_Uid</th>
-                               
-                                <th style={{ whiteSpace: 'nowrap' }}>Unit_Name</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>DC_Inv_No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Scheduled</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>DC_Inv_Date</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>InvoiceFor</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Order_No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Order_Date</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Order_ScheduleNo</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>DC_No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>DC_Date</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>DC_Fin_Year</th>
-                               
-                                
-                                <th style={{ whiteSpace: 'nowrap' }}>Inv_Fin_Year</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Payment Date</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Pmny_Recd</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Payment Mode</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Pymt_Amt_Recd</th>
-                                
-                                <th style={{ whiteSpace: 'nowrap' }}>Payment_Receipt_Details</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>GRN No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Cust_Code</th>
-                               
-                                <th style={{ whiteSpace: 'nowrap' }}>Cust_Name</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Cust_Address</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Cust_Place</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Cust_State</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Cust_StateId</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>PIN_Code</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Del_Address</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>ECC_No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>GST No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>TIN No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>KST_No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>TaxAmount</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>CST_No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>PO_No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>PO_Date</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Net_Total</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Pkng_Chg</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Tpt Changes</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Discount</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Pgm_Dft_Chg</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>MtrlChg</th>
-                                
-                                <th style={{ whiteSpace: 'nowrap' }}>Assessable Value</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Del_Chg</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Inv Total</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Round_off</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Grand Total</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Total_Wt</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Scrap Wt</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>DC_Status</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Cenvat Srl No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Despatch Time</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>TptMode</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Veh No</th>
-                             
-                                <th style={{ whiteSpace: 'nowrap' }}>Ex Not No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Insp By</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Packed By</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Com_inv_id</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Remarks</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Del_Responsibility</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Payment Terms</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>PkngLevel</th>
-
-
-                                
-
-                                
-                                <th style={{ whiteSpace: 'nowrap' }}>Summary Invoice</th>
-                               
-                                <th style={{ whiteSpace: 'nowrap' }}>Bill Type</th> */}
-                                
-
-
-
-
-
 
                             </tr>
                         </thead>
 
-
                         <tbody className='tablebody'>
-                            {/* {
-                                dataBasedOnCust.map((item, index) => {
-                                    return (
-                                        <>
-                                            <tr>
-                                                <td>
-                                                    <input type='checkbox' disabled/>
-                                                </td>
-                                                <td style={{ whiteSpace: 'nowrap' }}>{item.DC_InvType}</td>
-                                                <td>{item.Inv_No}</td>
-                                                <td>{item.Inv_Date}</td>
-                                                <td></td>
-                                                <td>{item.Balance}</td>
-                                                <td>{item.duedays}</td>
-                                                <td>{item.DCStatus}</td>
-                                            </tr>
-                                        </>
-                                    )
-                                })
-                            } */}
 
-                            {filteredInvoiceNumbers.map((item, index) => (
-                               
+                            {filterData.map((item, index) => (
+
                                 <tr onClick={() => handleRowSelect(item.DC_Inv_No)}
-                                key={index}
-                               
-                                className={selectedRow === item.DC_Inv_No ? 'selcted-row-clr' : ''}
-                               >
-                              <td><input type='checkBox' disabled/></td>
-                                <td style={{ whiteSpace: 'nowrap' }}>{item.DC_InvType}</td>
-                                <td>{item.Inv_No}</td>
-                                <td>{item.Formatted_Inv_Date}</td>
-                                <td>{item.GrandTotal}</td>
-                                <td>{item.Balance}</td>
-                                <td>{item.duedays}</td>
-                                <td>{item.DCStatus}</td>
-                               
-                                {/* <td>{item.Sync_HOId}</td>
-                                <td>{item.Unit_Uid}</td>
-                                
-                               
-                                <td>{item.UnitName}</td>
-                                <td>{item.DC_Inv_No}</td>
-                                <td>{item.ScheduleId}</td>
-                                <td>{item.Formatted_DC_inv_Date}</td>
-                     
-                      <td>{item.InvoiceFor}</td>
-                      <td>{item.OrderNo}</td>
-                      <td>{item.Formatted_OrderDate}</td>
-                      <td>{item.OrderScheduleNo}</td>
-                      <td>{item.Dc_No}</td>
-                      <td style={{whiteSpace:'nowrap'}}>{item.Formatted_DC_Date}</td>
-                      <td>{item.DC_Fin_Year}</td>
-                     
-                      
-                      <td>{item.Inv_Fin_Year}</td>
-                      <td>{item.Formatted_PaymentDate}</td>
-                    
-                    <td><input type="checkbox" checked={item.PmnyRecd === 1} /></td>
-                    <td>{item.PaymentMode}</td>
-                    <td>{item.PymtAmtRecd}</td>
-                  
-                    <td>{item.PaymentReceiptDetails}</td>
-                    <td>{item.GRNNo}</td>
-                      <td>{item.Cust_Code}</td>
-                      <td style={{whiteSpace:'nowrap'}}>{item.Cust_Name}</td>
-                      <td style={{whiteSpace:'nowrap'}}>{item.Cust_Address}</td>
-                      <td>{item.Cust_Place}</td>
-                      <td style={{whiteSpace:'nowrap'}}>{item.Cust_State}</td>
-                      <td>{item.Cust_StateId}</td>
-                      <td>{item.PIN_Code}</td>
-                      <td>{item.Del_Address}</td>
-                      <td>{item.ECC_No}</td>
-                      
-                      <td>{item.GSTNo}</td>
-                      <td>{item.TIN_No}</td>
-                      <td>{item.KST_No}</td>
-                      <td>{item.TaxAmount}</td>
-                      <td>{item.CST_No}</td>
-                      <td style={{whiteSpace:'nowrap'}}>{item.PO_No}</td>
-                      <td>{item.Formatted_PO_Date}</td>
-                      <td>{item.Net_Total}</td>
-                      <td>{item.Pkng_chg}</td>
-                      <td>{item.TptCharges}</td>
-                      <td>{item.Discount}</td>
-                      <td>{item.Pgm_Dft_Chg}</td>
-                      <td>{item.MtrlChg}</td>
-                      
-                      <td>{item.AssessableValue}</td>
-                      <td>{item.Del_Chg}</td>
-                      <td>{item.InvTotal}</td>
-                      <td>{item.Round_Off}</td>
-                      <td>{item.GrandTotal}</td>
-                      <td>{item.Total_Wt}</td>
-                      <td>{item.ScarpWt}</td>
-                      <td>{item.DCStatus}</td>
-                      <td>{item.CenvatSrlNo}</td>
-                      <td>{item.Formatted_DespatchTime}</td>
-                      <td>{item.TptMode}</td>
-                      <td>{item.VehNo}</td>
-                  
-                      <td>{item.ExNotNo}</td>
+                                    key={index}
 
-                      <td>{item.InspBy}</td>
-                      <td>{item.PackedBy}</td>
-                      <td>{item.Com_inv_id}</td>
-                      <td style={{whiteSpace:'nowrap'}}>{item.Remarks}</td>
-                      <td>{item.Del_responsibility}</td>
-                      <td>{item.PaymentTerms}</td>
-                      <td>{item.pkngLevel}</td> */}
+                                    className={selectedRow === item.DC_Inv_No ? 'selcted-row-clr' : ''}
+                                >
 
-                     
+                                    <td style={{ whiteSpace: 'nowrap' }}>{item.DC_InvType}</td>
+                                    <td>{item.Inv_No}</td>
+                                    <td>{item.InvoiceFor}</td>
+                                    <td>{new Date(item.Inv_Date).toLocaleDateString('en-GB')}</td>
+                                    <td style={{textAlign:'right'}}>{formatAmount(item.GrandTotal)}</td>
+                                    <td style={{textAlign:'right'}}>{formatAmount(item.Balance)}</td>
+                                    <td style={{textAlign:'center'}}>{item.duedays}</td>
+                                    <td>{item.DCStatus}</td>
 
-
-                      {/* <td><input type="checkbox" checked={item.SummaryInvoice === 1} /></td>
-                      <td>{item.BillType}</td> */}
-                      
-        
-                            </tr>
+                                </tr>
                             ))}
+
+                            {
+
+                            }
+
+
+
                         </tbody>
                     </Table>
                 </div>
@@ -284,8 +303,11 @@ const handleRowSelect = (dcInvNo) => {
 
             <div className="box col-md-6">
                 <CustomerOutStandingTable02
-                 selectedCustCode={selectedCustCode} selectedDCInvNo={selectedDCInvNo}  />
-           
+                    selectedCustCode={selectedCustCode} selectedDCInvNo={selectedDCInvNo}
+                    flag={flag}
+                    selectedDCType={selectedDCType}
+                />
+
             </div>
 
         </div>

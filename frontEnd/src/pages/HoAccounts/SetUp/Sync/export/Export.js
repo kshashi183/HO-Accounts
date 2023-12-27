@@ -119,7 +119,7 @@ useEffect(() => {
         <Tab eventKey="openReceipts" title="Open Receipts">
           <OpenReceipt data={data.open_rec}/>
         </Tab>
-        <Tab eventKey="hoReceiptVoucher" title="Ho Receipt Voucher">
+        <Tab eventKey="hoReceiptVoucher" title="HO Receipt Voucher">
           <HoReceiptVoucher/>
         </Tab>
       </Tabs>

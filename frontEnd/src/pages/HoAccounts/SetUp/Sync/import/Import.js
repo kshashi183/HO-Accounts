@@ -1,9 +1,11 @@
-import React, { useState,useRef } from "react";
+import React, { useState,useRef , useEffect} from "react";
 import ImportOpenInvoice from "./ImportOpenInvoice";
 import ImportOpenReceipt from "./ImportOpenReceipt";
 import ImportHoReceiptVoucher from "./ImportHoReceiptVoucher";
 import TallyInvoicesSync from "./TallyInvoicesSync";
 import { Tab, Tabs } from "react-bootstrap";
+import axios from "axios";
+import { baseURL } from "../../../../../api/baseUrl";
 
 export default function Import(props) {
   const fileInputRef = useRef(null);
@@ -64,27 +66,60 @@ export default function Import(props) {
           ) {
             syncedData.push({
               ...unitInv,
-              UnitName: matchedInv.UnitName,
+              // UnitName: matchedInv.UnitName,
               
+              // Remarks: 'Value Different',
+              // DC_Inv_No: matchedInv.DC_Inv_No,
+              // Unit_PymtAmtRecd: unitInv.PymtAmtRecd,
+              // Unit_GrandTotal: unitInv.GrandTotal,
+              // Unit_DCStatus: unitInv.DCStatus,
+              // Unit_DC_InvType:unitInv.DC_InvType,
+              // Unit_Cust_Name:unitInv.Unit_Cust_Name,
+              // Unit_Inv_No:unitInv.Inv_No,
+              // HO_PymtAmtRecd: matchedInv.PymtAmtRecd,
+              // HO_GrandTotal: matchedInv.GrandTotal,
+              // HO_DCStatus: matchedInv.DCStatus,
+              UnitName: matchedInv.UnitName,
+              Cust_Name: matchedInv.Cust_Name,
               Remarks: 'Value Different',
               DC_Inv_No: matchedInv.DC_Inv_No,
               Unit_PymtAmtRecd: unitInv.PymtAmtRecd,
               Unit_GrandTotal: unitInv.GrandTotal,
               Unit_DCStatus: unitInv.DCStatus,
-              Unit_DC_InvType:unitInv.DC_InvType,
-              Unit_Cust_Name:unitInv.Unit_Cust_Name,
-              Unit_Inv_No:unitInv.Inv_No
+              Inv_Date: matchedInv.Inv_Date,
+              Inv_No: matchedInv.Inv_No,
+              HO_ReceiptStatus: matchedInv.ReceiptStatus,
+              Unit_UId: matchedInv.Unit_UId,
+              Sync_HOId: matchedInv.Sync_HOId,
+              HO_GrandTotal: matchedInv.GrandTotal,
+              HO_PymtAmtRecd: matchedInv.PymtAmtRecd,
+              HO_DCStatus: matchedInv.DCStatus,
               
             });
             syncedData1.push({
               ...unitInv,
-              UnitName: matchedInv.UnitName,
+              // UnitName: matchedInv.UnitName,
               
+              // Remarks: 'Value Different',
+              // DC_Inv_No: matchedInv.DC_Inv_No,
+              // Unit_PymtAmtRecd: unitInv.PymtAmtRecd,
+              // Unit_GrandTotal: unitInv.GrandTotal,
+              // Unit_DCStatus: unitInv.DCStatus,
+              UnitName: matchedInv.UnitName,
+              Cust_Name: matchedInv.Cust_Name,
               Remarks: 'Value Different',
               DC_Inv_No: matchedInv.DC_Inv_No,
               Unit_PymtAmtRecd: unitInv.PymtAmtRecd,
               Unit_GrandTotal: unitInv.GrandTotal,
               Unit_DCStatus: unitInv.DCStatus,
+              Inv_Date: matchedInv.Inv_Date,
+              Inv_No: matchedInv.Inv_No,
+              HO_ReceiptStatus: matchedInv.ReceiptStatus,
+              Unit_UId: matchedInv.Unit_UId,
+              Sync_HOId: matchedInv.Sync_HOId,
+              HO_GrandTotal: matchedInv.GrandTotal,
+              HO_PymtAmtRecd: matchedInv.PymtAmtRecd,
+              HO_DCStatus: matchedInv.DCStatus,
               
             });
           }
@@ -158,9 +193,35 @@ export default function Import(props) {
       
     }; 
 
+    console.log("updated data ", updatedataa.open_inv[0]);
+
     const postData = async()=>{
-     
+      
+      axios.put(baseURL+'/sync/postData', updatedataa)
+      .then((res)=>{
+        console.log(res,'newiddd')
+        if(res.data.Status==='Success')
+        {
+          alert('Data Updated Successfully')
+        //  props.onDataReturn()
+          const parsedData = parseXmlData(receipt_data)  
+          sync_data(parsedData)
+          setFlag(true)
+          
+        }
+        else{
+            alert('Failed to update data')
+        }
+      }).catch((err)=>{
+        console.log('eroor in fromntend',err);
+      })
     }
+
+    useEffect(() => {
+      //console.log(receipt_data, 'receipt_data')
+      // const parsedData = parseXmlData(receipt_data)  
+      // sync_data(parsedData)
+    }, [flag]); 
   return (
     <div>
       <div className="row">
@@ -192,7 +253,7 @@ export default function Import(props) {
         <Tab eventKey="openReceipts" title="Open Receipts">
           <ImportOpenReceipt />
         </Tab>
-        <Tab eventKey="hoReceiptVoucher" title="Ho Receipt Voucher">
+        <Tab eventKey="hoReceiptVoucher" title="HO Receipt Voucher">
           <ImportHoReceiptVoucher />
         </Tab>
         <Tab eventKey="tallyInvoicesSync" title="Tally Invoices Sync">

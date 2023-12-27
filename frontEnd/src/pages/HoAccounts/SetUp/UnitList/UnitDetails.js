@@ -514,7 +514,7 @@ export default function UnitDetails() {
         <div className="col-md-2 col-sm-12">
           <button
             className="button-style  group-button"
-            onClick={e => navigate("/UnitAccounts")}
+            onClick={e => navigate("/HOAccounts")}
             style={{ width: "120px" }}
           >
             Close

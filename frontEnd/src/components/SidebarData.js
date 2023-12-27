@@ -9,7 +9,7 @@ import * as FaIcon from "react-icons/fa";
 import * as MdIcon from "react-icons/md";
 import { VscOutput, VscTypeHierarchySub } from "react-icons/vsc";
 import { BiFoodMenu } from "react-icons/bi";
-import { HiReceiptTax, HiUsers } from "react-icons/hi";
+import { HiArchive, HiClipboardList, HiOutlineClipboard, HiReceiptTax, HiUsers } from "react-icons/hi";
 import {
   BsPersonFill,
   BsFillGearFill,
@@ -124,8 +124,27 @@ export const customerSidebar = [
           {
             title: "Create New",
             icon: <SiArtstation />,
-            path: "/HOAccounts/HO/HOPrv/CreateNew",
+            path: "/HOAccounts/HO/HOPRV/CreateNew",
           },
+         
+
+          {
+            title: "Draft List",
+            icon: <HiArchive />,
+            path: "/HOAccounts/HO/HOPRV/DraftList",
+          },
+          {
+            title: "PRV List",
+            icon: <HiClipboardList />,
+            path: "/HOAccounts/HO/HOPRV/PRVList",
+          },
+          {
+            title: "On AccountList",
+            icon: <HiOutlineClipboard />,
+            path: "/HOAccounts/HO/HOPRV/OnAccountList",
+          },
+
+
         ],
       },
     ],
@@ -145,19 +164,7 @@ export const customerSidebar = [
     ],
   },
 
-  {
-    title: "Tally",
-    icon: <VscOutput />,
-    iconClosed: <RiIcons.RiArrowDownSFill />,
-    iconOpened: <RiIcons.RiArrowUpSFill />,
-    subNav: [
-      {
-        title: "Company List",
-        icon: <SiReacthookform />,
-        path: "/HOAccounts/Tally/CompanyList",
-      },
-    ],
-  },
+  
 ];
 
 export const adminSidebar = [
