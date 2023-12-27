@@ -17,6 +17,23 @@ export default function CreateNewForm() {
   const [selectedOption, setSelectedOption] = useState([]);
   const [selectedCustOption, setSelectedCustOption] = useState([]);
 
+  const initial = {
+    RecdPVID: "",
+    Recd_PVNo: 'Draft',
+    // Recd_PV_Date: formatDate(date),
+    ReceiptStatus: 'Draft',
+    CustName: '',
+    Cust_code: '',
+    TxnType: '',
+    Amount: '',
+    On_account: '',
+    Description: '',
+    selectedCustomer: ''
+  };
+
+  const [postData, setPostData] = useState(initial);
+
+
   const options = [
     { value: "option 1", label: "Bank" },
     { value: "option 2", label: "Cash" },
