@@ -216,7 +216,7 @@ export default function MonthlyReport() {
     }
   };
 
-  // console.log("Addition", getAdditionValues);
+  console.log("Addition", year);
 
   return (
     <div>
@@ -322,7 +322,9 @@ export default function MonthlyReport() {
 
             <div className="d-flex col-md-4" style={{ gap: "60px" }}>
               <div className="col-md-4">
-                <label className="form-label"style={{ marginBottom: "10px" }}>Month</label>
+                <label className="form-label" style={{ marginBottom: "10px" }}>
+                  Month
+                </label>
                 {/* <input
                   className="no-spinner"
                   onChange={(e) => handleMonth(e)}
