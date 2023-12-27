@@ -203,7 +203,7 @@ console.log("Sum of Balances for each PO_NO:", poSumMap);
 
           <Typeahead
 
-            id="basic-example"
+            id="basic-example "
             labelKey={(option) => (option && option.Cust_name ? option.Cust_name.toString() : '')}
             valueKey="Cust_Code"
             options={customersData}
@@ -222,22 +222,22 @@ console.log("Sum of Balances for each PO_NO:", poSumMap);
             placeholder="Search Invoice Number"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ marginTop: '8px' }}
+             style={{ marginTop: '-5px' }}
           ></input>
         </div>
 
-        <div className="col-md-2" style={{ marginTop: '13px' }}>
+        <div className="col-md-2" style={{ marginTop: '20px' }}>
           <label className="form-label">DC Inv Type</label>
           <select
-            style={{ height: '38px' }}
+            style={{ height: '18px' }}
             className="ip-select mt-1"
             value={selectedDCType}
             onChange={handleSelectChange}
           >
-            <option value=''>Select inv Type</option>
-            <option value='Sales & Jobwork'>Sales & Jobwork</option>
+            <option value='' >Select inv Type</option>
+            <option value='Sales & Jobwork' >Sales & Jobwork</option>
             {distictDCType.map((i) => (
-              <option key={i.DC_InvType} value={i.DC_InvType}>
+              <option key={i.DC_InvType} value={i.DC_InvType} >
                 {i.DC_InvType}
               </option>
             ))}

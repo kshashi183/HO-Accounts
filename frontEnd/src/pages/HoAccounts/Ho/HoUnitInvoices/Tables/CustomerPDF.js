@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   },
   unitprice: {
     width: "70px",
-    textAlign: "center",
+    textAlign: "right",
     padding: "1px",
     borderBottom: 1,
 
@@ -266,27 +266,11 @@ export default function CustomerPDF({ dataBasedOnCust }) {
       setCurrentDate(formattedDate);
     };
 
-    // Call the function when the component mounts
+   
     getCurrentDate();
   }, []);
 
-  const rowsPerPage = 5;
-  let serialNumber = 1;
-  const columnsPerPage = 2;
-  const chunkArray = (arr, size) => {
-    return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) => arr.slice(index * size, (index + 1) * size));
-  };
-
-  // const chunkArray = (arr, rows, columns) => {
-  //   const result = [];
-  //   for (let i = 0; i < arr.length; i += rows * columns) {
-  //     result.push(arr.slice(i, i + rows * columns));
-  //   }
-  //   return result;
-  // };
-
-
-  // Check if dataBasedOnCust is empty or undefined
+  
 
 
 
@@ -322,9 +306,7 @@ export default function CustomerPDF({ dataBasedOnCust }) {
 
 
 
-  console.log("filterd data", dataBasedOnCust);
-  const paginatedData = chunkArray(dataBasedOnCust, rowsPerPage);
-
+ 
 
 
   const Header = (dataBasedOnCust) => (
@@ -352,31 +334,7 @@ export default function CustomerPDF({ dataBasedOnCust }) {
 
   let totalGrandTotal = 0;
 
-  // ... (your other code)
-
-  // Calculate the totalGrandTotal before the return statement
-  if (paginatedData.length > 0) {
-    paginatedData.forEach((pageData) => {
-      if (pageData.length > 0) {
-        pageData.forEach((item) => {
-          // Update totalGrandTotal with the current GrandTotal value
-          totalGrandTotal += parseFloat(item.Balance);
-
-        });
-      }
-    });
-  }
-
-
-  console.log("balance", totalGrandTotal);
-  console.log("paginate data", paginatedData);
-
-
-  // const poBalanceSum = {};
-  // dataBasedOnCust.forEach((item) => {
-  //   const poNo = item.PO_No;
-  //   poBalanceSum[poNo] = (poBalanceSum[poNo] || 0) + parseFloat(item.Balance);
-  // });
+  
 
   const poBalanceSum = {};
 
@@ -415,8 +373,9 @@ export default function CustomerPDF({ dataBasedOnCust }) {
   const pageCount = Math.ceil(Object.keys(groupedData).length / itemsPerPage);
 
 
-  const rowsPerPageFirstPage = 3;
-const itemsPerPageForOtherPages = 6;
+  const rowsPerPageFirstPage = 6;
+const itemsPerPageForOtherPages = 8;
+
 
 function formatAmount(amount) {
   // Assuming amount is a number
@@ -499,7 +458,7 @@ function formatAmount(amount) {
 
               <View style={styles.tableDataView}>
                 {Object.keys(groupedData)
-                //  .slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage)
+               
                 .slice(pageIndex === 0 ? 0 : (pageIndex * (pageIndex === 0 ? rowsPerPageFirstPage : itemsPerPageForOtherPages)), (pageIndex === 0 ? rowsPerPageFirstPage : (pageIndex + 1) * itemsPerPageForOtherPages))
             
            
