@@ -360,36 +360,36 @@ export default function AdjustmentVoucherForm() {
                                      
                                            
 
-                                                <tr key={rowIndex} >
+                                                <tr  >
                                                     <td><input type='checkbox'
-                                                        checked={rowChecked[rowIndex]} // Use the checked state for this row
+                                                         // Use the checked state for this row
                                                       
                                                     /></td>
                                                     <td>
                                                         <input style={{ border: 'none', width: '70px' }}
                                                             type='text'
-                                                            value={item.DC_InvType}
+                                                            
                                                        
                                                         />
                                                     </td>
                                                     <td>
                                                         <input style={{ border: 'none', width: '70px' }}
                                                             type='text'
-                                                            value={item.Inv_No}
+                                                          
                                                             
                                                         />
                                                     </td>
                                                     <td>
                                                         <input style={{ border: 'none', width: '90px' }}
                                                             type='text'
-                                                            value={item.Formatted_Inv_Date}
+                                                           
                                                             
                                                         />
                                                     </td>
                                                     <td>
                                                         <input style={{ border: 'none', width: '70px' }}
                                                             type='text'
-                                                            value={item.GrandTotal}
+                                                          
                                                             
                                                         />
                                                     </td>
@@ -397,7 +397,7 @@ export default function AdjustmentVoucherForm() {
                                                     <td>
                                                         <input style={{ border: 'none', width: '70px' }}
                                                             type='text'
-                                                            value={item.PymtAmtRecd}
+                                                            
                                                          
                                                         />
                                                     </td>
