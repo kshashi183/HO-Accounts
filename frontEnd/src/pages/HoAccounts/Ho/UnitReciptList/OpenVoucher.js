@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { baseURL } from '../../../../api/baseUrl';
+import ReactPaginate from "react-paginate";
 
 export default function OpenVoucher() {
 
@@ -11,6 +12,25 @@ export default function OpenVoucher() {
     const [invoiceListData, setInvoiceListData]=useState([])
     const [selectRow, setSelectRow] = useState('');
     const [selectedCustCode, setSelectedCustCode] = useState("");
+
+    const [searchInput, setSearchInput] = useState("");
+    const [filteredData, setFilteredData] = useState([]);
+
+    const itemsPerPage = 100; // Number of items per page
+    const [currentPage, setCurrentPage] = useState(0);
+  
+    // Calculate the start and end indices for the current page
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+  
+    // Get the data for the current page
+    const currentPageData = filteredData.slice(startIndex, endIndex);
+    console.log(currentPageData, "currentPageData");
+    console.log(filteredData, "filteredData");
+  
+    const handlePageChange = ({ selected }) => {
+      setCurrentPage(selected);
+    };
     
     useEffect(() => {
         customers();
@@ -27,10 +47,40 @@ export default function OpenVoucher() {
         }
       }, [selectRow]);
 
+
+
+      const handleSearch = (event) => {
+        const inputValue = event.target.value;
+        console.log(event.target.value, "valueeeeeeee");
+        setSearchInput(inputValue);
+    
+        // Filter the data based on Receipt Status, Receipt Vr No, and Transaction Type if there's a search input, otherwise, use the initial data
+        // const filtered = inputValue
+        //   ? getCustomers.filter(
+        //       (rv) =>
+        //         rv.Recd_PVNo.toLowerCase().includes(inputValue.toLowerCase()) ||
+        //         rv.TxnType.toLowerCase().includes(inputValue.toLowerCase())
+        //     )
+        //   : getCustomers;
+        const filtered = inputValue
+    ? invoiceListData.filter(
+        (rv) =>
+          (rv.Recd_PVNo &&
+            rv.Recd_PVNo.toLowerCase().includes(inputValue.toLowerCase())) ||
+          (rv.TxnType &&
+            rv.TxnType.toLowerCase().includes(inputValue.toLowerCase()))
+      )
+    : invoiceListData;
+    
+        setFilteredData(filtered);
+      };
+
+      console.log("filteerr dara", filteredData);
     const customers = () => {
         axios.get(baseURL+'/unitReceiptList/getcustomerdata')
             .then((res) => {
                 setGetCustomers(res.data.Result)
+                
             })
             .catch((err) => {
                 console.log("err");
@@ -46,6 +96,7 @@ export default function OpenVoucher() {
         })
         .then((res) => {
             setInvoiceListData(res.data.Result)
+            setFilteredData(res.data.Result)
         })
         .catch((err) => {
             console.log("err");
@@ -119,7 +170,7 @@ export default function OpenVoucher() {
 
                 <div className="col-md-2">
                     <label className="form-label">Search</label>
-                    <input type='search'></input>
+                    <input type='search' onChange={handleSearch} value={searchInput}></input>
                 </div>
 
                 <div className="col-md-3">
@@ -177,15 +228,11 @@ export default function OpenVoucher() {
 
 
 
-            <div className='col-md-12 mt-3' style={{ height: '500px', overflowX: 'scroll', overflowY: 'scroll' }}>
+            <div className='col-md-12 mt-3' style={{ height: '300px', overflowX: 'scroll', overflowY: 'scroll' }}>
 
                 <Table striped className="table-data border">
                     <thead className="tableHeaderBGColor">
-                        <tr
-                        
-                        >
-
-
+                        <tr >
                             <th style={{ whiteSpace: 'nowrap' }}>Receipt VrNo</th>
                             <th style={{ whiteSpace: 'nowrap' }}>Receipt Status</th>
 
@@ -205,7 +252,7 @@ export default function OpenVoucher() {
                     <tbody className='tablebody'>
 
                       {
-                        invoiceListData.map((item, key)=>{
+                        currentPageData.map((item, key)=>{
                             return(
                                 <tr
                                 onClick={() => {
@@ -233,6 +280,18 @@ export default function OpenVoucher() {
                 </Table>
 
             </div>
+            <ReactPaginate
+        previousLabel={"previous"}
+        nextLabel={"next"}
+        breakLabel={"..."}
+        pageCount={Math.ceil(filteredData.length / itemsPerPage)}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageChange}
+        containerClassName={"pagination"}
+        subContainerClassName={"pages pagination"}
+        activeClassName={"active"}
+      />
         </div>
     );
 }

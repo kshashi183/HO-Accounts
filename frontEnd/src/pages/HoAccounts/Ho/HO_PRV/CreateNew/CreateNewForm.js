@@ -131,157 +131,160 @@ export default function CreateNewForm() {
         </div>
       </div>
 
-      <div>
-        <label className="form-label ms-4">Create New Payment Receipt</label>
-        <div className="form horizantal-line"></div>
-      </div>
-
       <div className="row col-md-12">
-        <div className="col-md-9">
-          <div className="mt-2">
-            <form className="">
-              <div className="">
-                <div className="d-flex ms-3" style={{ gap: "10px" }}>
-                  <div className="col-md-5">
-                    <label className="form-label ">Href No</label>
-                    <input class="" type="text" placeholder="" value="Draft" />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Date</label>
-                    <input
-                      className=""
-                      value={inputValue}
-                      // onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-5">
-                    <label className="form-label">Select Unit </label>
-                    <Typeahead
-                      id="basic-example"
-                      labelKey={(option) =>
-                        option && option.UnitName
-                          ? option.UnitName.toString()
-                          : ""
-                      }
-                      options={getUnitNames}
-                      placeholder="Select Unit"
-                      onChange={handleSelectUnit}
-                      selected={selectedOption}
-                    />
-                  </div>
-
-                  <div className=" col-md-6  ms-3">
-                    <label className="form-label">Customer</label>
-                    <Typeahead
-                      id="basic-example"
-                      labelKey={(option) =>
-                        option && option.Cust_Name
-                          ? option.Cust_Name.toString()
-                          : ""
-                      }
-                      options={getCustNames}
-                      placeholder="Select Customer"
-                      onChange={handleSelectCustomer}
-                      selected={selectedCustOption}
-                    />
-                  </div>
-                </div>
-
-                <div className="col-md-11 ms-3">
-                  <label className="form-label">Receive Form</label>
-                  <input className="" value={getCustomer} type="text" />
-                </div>
-
-                <div className="row col-md-12 col-sm-12">
-                  <div className="box col-md-6">
-                    <div className="">
-                      <label className="form-label">Transaction Type</label>
-                      <select
-                        className="ip-select"
-                        onChange={handleTxnTYpeChange}
-                        value={selectedTxntType}
-                      >
-                        {options.map((option) => (
-                          <option key={option.label} value={option.label}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="">
-                      <label className="form-label">Amount</label>
-                      <input className="" value="0" />
-                    </div>
-
-                    <div className="">
-                      <label className="form-label">HO Reference</label>
-                      <input className="" value="Draft" />
-                    </div>
-
-                    <div className="">
-                      <label className="form-label">Status</label>
-                      <input className="" value="created" />
-                    </div>
-                  </div>
-
-                  <div className="box col-md-6">
-                    <div className="mt-1">
-                      <label
-                        htmlFor="myBox"
-                        className="bg-light form-title tab_font mb-2"
-                      >
-                        Description
-                      </label>
-                      <textarea
-                        className="form-control"
-                        rows="2"
-                        id=""
-                        style={{ height: "200px", resize: "none" }}
-                      ></textarea>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
+        <div className="col-md-10">
+          <label className="form-label ">Create New Payment Receipt</label>
         </div>
-
-        <div className="col-md-3 mt-5">
-          <div className="col-md-12">
-            <div className="col-md-2 mb-5">
-              <button
-                className="button-style group-button ms-5"
-                onClick={() => navigate("/HOAccounts")}
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="col-md-2 ms-5">
-              <button className="button-style group-button">Save</button>
-            </div>
-
-            <div className="col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Delete</button>
-            </div>
-
-            <div className=" col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Post</button>
-            </div>
-            <div className=" col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Print</button>
-            </div>
-            <div className=" col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Cancel</button>
-            </div>
-          </div>
+        <div className="col-md-2">
+          <button style={{width:'90px'}}
+            className="button-style group-button "
+            onClick={() => navigate("/HOAccounts")}
+          >
+            Close
+          </button>
         </div>
       </div>
+
+
+
+
+      <div className="row col-md-12 " >
+        <div className="col-md-2">
+          <label className="form-label ">Href No</label>
+          <input class="" type="text" placeholder="" value="Draft" />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Date</label>
+          <input
+            className=""
+            value={inputValue}
+          // onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Select Unit </label>
+          <Typeahead
+            id="basic-example"
+            labelKey={(option) =>
+              option && option.UnitName
+                ? option.UnitName.toString()
+                : ""
+            }
+            options={getUnitNames}
+            placeholder="Select Unit"
+            onChange={handleSelectUnit}
+            selected={selectedOption}
+          />
+        </div>
+
+        <div className=" col-md-4  ">
+          <label className="form-label">Customer</label>
+          <Typeahead
+            id="basic-example"
+            labelKey={(option) =>
+              option && option.Cust_Name
+                ? option.Cust_Name.toString()
+                : ""
+            }
+            options={getCustNames}
+            placeholder="Select Customer"
+            onChange={handleSelectCustomer}
+            selected={selectedCustOption}
+          />
+        </div>
+      </div>
+
+
+
+
+
+
+
+      <div className="row col-md-12 " style={{}}>
+
+        <div className="col-md-2">
+          <label className="form-label">Transaction Type</label>
+          <select
+            className="ip-select"
+            onChange={handleTxnTYpeChange}
+            value={selectedTxntType}
+          >
+            {options.map((option) => (
+              <option key={option.label} value={option.label}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="col-md-3 ">
+          <label className="form-label">Receive Form</label>
+          <input className="" value={getCustomer} type="text" />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Amount</label>
+          <input className="" value="0" />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">HO Reference</label>
+          <input className="" value="Draft" />
+        </div>
+
+
+
+      </div>
+
+      <div className=" row col-md-12">
+        <div className="col-md-2">
+          <label className="form-label">Status</label>
+          <input className="" value="created" />
+        </div>
+
+
+
+        <div className="col-md-3">
+          <label
+            className="form-label"
+          >
+            Description
+          </label>
+          <textarea
+            className="form-control"
+            rows="2"
+            id=""
+            style={{ height: "70px", resize: "none" }}
+          ></textarea>
+        </div>
+
+
+        <div className="col-md-1 ">
+          <button className="button-style group-button" style={{ width: '90px' }}>Save</button>
+        </div>
+
+        <div className="col-md-2">
+          <button className="button-style group-button"
+           style={{ width: '90px', marginLeft:'70px' }}>Delete</button>
+        </div>
+
+        <div className=" col-md-1 ">
+              <button className="button-style group-button" style={{ width: '90px', marginLeft:'20px' }}>Post</button>
+            </div>
+            <div className=" col-md-1 ">
+              <button className="button-style group-button"
+               style={{ width: '90px', marginLeft:'70px' }}>Print</button>
+            </div>
+      </div>
+
+
+
+
+
+
+
 
       <div className="row col-md-12">
         <div className="col-md-6 mt-2 mb-3">
@@ -417,3 +420,5 @@ export default function CreateNewForm() {
     </>
   );
 }
+
+

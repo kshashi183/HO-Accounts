@@ -12,11 +12,11 @@ export default function AdjustmentCallFile() {
     </div>
 </div>
 
-<div>
+{/* <div>
     
     <label className="form-label">Create Adjustment Voucher for Receipt Voucher 17/18/0198 </label>
     <hr className="horizontal-line mt-3" />
-</div>
+</div> */}
       <div className='row '>
         <div className='col-md-12'>
             <AdjustmentVoucherForm/>
