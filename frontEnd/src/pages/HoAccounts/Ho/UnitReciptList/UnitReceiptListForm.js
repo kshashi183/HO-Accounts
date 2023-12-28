@@ -6,6 +6,7 @@ import ReactToPrint from 'react-to-print';
 import PaymentReceiptVoucherPdf from '../../../../PDF/PaymentReceiptVoucher';
 import { useNavigate, } from 'react-router-dom';
 import { baseURL } from '../../../../api/baseUrl';
+import PdfVoucherModal from './PdfVoucherModal';
 
 export default function UnitReceiptListForm() {
 
@@ -41,7 +42,6 @@ export default function UnitReceiptListForm() {
                 RecdPVID: selectRow.RecdPVID
             },
         })
-
             .then((res) => {
                 setGetClosedInvoices(res.data.Result)
                 console.log("re", res.data.Result);
@@ -57,7 +57,6 @@ export default function UnitReceiptListForm() {
                 Cust_code: selectRow.Cust_code
             },
         })
-
             .then((res) => {
                 setOpenInvoices(res.data.Result)
                 console.log("openinv", res.data.Result);
@@ -67,18 +66,29 @@ export default function UnitReceiptListForm() {
             })
     }
 
-    const handlePrintButtonClick = (e) => {
-        e.preventDefault();
+    // const handlePrintButtonClick = (e) => {
+    //     e.preventDefault();
       
-         printRef.current.handlePrint();
-      };
+    //      printRef.current.handlePrint();
+    //   };
 
     
 
     
+      const [pdfVoucher, setPdfVoucher] = useState(false);
+  const pdfSubmit = (e) => {
 
+    setPdfVoucher(true);
+    e.preventDefault();
+  }
+
+  console.log("sel row", selectRow.Amount);
     return (
         <div>
+            {
+                pdfVoucher && <PdfVoucherModal getClosedInvoices={getClosedInvoices} 
+                setPdfVoucher={setPdfVoucher} pdfVoucher={pdfVoucher} selectRow={selectRow}/>
+            }
 
             <div className='col-md-12'>
                 <div className='row'>
@@ -93,141 +103,144 @@ export default function UnitReceiptListForm() {
                 <label className="form-label">Unit Payment Receipt</label>
 
             </div>
-            <div className='col-md-12 mb-2'>
+            {/* <div className='col-md-12 mb-2'>
 
                 <label className="form-label">Select Customer</label>
 
-            </div>
+            </div> */}
 
 
-            <hr className="horizontal-line" />
+            {/* <hr className="horizontal-line" /> */}
 
-            <div className=''>
-                <div className="mt-2">
-                    <form className='row col-md-12'>
-                        <div className="col-md-6">
-                            <div className="d-flex" style={{ gap: '10px' }}>
-                                <div className="">
+           
+               
+                   
+                        
+                            <div className="row col-md-12" >
+                                <div className="col-md-2">
                                     <label className="form-label">Vr No</label>
                                     <input className=""
                                         value={selectRow.Recd_PVNo} disabled />
                                 </div>
 
-                                <div className="">
+                                <div className="col-md-3">
                                     <label className="form-label">Date</label>
                                     <input className="" type="text"
                                         value={selectRow.Formatted_Recd_PV_Date} disabled
                                     />
                                 </div>
 
-                                <div className="">
+                                <div className="col-md-3">
                                     <label className="form-label">Status</label>
                                     <input className="" type="text" disabled />
                                 </div>
-                            </div>
 
-                            <div className="">
-                                <div className="col-md-6">
+                                <div className="col-md-4">
                                     <label className="form-label">Customer Name</label>
                                     <input className="" type="text" value={selectRow.CustName} />
                                 </div>
+                            </div>
 
-                                <div className="row col-md-12 col-sm-12">
-                                    <div className="box col-md-6">
-                                        <div className="">
+                           
+                               
+
+                                <div className="row col-md-12 ">
+
+                               
+                                    
+                                        <div className="col-md-2">
                                             <label className="form-label">Transaction Type</label>
-                                            <select className="ip-select" disabled>
-                                                <option value="option 1"></option>
+                                            <select className="ip-select"   disabled={selectRow.Recd_PVNo==='Draft'}>
+                                                <option value="option 1">{selectRow.TxnType}</option>
                                                 <option value="option 2">Online Payment</option>
                                                 <option value="option 3">Cheque</option>
                                             </select>
                                         </div>
 
-                                        <div className="">
+                                        <div className="col-md-3">
                                             <label className="form-label">Amount</label>
                                             <input className="" style={{ marginTop: '-7px' }}
                                                 value={selectRow.Amount} disabled
                                             />
                                         </div>
 
-                                        <div className="">
+                                        <div className="col-md-3">
                                             <label className="form-label">On Account</label>
                                             <input className="" style={{ marginTop: '-7px' }}
                                                 value={selectRow.On_account} disabled
                                             />
                                         </div>
-                                    </div>
-
-                                    <div className="box col-md-6">
-                                        <div className="mt-1">
-                                            <label htmlFor="myBox" className="bg-light form-title tab_font mb-2">Description</label>
-                                            <textarea className="form-control" rows='2' id="" style={{ height: '130px', resize: 'none' }}
+                                    
+                                        <div className="mt-1 col-md-4">
+                                            <label className="form-label">Description</label>
+                                            <textarea className="form-control" rows='2' id="" style={{ height: '60px', resize: 'none' }}
                                                 value={selectRow.Description}
                                             ></textarea>
                                         </div>
-                                    </div>
+                       
+                                       
+                                    
                                 </div>
-                            </div>
-                        </div>
+                           
+                        
 
-                        <div className="col-md-6">
-                            <div className="box02 col-md-4">
+                        <div className="row col-md-12">
+                            
 
-                                <div className="row mt-3">
+                                <div className="col-md-2">
                                     <button disabled={selectRow.Recd_PVNo !== ''}
                                         className={selectRow.TaxName !== '' ? 'disabled-button' : 'button-style  group-button'}
+                                        style={{width:'90px'}}
                                     >
                                         Save
                                     </button>
                                 </div>
 
-                                <div className="row mt-3">
+                                <div className="col-md-2">
                                     <button
 
                                         disabled={selectRow.Recd_PVNo !== ''}
                                         className={selectRow.TaxName !== '' ? 'disabled-button' : 'button-style  group-button'}
+                                        style={{width:'90px'}}
                                     >
                                         Delete
                                     </button>
                                 </div>
 
-                                <div className="row mt-3">
+                                <div className="col-md-2">
                                     <button
                                         disabled={selectRow.Recd_PVNo !== ''}
-                                        className={selectRow.TaxName !== '' ? 'disabled-button' : 'button-style  group-button'}>
+                                        className={selectRow.TaxName !== '' ? 'disabled-button' : 'button-style  group-button'}
+                                        style={{width:'90px'}}
+                                        >
                                         Post
                                     </button>
                                 </div>
 
-                                <div className="row mt-3">
+                                <div className="col-md-2">
                                     <button
                                         className='button-style  group-button'
-                                        onClick={handlePrintButtonClick}>
+                                      //  onClick={handlePrintButtonClick}
+                                      onClick={pdfSubmit}  style={{width:'90px'}}
+                                      >
                                         Print
                                     </button>
-                                    <ReactToPrint
-                                        trigger={() => <div style={{ display: 'none' }}><PaymentReceiptVoucherPdf ref={contentRef} 
-                                        selectRow={selectRow}
-                               /></div>}
-                                        content={() => contentRef.current}
-                                        ref={printRef} 
-                                        // Attach the reference to the ReactToPrint component
-                                        documentTitle="Payment Receipt Voucher"
-                                    />
+                                  
                                     
                                 </div>
-                                <div className="row mt-3">
+                                <div className="col-md-2">
                                     <button type='button'
                                         className='button-style  group-button' 
+                                        style={{width:'90px'}}
                                         onClick={e => navigate("/HOAccounts")}>
                                         Close
                                     </button>
                                 </div>
-                            </div>
+                            
                         </div>
-                    </form>
-                </div>
-            </div>
+                   
+                
+            
 
 
 
@@ -236,7 +249,7 @@ export default function UnitReceiptListForm() {
 
 
             <div className='row mt-3'>
-                <div className='col-md-6' style={{ height: '500px', overflowX: 'scroll', overflowY: 'scroll' }}>
+                <div className='col-md-6' style={{ height: '300px', overflowX: 'scroll', overflowY: 'scroll' }}>
 
                     <Table striped className="table-data border">
                         <thead className="tableHeaderBGColor">
@@ -289,7 +302,7 @@ export default function UnitReceiptListForm() {
 
 
 
-                <div className='col-md-6' style={{ height: '500px', overflowX: 'scroll', overflowY: 'scroll' }}>
+                <div className='col-md-6' style={{ height: '300px', overflowX: 'scroll', overflowY: 'scroll' }}>
 
                     <Table striped className="table-data border">
                         <thead className="tableHeaderBGColor">
