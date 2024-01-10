@@ -240,7 +240,7 @@ const [onAccountList,setOnAccountList]=useState([])
                       <tr
                         // key={itemIndex}
                         style={{ whiteSpace: 'nowrap' }}
-                        onDoubleClick={() => handleNavigate(item.Id)}
+                     
                         className={key === selectRow?.index ? 'selcted-row-clr' : ''} key={item.RecdPVID}
                         onClick={() => selectedRowFun(item, key)}
                       >
