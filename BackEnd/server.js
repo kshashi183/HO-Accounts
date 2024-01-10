@@ -83,3 +83,10 @@ app.use('/tallyExport', tally_Export)
 
 const sync_HO=require('./routes/HOAccounts/SetUp/Sync_HO')
 app.use('/sync', sync_HO)
+
+const prvListdata=require('./routes/HOAccounts/HO/PRV_Onaccount_Draft/PRV_List.Data')
+app.use('/prvListdata', prvListdata)
+
+
+const createnew=require('./routes/HOAccounts/HO/HO_PaymentVoucher/Create_new')
+app.use('/createnew', createnew)

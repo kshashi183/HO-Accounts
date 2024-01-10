@@ -9,7 +9,7 @@ import ReactPaginate from "react-paginate";
 export default function OpenVoucher() {
 
     const [getCustomers, setGetCustomers] = useState([]);
-    const [invoiceListData, setInvoiceListData]=useState([])
+    const [invoiceListData, setInvoiceListData] = useState([])
     const [selectRow, setSelectRow] = useState('');
     const [selectedCustCode, setSelectedCustCode] = useState("");
 
@@ -18,42 +18,42 @@ export default function OpenVoucher() {
 
     const itemsPerPage = 100; // Number of items per page
     const [currentPage, setCurrentPage] = useState(0);
-  
+
     // Calculate the start and end indices for the current page
     const startIndex = currentPage * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-  
+
     // Get the data for the current page
     const currentPageData = filteredData.slice(startIndex, endIndex);
     console.log(currentPageData, "currentPageData");
     console.log(filteredData, "filteredData");
-  
+
     const handlePageChange = ({ selected }) => {
-      setCurrentPage(selected);
+        setCurrentPage(selected);
     };
-    
+
     useEffect(() => {
         customers();
-        if(selectedCustCode){
+        if (selectedCustCode) {
             basedOnCustomer();
         }
-     
+
     }, [selectedCustCode])
 
 
     useEffect(() => {
         if (selectRow) {
-          handleNavigation(selectRow);
+            handleNavigation(selectRow);
         }
-      }, [selectRow]);
+    }, [selectRow]);
 
 
 
-      const handleSearch = (event) => {
+    const handleSearch = (event) => {
         const inputValue = event.target.value;
         console.log(event.target.value, "valueeeeeeee");
         setSearchInput(inputValue);
-    
+
         // Filter the data based on Receipt Status, Receipt Vr No, and Transaction Type if there's a search input, otherwise, use the initial data
         // const filtered = inputValue
         //   ? getCustomers.filter(
@@ -63,24 +63,24 @@ export default function OpenVoucher() {
         //     )
         //   : getCustomers;
         const filtered = inputValue
-    ? invoiceListData.filter(
-        (rv) =>
-          (rv.Recd_PVNo &&
-            rv.Recd_PVNo.toLowerCase().includes(inputValue.toLowerCase())) ||
-          (rv.TxnType &&
-            rv.TxnType.toLowerCase().includes(inputValue.toLowerCase()))
-      )
-    : invoiceListData;
-    
-        setFilteredData(filtered);
-      };
+            ? invoiceListData.filter(
+                (rv) =>
+                    (rv.Recd_PVNo &&
+                        rv.Recd_PVNo.toLowerCase().includes(inputValue.toLowerCase())) ||
+                    (rv.TxnType &&
+                        rv.TxnType.toLowerCase().includes(inputValue.toLowerCase()))
+            )
+            : invoiceListData;
 
-      console.log("filteerr dara", filteredData);
+        setFilteredData(filtered);
+    };
+
+    console.log("filteerr dara", filteredData);
     const customers = () => {
-        axios.get(baseURL+'/unitReceiptList/getcustomerdata')
+        axios.get(baseURL + '/unitReceiptList/getcustomerdata')
             .then((res) => {
                 setGetCustomers(res.data.Result)
-                
+
             })
             .catch((err) => {
                 console.log("err");
@@ -88,26 +88,28 @@ export default function OpenVoucher() {
     }
 
 
-    const basedOnCustomer=()=>{
-        axios.get(baseURL+'/unitReceiptList/receiptBasedOnCustomer', {
+    const basedOnCustomer = () => {
+        axios.get(baseURL + '/unitReceiptList/receiptBasedOnCustomer', {
             params: {
-                selectedCustCode: selectedCustCode
+                selectedCustCode: selectedCustCode,
+                selectedUnitName:selectedUnitName
             },
         })
-        .then((res) => {
-            setInvoiceListData(res.data.Result)
-            setFilteredData(res.data.Result)
-        })
-        .catch((err) => {
-            console.log("err");
-        })
+            .then((res) => {
+                setInvoiceListData(res.data.Result)
+                setFilteredData(res.data.Result)
+            })
+            .catch((err) => {
+                console.log("err");
+            })
     }
     const navigate = useNavigate();
     //console.log("cust", invoiceListData);
 
-    
+
     // const [selectedOption, setSelectedOption] = useState([{ Cust_name: 'MAGOD LASER MACHINING PVT LTD' }]);
     const [selectedOption, setSelectedOption] = useState([]);
+    const [selectedUnitName, setSelectedUnitName]=useState([])
     const handleTypeaheadChange = (selectedOptions) => {
         if (selectedOptions && selectedOptions.length > 0) {
             const selectedCustomer = selectedOptions[0];
@@ -126,32 +128,63 @@ export default function OpenVoucher() {
     };
 
 
-   
-   
+
+
     const selectedRowFun = (item, index) => {
         let list = { ...item, index: index }
         //  setSelectRow(initial)
-       
+
         // console.log("se",list)
-        setSelectRow(list);  
-        
+        setSelectRow(list);
+
     }
 
-    console.log("selectedrow",selectRow)
-    
-    const handleNavigation=(selectRow)=>{
-        navigate("/HOAccounts/HO/Openvoucher", {state:{selectRow }});
-   }
-    
+    console.log("selectedrow", selectRow)
 
-   const handleOpenVoucherClick = () => {
-    if (invoiceListData.length > 0) {
-        const firstRowData = invoiceListData[0];
-        navigate("/HOAccounts/HO/Openvoucher", { state: { selectRow: firstRowData } });
+    const handleNavigation = (selectRow) => {
+        navigate("/HOAccounts/HO/Openvoucher", { state: { selectRow } });
     }
-}
 
-   
+
+    const handleOpenVoucherClick = () => {
+        if (invoiceListData.length > 0) {
+            const firstRowData = invoiceListData[0];
+            navigate("/HOAccounts/HO/Openvoucher", { state: { selectRow: firstRowData } });
+        }
+    }
+
+
+    
+
+    const[selectUnit, setSelectUnit]=useState([])
+    const [getName, setGetName] = useState("");
+
+    const handleUnitSelect = (selected) => {
+        const selectedCustomer = selected[0];
+        setSelectUnit(selected); // Update selected option state
+        setGetName(selectedCustomer ? selectedCustomer.UnitName : "");
+        setSelectedUnitName(selected)
+      };
+
+    const [unitdata, setunitData] = useState([]);
+    const handleUnitName = () => {
+        axios
+            .get(baseURL + '/unitReceiptList/getunitName')
+            .then((res) => {
+                 console.log("firstTable", res.data)
+                setunitData(res.data);
+                if (res.data.length > 0) {
+                    setSelectedUnitName([res.data[0]]);
+                  }
+            })
+            .catch((err) => {
+                console.log("err in table", err);
+            });
+    };
+
+    useEffect(() => {
+        handleUnitName();
+    }, []);
     return (
         <div>
             <div className='col-md-12'>
@@ -175,11 +208,11 @@ export default function OpenVoucher() {
 
                 <div className="col-md-3">
                     <button className="button-style mt-2 group-button"
-                        style={{ width: "150px", marginLeft: "20px" }} 
-                        
+                        style={{ width: "150px", marginLeft: "20px" }}
+
                         // onClick={() => navigate("/HOAccounts/HO/Openvoucher")}
                         onClick={handleOpenVoucherClick}
-                        >
+                    >
                         Open Voucher
                     </button>
                 </div>
@@ -198,20 +231,25 @@ export default function OpenVoucher() {
             <div className='row'>
                 <div className='col-md-3'>
                     <label className="form-label">Select Unit</label>
-                    <select className="ip-select">
-                        <option value="option 1"> Jigani</option>
-                        <option value="option 2">Peenya</option>
+                    
 
-                    </select>
+                    <Typeahead
+                        id="basic-example"
+                        labelKey={(option) =>
+                            option && option.UnitName
+                                ? option.UnitName.toString()
+                                : ""
+                        }
+                        options={unitdata}
+                        placeholder="Select Unit"
+                        onChange={handleUnitSelect}
+                        selected={selectedUnitName}
+                    />
                 </div>
 
                 <div className='col-md-3'>
                     <label className="form-label">Select Customer</label>
-                    {/* <select className="ip-select ">
-                        <option value="option 1"> Name1</option>
-                        <option value="option 2">Name2</option>
-                        <option value="option 3">Name3</option>
-                    </select> */}
+                    
                     <Typeahead
 
                         id="basic-example"
@@ -251,47 +289,47 @@ export default function OpenVoucher() {
 
                     <tbody className='tablebody'>
 
-                      {
-                        currentPageData.map((item, key)=>{
-                            return(
-                                <tr
-                                onClick={() => {
-                                    selectedRowFun(item, key);
-                                    console.log("items",item);
-                                }}
+                        {
+                            currentPageData.map((item, key) => {
+                                return (
+                                    <tr
+                                        onClick={() => {
+                                            selectedRowFun(item, key);
+                                            console.log("items", item);
+                                        }}
 
-                                className={key === selectRow?.index ? 'selcted-row-clr' : ''}
-                                >
-                                <td>{item.Recd_PVNo}</td>
-                                <td></td>
-                                <td style={{whiteSpace:'nowrap'}}>{item.Formatted_Recd_PV_Date}</td>
-                                <td style={{whiteSpace:'nowrap'} }>{item.CustName}</td>
-                                <td>{item.TxnType}</td>
-                                <td>{item.Amount}</td>
-                                <td>{item.On_account}</td>
-                                <td>{item.Description}</td>
-                            </tr>
-                            )
-                           
-                        })
-                      }
+                                        className={key === selectRow?.index ? 'selcted-row-clr' : ''}
+                                    >
+                                        <td>{item.Recd_PVNo}</td>
+                                        <td></td>
+                                        <td style={{ whiteSpace: 'nowrap' }}>{item.Formatted_Recd_PV_Date}</td>
+                                        <td style={{ whiteSpace: 'nowrap' }}>{item.CustName}</td>
+                                        <td>{item.TxnType}</td>
+                                        <td>{item.Amount}</td>
+                                        <td>{item.On_account}</td>
+                                        <td>{item.Description}</td>
+                                    </tr>
+                                )
+
+                            })
+                        }
 
                     </tbody>
                 </Table>
 
             </div>
             <ReactPaginate
-        previousLabel={"previous"}
-        nextLabel={"next"}
-        breakLabel={"..."}
-        pageCount={Math.ceil(filteredData.length / itemsPerPage)}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={5}
-        onPageChange={handlePageChange}
-        containerClassName={"pagination"}
-        subContainerClassName={"pages pagination"}
-        activeClassName={"active"}
-      />
+                previousLabel={"previous"}
+                nextLabel={"next"}
+                breakLabel={"..."}
+                pageCount={Math.ceil(filteredData.length / itemsPerPage)}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageChange}
+                containerClassName={"pagination"}
+                subContainerClassName={"pages pagination"}
+                activeClassName={"active"}
+            />
         </div>
     );
 }

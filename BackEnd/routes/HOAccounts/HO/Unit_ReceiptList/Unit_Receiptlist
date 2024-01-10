@@ -22,7 +22,8 @@ unitReceiptList.get("/getcustomerdata", (req, res) => {
 
 unitReceiptList.get('/receiptBasedOnCustomer', (req, res) => {
     const custcode = req.query.selectedCustCode;
-    //console.log(" ------",custcode);
+    const unit=req.query.selectedUnitName;
+    console.log(" ------",unit);
     const sql = `SELECT * ,DATE_FORMAT(Recd_PV_Date, '%d-%m-%Y') AS Formatted_Recd_PV_Date
 FROM magod_hq_mis.unit_payment_recd_voucher_register u 
 WHERE u.Unitname = 'Jigani'
@@ -43,12 +44,12 @@ ORDER BY u.Recd_PV_Date DESC;`
 
 
 unitReceiptList.get('/getInvoices', (req, res) => {
-    
+
     const RecdPVID = req.query.RecdPVID;
     //console.log(" ------", RecdPVID);
     // const sql = `SELECT * FROM magod_hq_mis.unit_payment_recd_voucher_details WHERE  Unitname='Jigani' AND RecdPVID='${RecdPVID}';`
 
-const sql=`SELECT *, DATE_FORMAT(Inv_date, '%d-%m-%Y') AS Formatted_Inv_date
+    const sql = `SELECT *, DATE_FORMAT(Inv_date, '%d-%m-%Y') AS Formatted_Inv_date
 FROM magod_hq_mis.unit_payment_recd_voucher_details
 WHERE Unitname = 'Jigani' AND RecdPVID = '${RecdPVID}';
 
@@ -61,17 +62,17 @@ WHERE Unitname = 'Jigani' AND RecdPVID = '${RecdPVID}';
             return res.json({ Error: " error in sql" })
         }
         else {
-        // console.log("result", result);
+            // console.log("result", result);
             return res.json({ Status: 'Success', Result: result })
         }
     })
 })
 
 
-unitReceiptList.get('/getOpenInvoices', (req,res)=>{
-    const Cust_code= req.query.Cust_code;
-    console.log("CUSTCODE",Cust_code);
-    const sql=`SELECT 
+unitReceiptList.get('/getOpenInvoices', (req, res) => {
+    const Cust_code = req.query.Cust_code;
+    console.log("CUSTCODE", Cust_code);
+    const sql = `SELECT 
     'Jigani' as UnitName,
     d.DC_Inv_No, 
     d.DC_InvType, 
@@ -90,16 +91,37 @@ WHERE
     AND d.DCStatus = 'Despatched' 
     AND d.GrandTotal <> d.PymtAmtRecd;
 `
-setupQueryMod(sql, (err, result) => {
-    if (err) {
-        console.log("error", err);
-        return res.json({ Error: " error in sql" })
-    }
-    else {
-    //console.log("openinvoice", result);
-        return res.json({ Status: 'Success', Result: result })
-    }
-})
+    setupQueryMod(sql, (err, result) => {
+        if (err) {
+            console.log("error", err);
+            return res.json({ Error: " error in sql" })
+        }
+        else {
+            //console.log("openinvoice", result);
+            return res.json({ Status: 'Success', Result: result })
+        }
+    })
 })
 
+
+
+unitReceiptList.get("/getunitName", async (req, res, next) => {
+    
+    try {
+        setupQueryMod(
+            `SELECT DISTINCT UnitName FROM magod_setup.magodlaser_units`,
+            (err, data) => {
+                if (err) {
+                    console.log("err", err);
+                }
+                else {
+                   // console.log("dattttta", data);
+                    res.send(data);
+                }
+            }
+        );
+    } catch (error) {
+        next(error);
+    }
+});
 module.exports = unitReceiptList;
