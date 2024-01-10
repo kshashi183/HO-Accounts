@@ -83,6 +83,11 @@ export default function UnitReceiptListForm() {
   }
 
   console.log("sel row", selectRow.Amount);
+
+
+
+
+ 
     return (
         <div>
             {
@@ -126,7 +131,10 @@ export default function UnitReceiptListForm() {
                                 <div className="col-md-3">
                                     <label className="form-label">Date</label>
                                     <input className="" type="text"
-                                        value={selectRow.Formatted_Recd_PV_Date} disabled
+                                      
+                                        value={new Date(selectRow.Recd_PV_Date).toLocaleDateString('en-GB')}
+                                        
+                                        disabled
                                     />
                                 </div>
 
@@ -151,9 +159,9 @@ export default function UnitReceiptListForm() {
                                         <div className="col-md-2">
                                             <label className="form-label">Transaction Type</label>
                                             <select className="ip-select"   disabled={selectRow.Recd_PVNo==='Draft'}>
-                                                <option value="option 1">{selectRow.TxnType}</option>
+                                                {/* <option value="option 1">{selectRow.TxnType}</option>
                                                 <option value="option 2">Online Payment</option>
-                                                <option value="option 3">Cheque</option>
+                                                <option value="option 3">Cheque</option> */}
                                             </select>
                                         </div>
 
@@ -174,7 +182,7 @@ export default function UnitReceiptListForm() {
                                         <div className="mt-1 col-md-4">
                                             <label className="form-label">Description</label>
                                             <textarea className="form-control" rows='2' id="" style={{ height: '60px', resize: 'none' }}
-                                                value={selectRow.Description}
+                                                value={selectRow.Description} disabled
                                             ></textarea>
                                         </div>
                        
@@ -184,10 +192,10 @@ export default function UnitReceiptListForm() {
                            
                         
 
-                        <div className="row col-md-12">
+                        <div className="row col-md-12" style={{gap:'20px'}}>
                             
 
-                                <div className="col-md-2">
+                                <div className="col-md-1">
                                     <button disabled={selectRow.Recd_PVNo !== ''}
                                         className={selectRow.TaxName !== '' ? 'disabled-button' : 'button-style  group-button'}
                                         style={{width:'90px'}}
@@ -196,7 +204,7 @@ export default function UnitReceiptListForm() {
                                     </button>
                                 </div>
 
-                                <div className="col-md-2">
+                                <div className="col-md-1">
                                     <button
 
                                         disabled={selectRow.Recd_PVNo !== ''}
@@ -207,7 +215,7 @@ export default function UnitReceiptListForm() {
                                     </button>
                                 </div>
 
-                                <div className="col-md-2">
+                                <div className="col-md-1">
                                     <button
                                         disabled={selectRow.Recd_PVNo !== ''}
                                         className={selectRow.TaxName !== '' ? 'disabled-button' : 'button-style  group-button'}
@@ -217,7 +225,7 @@ export default function UnitReceiptListForm() {
                                     </button>
                                 </div>
 
-                                <div className="col-md-2">
+                                <div className="col-md-1">
                                     <button
                                         className='button-style  group-button'
                                       //  onClick={handlePrintButtonClick}
@@ -239,15 +247,6 @@ export default function UnitReceiptListForm() {
                             
                         </div>
                    
-                
-            
-
-
-
-
-
-
-
             <div className='row mt-3'>
                 <div className='col-md-6' style={{ height: '300px', overflowX: 'scroll', overflowY: 'scroll' }}>
 
