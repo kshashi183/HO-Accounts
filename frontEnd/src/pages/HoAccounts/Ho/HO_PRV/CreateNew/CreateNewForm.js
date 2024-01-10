@@ -504,7 +504,7 @@ export default function CreateNewForm() {
                     <>
                       <tr
                         style={{ whiteSpace: "nowrap" }}
-                        onClick={() => handleRowSelect(data)}
+                       
                         key={data.PVSrlID}
                         className={
                           rvData.firstTableArray.some(
@@ -624,15 +624,7 @@ export default function CreateNewForm() {
                 {rvData.data.inv_data?.map((row, index) => (
                   <tr key={index}
                     style={{ backgroundColor: row.isSelected ? '#3498db' : 'inherit', whiteSpace: "nowrap" }}
-                  // onDoubleClick={addToVoucher}
-
-                  // onDoubleClick={() => {
-
-                  //   setDoubleClickSignal(true);
-
-
-                  //   handleCheckboxChange({ target: { checked: !row.isSelected } }, row);
-                  // }}
+                 
 
                   >
 
