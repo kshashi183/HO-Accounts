@@ -588,6 +588,20 @@ li.nav-item {
   border-bottom: 1px solid black !important;
 }
 
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.button-style.loading {
+  cursor: wait;
+}
+
+.spinner-container.loading {
+  cursor: wait;
+}
 .pagination {
   display: flex;
   justify-content: center;
