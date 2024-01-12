@@ -1,7 +1,3 @@
-
-
-
-
 import React from "react";
 import * as AiIcons from "react-icons/ai";
 import * as RiIcons from "react-icons/ri";
@@ -9,7 +5,13 @@ import * as FaIcon from "react-icons/fa";
 import * as MdIcon from "react-icons/md";
 import { VscOutput, VscTypeHierarchySub } from "react-icons/vsc";
 import { BiFoodMenu } from "react-icons/bi";
-import { HiArchive, HiClipboardList, HiOutlineClipboard, HiReceiptTax, HiUsers } from "react-icons/hi";
+import {
+  HiArchive,
+  HiClipboardList,
+  HiOutlineClipboard,
+  HiReceiptTax,
+  HiUsers,
+} from "react-icons/hi";
 import {
   BsPersonFill,
   BsFillGearFill,
@@ -71,11 +73,6 @@ export const customerSidebar = [
         icon: <HiReceiptTax />,
         path: "/HOAccounts/SetUp/Tax_Master",
       },
-      {
-        title: "Sync",
-        icon: <BsFillCloudArrowUpFill />,
-        path: "/HOAccounts/SetUp/sync",
-      },
     ],
   },
 
@@ -126,7 +123,6 @@ export const customerSidebar = [
             icon: <SiArtstation />,
             path: "/HOAccounts/HO/HOPRV/CreateNew",
           },
-         
 
           {
             title: "Draft List",
@@ -143,13 +139,10 @@ export const customerSidebar = [
             icon: <HiOutlineClipboard />,
             path: "/HOAccounts/HO/HOPRV/OnAccountList",
           },
-
-
         ],
       },
     ],
   },
-
   {
     title: "Sync",
     icon: <AiIcons.AiFillCloud />,
@@ -157,14 +150,38 @@ export const customerSidebar = [
     iconOpened: <RiIcons.RiArrowUpSFill />,
     subNav: [
       {
+        title: "Sync",
+        icon: <FaIcon.FaSyncAlt />,
+        subNav: [
+          {
+            title: "Accounts Sync",
+            icon: <RiIcons.RiApps2Fill />,
+            path: "/HOAccounts/Sync/AccountSync",
+          },
+          {
+            title: "From UNIT Sync",
+            icon: <RiIcons.RiBattery2Fill />,
+            path: "/HOAccounts/Sync/FromUnitSync",
+          },
+          {
+            title: "From UNIT Update",
+            icon: <RiIcons.RiArticleFill />,
+            path: "/HOAccounts/Sync/FromUnitUpdate",
+          },
+        ],
+      },
+      {
+        title: "Sync Export",
+        icon: <BsFillCloudArrowUpFill />,
+        path: "/HOAccounts/Sync/SyncExport",
+      },
+      {
         title: "Show Sync Status",
         icon: <FiCloudSnow />,
         path: "/HOAccounts/Sync/ShowSync",
       },
     ],
   },
-
-  
 ];
 
 export const adminSidebar = [
