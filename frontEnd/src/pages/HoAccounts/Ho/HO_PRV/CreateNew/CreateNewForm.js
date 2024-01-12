@@ -1,12 +1,16 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Table } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { baseURL } from "../../../../../api/baseUrl";
 
 export default function CreateNewForm() {
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const rowData = location.state ? location.state : "";
+  console.log("rowdata", rowData);
   const [getUnit, setGetUnit] = useState("");
   const [getCustomer, setGetCustomer] = useState("");
   const [getCustCode, setGetCustCode] = useState("");
@@ -17,36 +21,70 @@ export default function CreateNewForm() {
   const [selectedOption, setSelectedOption] = useState([]);
   const [selectedCustOption, setSelectedCustOption] = useState([]);
 
-  const initial = {
-    RecdPVID: "",
-    Recd_PVNo: 'Draft',
-    // Recd_PV_Date: formatDate(date),
-    ReceiptStatus: 'Draft',
-    CustName: '',
-    Cust_code: '',
-    TxnType: '',
-    Amount: '',
-    On_account: '',
-    Description: '',
-    selectedCustomer: ''
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
-  const [postData, setPostData] = useState(initial);
+  const [rvData, setRvData] = useState({
+    apiData: null,
+    flag: false,
+    date: new Date(),
+    insertId: "",
+    firstTableArray: [],
+    secondTableArray: [],
+    custData: [],
+    postData: {
+      RecdPVID: "",
+      Recd_PVNo: "Draft",
+      Recd_PV_Date: new Date().toLocaleDateString("en-GB").split("/").join("-"),
+      //  Recd_PV_Date: formatDate(new Date()),
+
+      ReceiptStatus: "Draft",
+      CustName: "",
+      Cust_code: "",
+      TxnType: "",
+      Amount: "",
+      On_account: "",
+      Description: "",
+      selectedCustomer: "",
+      RecdPvSrl: 0,
+      PVSrlID: "",
+      InvUpdated: 0,
+      Sync_Hold: 0,
+    },
+    data: {
+      inv_data: [],
+      receipt_details: [],
+      receipt_id: "",
+      receipt_data: null,
+    },
+    open: false,
+  });
+
+  const initial = {
+    RecdPVID: "",
+    Recd_PVNo: "Draft",
+    Recd_PV_Date: new Date().toLocaleDateString("en-GB").split("/").join("-"),
+    // Recd_PV_Date: formatDate(new Date()),
+    ReceiptStatus: "Draft",
+    CustName: "",
+    Cust_code: "",
+    TxnType: "",
+    Amount: "",
+    On_account: "",
+    Description: "",
+    selectedCustomer: "",
+  };
 
 
-  const options = [
-    { value: "option 1", label: "Bank" },
-    { value: "option 2", label: "Cash" },
-    { value: "option 3", label: "Adjustment" },
-    { value: "option 4", label: "Rejection" },
-    { value: "option 5", label: "TDS Receivable" },
-    { value: "option 6", label: "Rate Difference" },
-    { value: "option 7", label: "Short Supply" },
-    { value: "option 8", label: "Balance Recoverable" },
-    { value: "option 9", label: "Other Income" },
-    { value: "option 10", label: "Balance Not Recoverable" },
-    { value: "option 11", label: "QR Code And RTGS" },
-  ];
+
+  // const [postData, setPostData] = useState(initial);
+
+
 
   // Create a new Date object
   const currentDate = new Date();
@@ -115,14 +153,87 @@ export default function CreateNewForm() {
     setSelectedTxntType(event.target.value);
   };
 
-  // const handleCustomerInput = (event)=>{
-  //   setGetInputCustName(event.target.value);
-  // }
 
-  // console.log("Name and code", getCustomer, getCustCode);
-  // console.log("unit name", getUnit);
-  // console.log(formattedDate);
-  console.log(selectedTxntType);
+  const getReceipts = async (cust_code, postdata) => {
+    setRvData((prevRvData) => ({ ...prevRvData, postData: postdata }));
+
+    try {
+      const resp = await axios.get(
+        baseURL + `/createnew/getleftTable?receipt_id=${rowData}`
+      );
+
+      try {
+        const response = await axios.get(
+          baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}`
+        );
+
+        setRvData((prevRvData) => ({
+          ...prevRvData,
+          data: {
+            ...prevRvData.data,
+            inv_data: response.data.Result,
+            receipt_details: resp.data.Result,
+
+            receipt_id: rowData,
+          },
+        }));
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (rowData !== "") {
+        try {
+          const response = await axios.get(
+            baseURL + `/createnew/getFormData?receipt_id=${rowData}`
+          );
+          console.log("cudtt", response.data.Result[0]);
+          getReceipts(
+            response.data.Result[0].Cust_code,
+            response.data.Result[0]
+          );
+        } catch (error) {
+          console.error("Error making API call:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [rowData]);
+
+
+
+
+  function formatAmount(amount) {
+    // Assuming amount is a number
+    const formattedAmount = new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+
+    return formattedAmount;
+  }
+
+  const PaymentReceipts = useCallback((e) => {
+
+    const { name, value } = e.target;
+
+    setRvData((prevRvData) => ({
+      ...prevRvData,
+      postData: {
+        ...prevRvData.postData,
+        [name]: value,
+        // On_account: name === "Amount" ? value : prevRvData.postData.On_account,
+      },
+    }));
+  }, []);
   return (
     <>
       <div className="col-md-12">
@@ -131,157 +242,205 @@ export default function CreateNewForm() {
         </div>
       </div>
 
-      <div>
-        <label className="form-label ms-4">Create New Payment Receipt</label>
-        <div className="form horizantal-line"></div>
-      </div>
-
       <div className="row col-md-12">
-        <div className="col-md-9">
-          <div className="mt-2">
-            <form className="">
-              <div className="">
-                <div className="d-flex ms-3" style={{ gap: "10px" }}>
-                  <div className="col-md-5">
-                    <label className="form-label ">Href No</label>
-                    <input class="" type="text" placeholder="" value="Draft" />
-                  </div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Date</label>
-                    <input
-                      className=""
-                      value={inputValue}
-                      // onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-md-5">
-                    <label className="form-label">Select Unit </label>
-                    <Typeahead
-                      id="basic-example"
-                      labelKey={(option) =>
-                        option && option.UnitName
-                          ? option.UnitName.toString()
-                          : ""
-                      }
-                      options={getUnitNames}
-                      placeholder="Select Unit"
-                      onChange={handleSelectUnit}
-                      selected={selectedOption}
-                    />
-                  </div>
-
-                  <div className=" col-md-6  ms-3">
-                    <label className="form-label">Customer</label>
-                    <Typeahead
-                      id="basic-example"
-                      labelKey={(option) =>
-                        option && option.Cust_Name
-                          ? option.Cust_Name.toString()
-                          : ""
-                      }
-                      options={getCustNames}
-                      placeholder="Select Customer"
-                      onChange={handleSelectCustomer}
-                      selected={selectedCustOption}
-                    />
-                  </div>
-                </div>
-
-                <div className="col-md-11 ms-3">
-                  <label className="form-label">Receive Form</label>
-                  <input className="" value={getCustomer} type="text" />
-                </div>
-
-                <div className="row col-md-12 col-sm-12">
-                  <div className="box col-md-6">
-                    <div className="">
-                      <label className="form-label">Transaction Type</label>
-                      <select
-                        className="ip-select"
-                        onChange={handleTxnTYpeChange}
-                        value={selectedTxntType}
-                      >
-                        {options.map((option) => (
-                          <option key={option.label} value={option.label}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="">
-                      <label className="form-label">Amount</label>
-                      <input className="" value="0" />
-                    </div>
-
-                    <div className="">
-                      <label className="form-label">HO Reference</label>
-                      <input className="" value="Draft" />
-                    </div>
-
-                    <div className="">
-                      <label className="form-label">Status</label>
-                      <input className="" value="created" />
-                    </div>
-                  </div>
-
-                  <div className="box col-md-6">
-                    <div className="mt-1">
-                      <label
-                        htmlFor="myBox"
-                        className="bg-light form-title tab_font mb-2"
-                      >
-                        Description
-                      </label>
-                      <textarea
-                        className="form-control"
-                        rows="2"
-                        id=""
-                        style={{ height: "200px", resize: "none" }}
-                      ></textarea>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
+        <div className="col-md-10">
+          <label className="form-label ">Create New Payment Receipt</label>
         </div>
-
-        <div className="col-md-3 mt-5">
-          <div className="col-md-12">
-            <div className="col-md-2 mb-5">
-              <button
-                className="button-style group-button ms-5"
-                onClick={() => navigate("/HOAccounts")}
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="col-md-2 ms-5">
-              <button className="button-style group-button">Save</button>
-            </div>
-
-            <div className="col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Delete</button>
-            </div>
-
-            <div className=" col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Post</button>
-            </div>
-            <div className=" col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Print</button>
-            </div>
-            <div className=" col-md-2 mt-2 ms-5">
-              <button className="button-style group-button">Cancel</button>
-            </div>
-          </div>
+        <div className="col-md-2">
+          <button style={{ width: '90px' }}
+            className="button-style group-button "
+            onClick={() => navigate("/HOAccounts")}
+          >
+            Close
+          </button>
         </div>
       </div>
+
+
+
+
+      <div className="row col-md-12 " >
+        <div className="col-md-2">
+          <label className="form-label ">Href No</label>
+          <input class="" name="HORef" placeholder="" disabled
+            value={rvData.postData.HORef} />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Date</label>
+          <input
+            className=""
+            value={inputValue}
+          // onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Select Unit </label>
+          <Typeahead
+            id="basic-example"
+            labelKey={(option) =>
+              option && option.UnitName
+                ? option.UnitName.toString()
+                : ""
+            }
+            options={getUnitNames}
+            placeholder="Select Unit"
+            onChange={handleSelectUnit}
+            selected={selectedOption}
+          />
+        </div>
+
+        <div className=" col-md-4  ">
+          <label className="form-label">Customer</label>
+          <Typeahead
+            id="basic-example"
+            labelKey={(option) =>
+              option && option.Cust_Name
+                ? option.Cust_Name.toString()
+                : ""
+            }
+            options={getCustNames}
+            placeholder="Select Customer"
+            onChange={handleSelectCustomer}
+            selected={selectedCustOption}
+          />
+        </div>
+      </div>
+
+
+
+
+
+
+
+      <div className="row col-md-12 " style={{}}>
+
+        <div className="col-md-2">
+          <label className="form-label">Transaction Type</label>
+          <select
+            className="ip-select"
+            onChange={PaymentReceipts}
+            value={rvData.postData.TxnType}
+          >
+            <option value="">Select</option>
+            <option value="Bank">Bank</option>
+            <option value="Cash">Cash</option>
+            <option value="Adjustment">Adjustment</option>
+            <option value="Rejection">Rejection</option>
+            <option value="TDS Receivable">TDS Receivable</option>
+            <option value="Rate Difference">Rate Difference</option>
+            <option value="Short Supply">Short Supply</option>
+            <option value="Balance Recoverable">Balance Recoverable</option>
+            <option value="Other Income">Other Income</option>
+            <option value="Balance Not Recoverable">
+              Balance Not Recoverable
+            </option>
+            <option value="QR Code and RTGS">QR Code and RTGS</option>
+          </select>
+        </div>
+
+        <div className="col-md-3 ">
+          <label className="form-label">Receive Form</label>
+          <input className="" value={getCustomer} />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Amount</label>
+          <input name='Amount'
+            onChange={PaymentReceipts}
+            disabled={
+              rvData && rvData.postData.Status !== "Draft"
+                ? rvData.postData.ReceiptStatus
+                : "" || rvData.data.receipt_details.length !== 0
+            }
+            value={rvData.postData.Amount} />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">HO Reference</label>
+          <input name='HORef'
+            onChange={PaymentReceipts}
+            value={rvData.postData.HORef} />
+        </div>
+
+
+
+      </div>
+
+      <div className=" row col-md-12">
+        <div className="col-md-2">
+          <label className="form-label">Status</label>
+          <input name="Status"
+            onChange={PaymentReceipts}
+            disabled={
+              rvData && rvData.postData.Status !== "Draft"
+                ? rvData.postData.ReceiptStatus
+                : "" || rvData.data.receipt_details.length !== 0
+            }
+            value={rvData.postData.Status} />
+        </div>
+
+
+
+        <div className="col-md-3">
+          <label
+            className="form-label"
+          >
+            Description
+          </label>
+          <textarea
+            className="form-control"
+            rows="2"
+            id="" name='Description'
+            onChange={PaymentReceipts}
+            value={rvData.postData.Description}
+            disabled={
+              rvData && rvData.postData.Status !== "Draft"
+                ? rvData.postData.ReceiptStatus
+                : "" || rvData.data.receipt_details.length !== 0
+            }
+            style={{ height: "70px", resize: "none" }}
+          ></textarea>
+        </div>
+
+        <div className="col-md-7 row">
+
+          {rvData.postData.ReceiptStatus === "Draft" && (
+
+            <>
+              <div className="col-md-2">
+                <button className="button-style group-button" style={{ width: '90px' }}>Save</button>
+              </div>
+
+              <div className="col-md-2">
+                <button className="button-style group-button"
+                  style={{ width: '90px' }}>Delete</button>
+              </div>
+
+              <div className=" col-md-2 ">
+                <button className="button-style group-button" style={{ width: '90px', }}>Post</button>
+              </div>
+            </>
+          )}
+
+          <div className=" col-md-2 ">
+            <button className="button-style group-button"
+              style={{ width: '90px', }}>Print</button>
+          </div>
+
+          <div className=" col-md-3 ">
+            <button className="button-style group-button"
+              style={{ width: '90px', }}>Cancel</button>
+          </div>
+        </div>
+
+
+
+      </div>
+
+
+
 
       <div className="row col-md-12">
         <div className="col-md-6 mt-2 mb-3">
@@ -340,15 +499,77 @@ export default function CreateNewForm() {
               </thead>
 
               <tbody className="tablebody">
-                <tr style={{ whiteSpace: "nowrap" }} className="">
-                  {/* <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td> 
-                  <td></td>
-                  <td></td> */}
-                </tr>
+                {rvData.data.receipt_details
+                  ? rvData.data.receipt_details.map((data, index) => (
+                    <>
+                      <tr
+                        style={{ whiteSpace: "nowrap" }}
+                       
+                        key={data.PVSrlID}
+                        className={
+                          rvData.firstTableArray.some(
+                            (row) => row.Dc_inv_no === data.Dc_inv_no
+                          )
+                            ? "selectedRow"
+                            : ""
+                        }
+                      >
+                        {/* <td>{data.RecdPvSrl}</td> */}
+                        <td>{index + 1}</td>
+
+                        <td>{data.Inv_No}</td>
+
+                        <td>
+                          {new Date(data.Inv_date)
+                            .toLocaleDateString("en-GB")
+                            .replace(/\//g, "-")}
+                        </td>
+
+                        <td>{data.Inv_Type}</td>
+                        <td>{formatAmount(data.Inv_Amount)}</td>
+                        <td>{formatAmount(data.Amt_received)}</td>
+                        <td>
+                          <input
+                            //type="number"
+                            // onBlur={onBlurr}
+                            name="Receive_Now"
+                            value={(data.Receive_Now)}
+                            onChange={(e) =>
+                              handleInputChange(
+                                e,
+                                data.Inv_No,
+                                data.Receive_Now
+                              )
+                            }
+                            disabled={rvData && rvData.postData.ReceiptStatus !== "Draft"
+                              ? rvData.postData.ReceiptStatus
+                              : ""}
+
+                            onKeyPress={(e) => {
+                              // Allow only numbers (0-9) and backspace
+                              const isNumber = /^[0-9\b]+$/;
+                              if (!isNumber.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        </td>
+                        <td>{data.RefNo}</td>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={
+                              rvData.postData.InvUpdated === 1
+                                ? rvData.postData.InvUpdated
+                                : ""
+                            }
+                          // onChange={(e) => handlesaveChange(rv.Inv_No)}
+                          />
+                        </td>
+                      </tr>
+                    </>
+                  ))
+                  : ""}
               </tbody>
             </Table>
           </div>
@@ -393,22 +614,41 @@ export default function CreateNewForm() {
                   <th>Select</th>
                   <th>Type</th>
                   <th>Invoice No</th>
-                  <th>Rate</th>
+                  <th>Date</th>
                   <th>Grand Total</th>
                   <th>Amount Received</th>
                 </tr>
               </thead>
 
               <tbody className="tablebody">
-                <tr style={{ whiteSpace: "nowrap" }} className="">
-                  {/* <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td> */}
-                </tr>
+                {rvData.data.inv_data?.map((row, index) => (
+                  <tr key={index}
+                    style={{ backgroundColor: row.isSelected ? '#3498db' : 'inherit', whiteSpace: "nowrap" }}
+                 
+
+                  >
+
+                    <td>
+                      <input
+                        type="checkbox"
+                        className="mt-1"
+                        id={`checkbox_${index}`}
+                        checked={row.isSelected}
+                      //   onChange={(e) => handleCheckboxChange(e, row)}
+                      />
+                    </td>
+                    <td>{row.DC_InvType}</td>
+                    <td>{row.Inv_No}</td>
+                    <td>
+                      {new Date(row.Inv_Date)
+                        .toLocaleDateString("en-GB")
+                        .replace(/\//g, "-")}
+                    </td>
+                    <td>{row.GrandTotal}</td>
+                    <td>{row.PymtAmtRecd}</td>
+                    <td>{row.Balance}</td>
+                  </tr>
+                ))}
               </tbody>
             </Table>
           </div>
@@ -417,3 +657,5 @@ export default function CreateNewForm() {
     </>
   );
 }
+
+

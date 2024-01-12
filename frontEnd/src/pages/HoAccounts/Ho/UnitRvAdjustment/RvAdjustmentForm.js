@@ -97,6 +97,35 @@ export default function RvAdjustmentForm() {
         navigate("/HOAccounts/HO/AdjustmentVoucher", {state:{selectRow }});
       }
       
+
+
+      const [selectedUnitName, setSelectedUnitName]=useState([])
+      const [selectUnit, setSelectUnit] = useState([])
+      const [getName, setGetName] = useState("");
+  
+      const handleUnitSelect = (selected) => {
+          const selectedCustomer = selected[0];
+          setSelectUnit(selected); // Update selected option state
+          setGetName(selectedCustomer ? selectedCustomer.UnitName : "");
+          setSelectedUnitName(selected)
+      };
+  
+      const [unitdata, setunitData] = useState([]);
+      const handleUnitName = () => {
+          axios
+              .get(baseURL + '/unitReceiptList/getunitName')
+              .then((res) => {
+                  console.log("firstTable", res.data)
+                  setunitData(res.data);
+              })
+              .catch((err) => {
+                  console.log("err in table", err);
+              });
+      };
+  
+      useEffect(() => {
+          handleUnitName();
+      }, []);
     
     return (
         <div>
@@ -110,11 +139,18 @@ export default function RvAdjustmentForm() {
 
                 <div className="col-md-2">
                     <label className="form-label">Select Unit</label>
-                    <select className="ip-select">
-                        <option value="option 1"> Jigani</option>
-                        <option value="option 2">Peenya</option>
-                        <option value="option 3">Name3</option>
-                    </select>
+                    <Typeahead
+                        id="basic-example"
+                        labelKey={(option) =>
+                            option && option.UnitName
+                                ? option.UnitName.toString()
+                                : ""
+                        }
+                        options={unitdata}
+                        placeholder="Select Unit"
+                        onChange={handleUnitSelect}
+                        selected={selectedUnitName}
+                    />
                 </div>
 
                 <div className="col-md-2">

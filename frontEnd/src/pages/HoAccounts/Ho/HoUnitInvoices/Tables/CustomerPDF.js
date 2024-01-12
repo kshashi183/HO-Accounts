@@ -84,10 +84,10 @@ const styles = StyleSheet.create({
 
   headerText1: {
     width: "45%",
-  
+
     fontFamily: "Helvetica-Bold",
     borderBottom: "1px",
-    marginLeft:'30%'
+    marginLeft: '30%'
   },
 
 
@@ -195,15 +195,15 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    marginBottom:5,
-    marginTop:10
+    marginBottom: 5,
+    marginTop: 10
 
   },
-  
+
   row1: {
     flexDirection: "row",
-    marginBottom:15,
-    marginTop:10
+    marginBottom: 15,
+    marginTop: 10
 
   },
 
@@ -246,8 +246,8 @@ const styles = StyleSheet.create({
     textDecoration: 'underline',
 
   },
-  
- 
+
+
 });
 
 
@@ -266,11 +266,11 @@ export default function CustomerPDF({ dataBasedOnCust }) {
       setCurrentDate(formattedDate);
     };
 
-   
+
     getCurrentDate();
   }, []);
 
-  
+
 
 
 
@@ -306,7 +306,7 @@ export default function CustomerPDF({ dataBasedOnCust }) {
 
 
 
- 
+
 
 
   const Header = (dataBasedOnCust) => (
@@ -334,7 +334,7 @@ export default function CustomerPDF({ dataBasedOnCust }) {
 
   let totalGrandTotal = 0;
 
-  
+
 
   const poBalanceSum = {};
 
@@ -345,7 +345,7 @@ export default function CustomerPDF({ dataBasedOnCust }) {
   });
 
 
-  let c = 0;
+
 
   const groupDataByPO = () => {
     const groupedData = {};
@@ -369,29 +369,30 @@ export default function CustomerPDF({ dataBasedOnCust }) {
   console.log("group", groupedData);
 
   let globalIndex = 0;
-  const itemsPerPage = 5;
+  const itemsPerPage = 2;
+  const maxRowsPerPage = 5
   const pageCount = Math.ceil(Object.keys(groupedData).length / itemsPerPage);
 
 
-  const rowsPerPageFirstPage = 6;
-const itemsPerPageForOtherPages = 8;
+  const rowsPerPageFirstPage = 5;
+  const itemsPerPageForOtherPages = 6;
 
 
-function formatAmount(amount) {
-  // Assuming amount is a number
-  const formattedAmount = new Intl.NumberFormat('en-IN', {
+  function formatAmount(amount) {
+    // Assuming amount is a number
+    const formattedAmount = new Intl.NumberFormat('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-  }).format(amount);
+    }).format(amount);
 
-  return formattedAmount;
-}
+    return formattedAmount;
+  }
 
   return (
     <>
 
 
-      <Document>
+      {/* <Document>
         {Array.from({ length: pageCount }).map((_, pageIndex) => (
 
           
@@ -406,7 +407,7 @@ function formatAmount(amount) {
                   <Text style={styles.headerText}>Magod Laser Private Limited   </Text>
                   <Text style={{ marginLeft: '30px', marginTop: '5px' }}>Jigani</Text>
                 </View>
-                {/* Adjust the styles as needed for the address */}
+              
                 <Text style={styles.head1234}>Plot NO 72, Phase || KIADB Industrial Area Jigani, Anekal Taluk Bangalore
                   Pin:{dataBasedOnCust && dataBasedOnCust.length >= 0 ? dataBasedOnCust[0]?.PIN_Code : ''}
 
@@ -459,7 +460,7 @@ function formatAmount(amount) {
               <View style={styles.tableDataView}>
                 {Object.keys(groupedData)
                
-                .slice(pageIndex === 0 ? 0 : (pageIndex * (pageIndex === 0 ? rowsPerPageFirstPage : itemsPerPageForOtherPages)), (pageIndex === 0 ? rowsPerPageFirstPage : (pageIndex + 1) * itemsPerPageForOtherPages))
+              //  .slice(pageIndex === 0 ? 0 : (pageIndex * (pageIndex === 0 ? rowsPerPageFirstPage : itemsPerPageForOtherPages)), (pageIndex === 0 ? rowsPerPageFirstPage : (pageIndex + 1) * itemsPerPageForOtherPages))
             
            
                   .map((PO_No, index) => (
@@ -471,6 +472,7 @@ function formatAmount(amount) {
 
                       {groupedData[PO_No].map((item, itemIndex) => {
                         globalIndex++;
+
                         return (
                           <View style={styles.row} key={itemIndex}>
                             <Text style={styles.srl}>{globalIndex}</Text>
@@ -491,7 +493,116 @@ function formatAmount(amount) {
             </View>
             
           </Page>
-        ))}
+         ))} 
+      </Document> */}
+
+
+
+      <Document>
+        {Object.keys(groupedData).map((PO_No, index) => {
+          const startItem = index * itemsPerPageForOtherPages;
+          const endItem = startItem + itemsPerPageForOtherPages;
+
+          const currentPageData = Object.keys(groupedData)
+            .slice(startItem, endItem)
+            .reduce((acc, key) => {
+              acc[key] = groupedData[key];
+              return acc;
+            }, {});
+
+          if (Object.keys(currentPageData).length === 0) {
+            return null; // Skip rendering empty pages
+          }
+
+          return (
+            <Page key={index} size="A4" style={styles.page}>
+              <View style={styles.pageHeader}>
+                <Image src={MagodIMAGE} style={styles.logo} />
+
+                <View>
+                  <Text style={styles.headerText}>Magod Laser Private Limited   </Text>
+                  <Text style={{ marginLeft: '30px', marginTop: '5px' }}>Jigani</Text>
+                </View>
+
+                <Text style={styles.head1234}>Plot NO 72, Phase || KIADB Industrial Area Jigani, Anekal Taluk Bangalore
+                  Pin:{dataBasedOnCust && dataBasedOnCust.length >= 0 ? dataBasedOnCust[0]?.PIN_Code : ''}
+
+                  Karnataka
+                </Text>
+              </View>
+
+
+
+              {index === 0 &&
+                <>
+
+                  <View style={styles.header}>
+                    <Text style={[styles.headerText1, { marginBottom: '20px' }]}>List of invoices Due for Payment As On:{currentDate}</Text>
+                  </View>
+                  <View style={styles.header}>
+                    <Text style={[styles.header, { marginLeft: '10px' }]}>
+                      <Text style={[styles.globalfontwithbold, { marginLeft: '10px' }, styles.underline]}>
+                        Customer Name:
+                      </Text> <Text style={[styles.globalfontwithbold,]}>{dataBasedOnCust && dataBasedOnCust.length > 0 ? dataBasedOnCust[0]?.Cust_Name : 'Unknown Customer'}</Text>
+                    </Text>
+
+                    <Text style={[styles.header, { marginLeft: '29px' }]}>
+                      <Text style={[styles.globalfontwithbold, { marginLeft: '10px' }, styles.underline]}>
+                        Amount Due:
+                      </Text> <Text style={[styles.globalfontwithbold]}>{formatAmount(totalGrandTotal)}</Text>
+                    </Text>
+                  </View>
+                </>
+              }
+
+              <View style={styles.tableDisplay}>
+                <View style={[styles.row1, styles.globalfontwithbold]}>
+                  <Text style={styles.srl}>Srl</Text>
+                  <Text style={styles.Material}>Inv No</Text>
+                  <Text style={styles.hsn}>Inv Date</Text>
+                  <Text style={styles.qty}>Amount</Text>
+                  <Text style={styles.uom}>Received</Text>
+                  <Text style={styles.unitprice}>Balance</Text>
+                  <Text style={styles.unitprice}>Due Days</Text>
+                  <Text style={styles.grnno}>GRN No</Text>
+                </View>
+              </View>
+
+              <View style={styles.tableDataView}>
+                {Object.keys(currentPageData)
+                  .map((PO_No, index) => (
+                    <View key={index}>
+                      <View style={styles.middata}>
+                        <Text style={{ paddingBottom: "5px", marginLeft: '49px' }}>PO_No: <Text style={styles.globalfontwithbold}>{PO_No}</Text></Text>
+                        <Text style={{ paddingBottom: "5px", marginLeft: '20px' }}>Due_Amount:  <Text style={styles.globalfontwithbold}>{formatAmount(getTotalBalance(currentPageData[PO_No]))}</Text></Text>
+                      </View>
+
+                      {currentPageData[PO_No].map((item, itemIndex) => {
+                        globalIndex++;
+                        if (itemIndex < maxRowsPerPage) {
+                          return (
+                            <View style={styles.row} key={itemIndex}>
+                              <Text style={styles.srl}>{globalIndex}</Text>
+                              <Text style={styles.Material}>{item.Inv_No}</Text>
+                              <Text style={styles.hsn}>{new Date(item.Inv_Date).toLocaleDateString('en-GB')}</Text>
+                              <Text style={[styles.qty, { textAlign: 'right' }]}>{formatAmount(item.GrandTotal)}</Text>
+                              <Text style={[styles.uom, { textAlign: 'right' }]}>{formatAmount(item.PymtAmtRecd)}</Text>
+                              <Text style={[styles.unitprice, { textAlign: 'right' }]}>{formatAmount(item.Balance)}</Text>
+                              <Text style={styles.unitprice}>{item.duedays}</Text>
+                              <Text style={styles.grnno}>{item.GRNNo}</Text>
+                            </View>
+                          );
+                        }
+                        else {
+                          return null;
+                        }
+                      })}
+                    </View>
+                  ))}
+              </View>
+            </Page>
+          );
+        })}
       </Document>
     </>
   )

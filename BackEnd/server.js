@@ -71,7 +71,16 @@ const accountSyncRouter = require("./routes/HOAccounts/Sync/AccountSync");
 app.use("/accountSync", accountSyncRouter);
 
 const fromUnitSyncRouter = require("./routes/HOAccounts/Sync/FromUnitSync");
-app.use('/fromUnitSync', fromUnitSyncRouter)
+app.use("/fromUnitSync", fromUnitSyncRouter);
 
 const showSyncRouter = require("./routes/HOAccounts/Sync/ShowSyncStatus");
-app.use('/showSyncStatus', showSyncRouter)
+app.use("/showSyncStatus", showSyncRouter);
+
+const sync_HO = require("./routes/HOAccounts/SetUp/Sync_HO");
+app.use("/sync", sync_HO);
+
+const prvListdata = require("./routes/HOAccounts/HO/PRV_Onaccount_Draft/PRV_List.Data");
+app.use("/prvListdata", prvListdata);
+
+const createnew = require("./routes/HOAccounts/HO/HO_PaymentVoucher/Create_new");
+app.use("/createnew", createnew);
