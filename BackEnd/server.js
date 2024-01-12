@@ -64,8 +64,7 @@ app.use("/unitReceiptList", unitReceiptList);
 const tally_Export = require("./routes/HOAccounts/HO/Tally_Export/TallyExport");
 app.use("/tallyExport", tally_Export);
 
-const sync_HO = require("./routes/HOAccounts/SetUp/Sync_HO");
-app.use("/sync", sync_HO);
+
 
 const accountSyncRouter = require("./routes/HOAccounts/Sync/AccountSync");
 app.use("/accountSync", accountSyncRouter);
