@@ -21,7 +21,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
 
 
     const invoiceListSubmit = () => {
-        axios.get(baseURL+'/tallyExport/getInvoiceData',
+        axios.get(baseURL + '/tallyExport/getInvoiceData',
             {
                 params: {
                     date: selectedDate
@@ -31,6 +31,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
             .then((res) => {
 
                 setInvoiceListData(res.data.Result)
+                console.log("inv ", res.data.Result);
             })
             .catch((err) => {
                 console.log("err", err);
@@ -46,7 +47,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
 
     const invoiceTaxDetails = (dcNo) => {
         if (dcNo) {
-            axios.get(baseURL+'/tallyExport/getInvoiceTaxDetails',
+            axios.get(baseURL + '/tallyExport/getInvoiceTaxDetails',
                 {
                     params: {
                         DC_Inv_No: dcNo
@@ -54,7 +55,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
                 }
             )
                 .then((res) => {
-
+                    console.log("inv 2", res.data.Result);
                     setTaxInvoiceData(res.data.Result)
                 })
                 .catch((err) => {
@@ -96,7 +97,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
                 _attributes: {
                     version: '1.0',
                 },
-                rows: invoiceListData.map((row) => ({
+                Voucher: invoiceListData.map((row) => ({
                     row: {
                         _attributes: { DC_InvType: row.DC_InvType },
                         Cust_Name: { _text: row.Cust_Name },
