@@ -263,7 +263,9 @@ export default function CreateNewForm() {
         <div className="col-md-2">
           <label className="form-label ">Href No</label>
           <input class="" name="HORef" placeholder="" disabled
-            value={rvData.postData.HORef} />
+            value={rvData.postData.HORef} 
+            
+            />
         </div>
 
         <div className="col-md-3">
@@ -288,6 +290,11 @@ export default function CreateNewForm() {
             placeholder="Select Unit"
             onChange={handleSelectUnit}
             selected={selectedOption}
+            disabled={
+              rvData.postData.Status != "Draft"
+                ? rvData.postData.Status
+                : ""
+            }
           />
         </div>
 
@@ -304,6 +311,11 @@ export default function CreateNewForm() {
             placeholder="Select Customer"
             onChange={handleSelectCustomer}
             selected={selectedCustOption}
+            disabled={
+              rvData.postData.Status != "Draft"
+                ? rvData.postData.Status
+                : ""
+            }
           />
         </div>
       </div>
@@ -322,6 +334,11 @@ export default function CreateNewForm() {
             className="ip-select"
             onChange={PaymentReceipts}
             value={rvData.postData.TxnType}
+            disabled={
+              rvData.postData.Status != "Draft"
+                ? rvData.postData.Status
+                : ""
+            }
           >
             <option value="">Select</option>
             <option value="Bank">Bank</option>
@@ -342,7 +359,13 @@ export default function CreateNewForm() {
 
         <div className="col-md-3 ">
           <label className="form-label">Receive Form</label>
-          <input className="" value={getCustomer} />
+          <input className="" value={rvData.postData.CustName} 
+           disabled={
+            rvData.postData.Status != "Draft"
+              ? rvData.postData.Status
+              : ""
+          }
+          />
         </div>
 
         <div className="col-md-3">
@@ -351,8 +374,8 @@ export default function CreateNewForm() {
             onChange={PaymentReceipts}
             disabled={
               rvData && rvData.postData.Status !== "Draft"
-                ? rvData.postData.ReceiptStatus
-                : "" || rvData.data.receipt_details.length !== 0
+                ? rvData.postData.Status
+                : "" 
             }
             value={rvData.postData.Amount} />
         </div>
@@ -361,7 +384,13 @@ export default function CreateNewForm() {
           <label className="form-label">HO Reference</label>
           <input name='HORef'
             onChange={PaymentReceipts}
-            value={rvData.postData.HORef} />
+            value={rvData.postData.HORef} 
+            disabled={
+              rvData.postData.Status != "Draft"
+                ? rvData.postData.Status
+                : ""
+            }
+            />
         </div>
 
 
@@ -375,7 +404,7 @@ export default function CreateNewForm() {
             onChange={PaymentReceipts}
             disabled={
               rvData && rvData.postData.Status !== "Draft"
-                ? rvData.postData.ReceiptStatus
+                ? rvData.postData.Status
                 : "" || rvData.data.receipt_details.length !== 0
             }
             value={rvData.postData.Status} />
@@ -397,8 +426,8 @@ export default function CreateNewForm() {
             value={rvData.postData.Description}
             disabled={
               rvData && rvData.postData.Status !== "Draft"
-                ? rvData.postData.ReceiptStatus
-                : "" || rvData.data.receipt_details.length !== 0
+                ? rvData.postData.Status
+                : "" 
             }
             style={{ height: "70px", resize: "none" }}
           ></textarea>
@@ -406,23 +435,51 @@ export default function CreateNewForm() {
 
         <div className="col-md-7 row">
 
-          {rvData.postData.ReceiptStatus === "Draft" && (
 
-            <>
-              <div className="col-md-2">
-                <button className="button-style group-button" style={{ width: '90px' }}>Save</button>
-              </div>
 
-              <div className="col-md-2">
-                <button className="button-style group-button"
-                  style={{ width: '90px' }}>Delete</button>
-              </div>
 
-              <div className=" col-md-2 ">
-                <button className="button-style group-button" style={{ width: '90px', }}>Post</button>
-              </div>
-            </>
-          )}
+          <div className="col-md-2">
+            <button
+              className={rvData.postData.Status != "Draft" ? "disabled-button"
+                : "button-style  group-button"
+              }
+              style={{ width: '90px' }}
+              disabled={
+                rvData.postData.Status != "Draft" ? rvData.postData.Status
+                  : ""
+              }
+            >Save</button>
+          </div>
+
+          <div className="col-md-2">
+            <button
+              className={rvData.postData.Status != "Draft" ? "disabled-button"
+                : "button-style  group-button"
+              }
+              style={{ width: '90px' }}
+              disabled={
+                rvData.postData.Status != "Draft" ? rvData.postData.Status
+                  : ""
+              }
+
+            >Delete</button>
+          </div>
+
+          <div className=" col-md-2 ">
+            <button
+              className={rvData.postData.Status != "Draft" ? "disabled-button"
+                : "button-style  group-button"
+              }
+              style={{ width: '90px' }}
+              disabled={
+                rvData.postData.Status != "Draft" ? rvData.postData.Status
+                  : ""
+              }
+
+            >Post</button>
+          </div>
+
+
 
           <div className=" col-md-2 ">
             <button className="button-style group-button"
@@ -450,7 +507,14 @@ export default function CreateNewForm() {
             </div>
 
             <div className="col-md-6">
-              <button className="button-style mt-1 mb-2 group-button ms-5">
+              <button
+                className={rvData.postData.Status != "Draft" ? "disabled-button"
+                  : "button-style  group-button"
+                }
+
+                disabled={rvData.postData.Status != "Draft" ? rvData.postData.Status : ""}
+
+              >
                 Remove Invoice
               </button>
             </div>
@@ -504,7 +568,7 @@ export default function CreateNewForm() {
                     <>
                       <tr
                         style={{ whiteSpace: "nowrap" }}
-                       
+
                         key={data.PVSrlID}
                         className={
                           rvData.firstTableArray.some(
@@ -584,15 +648,17 @@ export default function CreateNewForm() {
             </label>
 
             <div className="col-md-3 mt-3">
-              <select className="ip-select">
-                <option value="option 1">MAGOD LASER</option>
-                <option value="option 2"></option>
-                <option value="option 3"></option>
-              </select>
+              <label></label>
             </div>
 
             <div className=" col-md-4 ms-5 mb-1">
-              <button className="button-style group-button ">
+              <button
+                className={rvData.postData.Status != "Draft" ? "disabled-button"
+                  : "button-style  group-button"
+                }
+
+                disabled={rvData.postData.Status != "Draft" ? rvData.postData.Status : ""}
+              >
                 Add Invoice
               </button>
             </div>
@@ -624,7 +690,7 @@ export default function CreateNewForm() {
                 {rvData.data.inv_data?.map((row, index) => (
                   <tr key={index}
                     style={{ backgroundColor: row.isSelected ? '#3498db' : 'inherit', whiteSpace: "nowrap" }}
-                 
+
 
                   >
 
