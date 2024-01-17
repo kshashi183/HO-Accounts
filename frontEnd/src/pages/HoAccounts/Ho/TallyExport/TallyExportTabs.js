@@ -23,7 +23,9 @@ export default function TallyExportTabs({selectedDate ,setFlag, flag, exportTall
       </Tab>
 
       <Tab eventKey="PR" title="Payment Receipt Details">
-       <PaymentReceiptFormTable selectedDate={selectedDate}  flag={flag} setFlag={setFlag}/>
+       <PaymentReceiptFormTable selectedDate={selectedDate}  flag={flag} setFlag={setFlag}
+       exportTally={exportTally} setExportTally={setExportTally}
+       />
       </Tab>
 
       <Tab eventKey="HOR" title=" HO Receipt Vouchers">

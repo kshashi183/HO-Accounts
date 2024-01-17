@@ -83,3 +83,6 @@ app.use("/prvListdata", prvListdata);
 
 const createnew = require("./routes/HOAccounts/HO/HO_PaymentVoucher/Create_new");
 app.use("/createnew", createnew);
+
+const userRouter = require("./routes/user");
+app.use("/user", userRouter);

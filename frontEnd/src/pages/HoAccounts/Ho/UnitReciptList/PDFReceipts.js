@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   head4: {
     flexDirection: "row",
-    marginBottom: '15px'
+    marginBottom: '5px'
   }
 
 
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
 
   mrgnbttm:{
     flexDirection: "row",
-    marginBottom:'5px'
+    marginBottom:'1px'
   },
   unitprice11: {
         width: "80px",
@@ -239,8 +239,8 @@ const styles = StyleSheet.create({
 export default function PDFReceipts({ data, selectRow }) {
 
 
-  console.log("pdf voucher", );
-  console.log(">>>>>>>", selectRow);
+  console.log("pdf voucher", selectRow);
+  console.log(">>>>>>>", data);
 
   const [currentDate, setCurrentDate] = useState('');
   // const [totalReceiveNow, setTotalReceiveNow] = useState(0);
@@ -425,12 +425,93 @@ export default function PDFReceipts({ data, selectRow }) {
   );
 
 
+  const Header222 = () => (
+    <>
+        
+
+
+        <View style={styles.mrgnbttm}>
+          <Text style={{ marginLeft: '70px' }}>
+            Unit :
+          </Text>
+          <Text style={{ marginLeft: '130px' ,width:'340px'}}>
+
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Received From:</Text>{selectRow.CustName} ({selectRow.Cust_code})
+
+
+          </Text>
+        </View>
+
+        <View style={styles.mrgnbttm}>
+          <Text style={{ marginLeft: '30px' }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Voucher No :  </Text>{selectRow.Recd_PVNo}
+          </Text>
+
+
+
+        </View>
+
+
+
+        <View style={styles.mrgnbttm}>
+          <Text style={{ marginLeft: '65px' }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Date :  </Text>{currentDate}
+
+          </Text>
+          
+        </View>
+
+        <View style={styles.mrgnbttm}>
+          <Text style={{ marginLeft: '30px' }}>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Transaction Type: </Text> {selectRow.TxnType}
+
+          </Text>
+
+          <Text style={{ marginLeft: '100px',width:'300px' }}>
+
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Vibe : </Text> {selectRow.Description}
+          </Text>
+
+        </View>
+
+
+        <View style={styles.head4}>
+                <Text style={{ marginLeft: '400px' }}>
+                  <Text style={{ fontFamily: "Helvetica-Bold" }}>Amount:   </Text>  {formatAmount(selectRow.Amount)}
+
+                </Text>
+
+              </View>
+
+              <View style={styles.head4}>
+                <Text style={{ marginLeft: '395px', }}>
+
+                  <Text style={{ fontFamily: "Helvetica-Bold" }}>Adjusted:    </Text> {formatAmount(totalReceiveNow)}
+
+                </Text>
+
+              </View>
+
+
+          
+
+              <View style={styles.head4}>
+                <Text style={{ marginLeft: '377px', }}>
+
+                  <Text style={{ fontFamily: "Helvetica-Bold" }}> On Account:     </Text>{formatAmount(selectRow.On_account)}
+                </Text>
+              </View>
+        </>
+
+
+  );
+
 
 
   if (!data || data.length === 0) {
     return <Header22 />;
   }
-
+  const itemsPerPageForOtherPages = 15;
   
   return (
     <>
@@ -438,7 +519,7 @@ export default function PDFReceipts({ data, selectRow }) {
 
 
 
-      <Document>
+      {/* <Document>
         {paginatedData.map((pageData, pageIndex) => (
 
           <Page key={pageIndex} size="A4" style={styles.page}>
@@ -619,6 +700,135 @@ export default function PDFReceipts({ data, selectRow }) {
             </View>}
           </Page>
         ))}
+      </Document> */}
+
+      
+<Document>
+        {data.map((pageData, pageIndex) => {
+          const startItem = pageIndex * itemsPerPageForOtherPages;
+          const endItem = startItem + itemsPerPageForOtherPages;
+
+          const currentPageData = Object.keys(pageData)
+            .slice(startItem, endItem)
+            .reduce((acc, key) => {
+              acc[key] = pageData[key];
+              return acc;
+            }, {});
+
+          if (Object.keys(currentPageData).length === 0) {
+            return null; 
+            // Skip rendering empty pages
+          }
+
+          return(
+          <Page key={pageIndex} size="A4" style={styles.page}>
+
+
+
+            
+
+            {pageIndex === 0 && 
+            <>
+            <Header />
+            
+            <Header222/>
+            </>
+            }
+
+
+
+
+
+            {pageIndex === 0 &&
+              <View style={styles.tableDisplay}>
+
+                <View style={styles.row}>
+                  <View style={styles.srl}>
+                    <Text style={styles.globalfontwithbold}>Srl </Text>
+                  </View>
+
+
+
+                  <View style={styles.Material}>
+                    <Text style={styles.globalfontwithbold}>Invoice No</Text>
+                  </View>
+
+                  <View style={styles.hsn}>
+                    <Text style={styles.globalfontwithbold}>Type </Text>
+                  </View>
+
+                  <View style={styles.qty}>
+                    <Text style={styles.globalfontwithbold}>Invoiced</Text>
+                  </View>
+                  <View style={styles.uom}>
+                    <Text style={[styles.globalfontwithbold, { textAlign: 'right' }]}>Received</Text>
+                  </View>
+                  <View style={styles.unitprice}>
+                    <Text style={[styles.globalfontwithbold, { textAlign: 'right' }]}>Receive Now</Text>
+                  </View>
+                  <View style={styles.unitprice11}>
+                    <Text style={styles.globalfontwithbold}>Reference No</Text>
+                  </View>
+
+
+                </View>
+
+              </View>}
+
+
+
+            {pageIndex === 0 && <View style={styles.tableDataView}>
+
+
+              {data.map((item, index) => (
+                <>
+
+                  <View style={styles.row} key={index}>
+                    <View style={styles.srl}>
+                      <Text style={[styles.globalfontwithoutbold, { paddingBottom: "15px" }]}>{index + 1}</Text>
+                    </View>
+
+                    <View style={styles.drawingname}>
+                      <Text style={styles.globalfontwithoutbold}>
+                        {item.Inv_No} {new Date(item.Inv_date).toLocaleDateString('en-GB')}
+                      </Text>
+                    </View>
+
+
+
+                    <View style={styles.hsn}>
+                      <Text style={styles.globalfontwithoutbold}>{item.Inv_Type} </Text>
+                    </View>
+
+                    <View style={styles.qty}>
+                      <Text style={[styles.globalfontwithoutbold, { textAlign: 'right' }]}>{formatAmount(item.Inv_Amount)}</Text>
+                    </View>
+                    <View style={styles.uom}>
+                      <Text style={[styles.globalfontwithoutbold, { textAlign: 'right' }]}>{formatAmount(item.Amt_received)}</Text>
+                    </View>
+
+                    <View style={styles.unitprice}>
+                      <Text style={[styles.globalfontwithoutbold, { textAlign: 'right' }]}>{formatAmount(item.Receive_Now)}</Text>
+                    </View>
+                    <View style={styles.unitprice11}>
+                      <Text style={styles.globalfontwithoutbold}>{item.RefNo}</Text>
+                    </View>
+
+
+                  </View>
+
+                </>
+              ))}
+
+            </View>}
+
+
+            {pageIndex === 0 && <View>
+              <Text style={{ marginLeft: '410px', fontSize: "10px", }}>{formatAmount(totalReceiveNow)}</Text>
+            </View>}
+          </Page>
+          )
+})}
       </Document>
     </>
   )

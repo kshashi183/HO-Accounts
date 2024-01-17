@@ -552,7 +552,7 @@ export default function AdjustmentVoucherForm() {
 
                 <div className="col-md-3">
                     <label className="form-label">Amount</label>
-                    <input className="" value={selectRow.Amount} />
+                    <input className="" />
                 </div>
 
                 <div className="col-md-3">
