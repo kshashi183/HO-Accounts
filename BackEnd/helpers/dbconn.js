@@ -3,21 +3,21 @@ var mysql = require("mysql2");
 var dailyReport = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "password",
   database: "magodmis",
 });
 
 var setupConn = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "password",
   database: "magod_setup",
 });
 
 var hqConnection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "password",
   database: "magod_hq_mis",
 });
 
@@ -196,7 +196,7 @@ const hqQuery = (query, values) => {
 const misConn = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "password",
   database: "magodmis",
   dateStrings: true,
 });
