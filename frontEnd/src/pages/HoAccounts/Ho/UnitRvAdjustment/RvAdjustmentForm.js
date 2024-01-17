@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { baseURL } from '../../../../api/baseUrl';
+import ReactPaginate from "react-paginate";
 
 const initial={
     HoRefDate:'', TxnType:'', Amount:'', Description:'',HORef:'', Status:''
@@ -17,11 +18,33 @@ export default function RvAdjustmentForm() {
     const [selectedCustCode, setSelectedCustCode] = useState("0000");
     const [showAll, setShowAll] = useState(false);
 
+
+    const [selectedUnitName, setSelectedUnitName]=useState("")
+      const [selectUnit, setSelectUnit] = useState([])
+      const [getName, setGetName] = useState("");
+
+
+      const itemsPerPage = 100;
+      const [currentPage, setCurrentPage] = useState(0);
+
+  // Calculate the start and end indices for the current page
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  // Get the data for the current page
+  const currentPageData = rvAdjustmentData.slice(startIndex, endIndex);
+  console.log(currentPageData, "currentPageData");
+
+  const handlePageChange = ({ selected }) => {
+    setCurrentPage(selected);
+  };
     useEffect(() => {
         AdjsutmentSubmit()
         getCustomersSubmit()
-    }, [selectedCustCode, showAll])
+    }, [selectedCustCode, showAll, selectedUnitName ])
 
+
+    console.log("selectedUnitName1111", selectedUnitName);
     const AdjsutmentSubmit = () => {
         if (showAll) {
             axios.get(baseURL+'/unitRV_Adjustment/rvAdjustment',)
@@ -34,10 +57,11 @@ export default function RvAdjustmentForm() {
                 })
         }
         else {
-          console.log("custcode", selectedCustCode);
+          console.log("selectedUnitName", selectedUnitName);
             axios.get(baseURL+'/unitRV_Adjustment/rvAdjustment', {
                 params: {
-                    selectedCustCode: selectedCustCode
+                    selectedCustCode: selectedCustCode,
+                    selectedUnitName:selectedUnitName
                 },
             })
                 .then((res) => {
@@ -92,16 +116,15 @@ export default function RvAdjustmentForm() {
 
     }
     function handleButtonClick(selectRow) {
-    
+    const select=selectRow.HOPrvId;
         
-        navigate("/HOAccounts/HO/AdjustmentVoucher", {state:{selectRow }});
+        navigate("/HOAccounts/HO/HOPRV/CreateNew", {state:{ select }});
       }
       
 
+      console.log("hoprv id",selectRow.HOPrvId );
 
-      const [selectedUnitName, setSelectedUnitName]=useState([])
-      const [selectUnit, setSelectUnit] = useState([])
-      const [getName, setGetName] = useState("");
+      
   
       const handleUnitSelect = (selected) => {
           const selectedCustomer = selected[0];
@@ -175,7 +198,6 @@ export default function RvAdjustmentForm() {
                         onClick={() => 
                             
                             {
-                       
                             handleButtonClick(selectRow);}
                         }
                         >
@@ -212,7 +234,7 @@ export default function RvAdjustmentForm() {
 
             <div className='col-md-12'>
                 <div className='mt-3 col-md-12'>
-                    <div style={{ height: "400px", overflowY: "scroll", overflowX: 'scroll' }}>
+                    <div style={{ height: "350px", overflowY: "scroll", overflowX: 'scroll' }}>
                         <Table className='table-data border' striped>
                             <thead className='tableHeaderBGColor' >
                                 <tr>
@@ -230,8 +252,8 @@ export default function RvAdjustmentForm() {
 
 
                             <tbody className='tablebody'>
-                                {
-                                    rvAdjustmentData.map((item, key) => {
+                                { currentPageData ? 
+                                    currentPageData.map((item, key) => {
                                         return (
                                             <tr  onClick={() => selectedRowFun(item, key)}
 
@@ -251,13 +273,81 @@ export default function RvAdjustmentForm() {
                                                 <td>{item.TxnType}</td>
                                             </tr>
                                         )
-                                    })
+                                    }) :''
                                 }
                             </tbody>
                         </Table>
                     </div>
                 </div>
             </div>
+
+            <ReactPaginate
+        previousLabel={"previous"}
+        nextLabel={"next"}
+        breakLabel={"..."}
+        pageCount={Math.ceil(rvAdjustmentData.length / itemsPerPage)}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageChange}
+        containerClassName={"pagination"}
+        subContainerClassName={"pages pagination"}
+        activeClassName={"active"}
+      />
         </div>
     );
 }
+
+
+// const getReceipts = async (cust_code, postdata) => {
+//     setRvData((prevRvData) => ({ ...prevRvData, postData: postdata }));
+
+//     try {
+//       const resp = await axios.get(
+//         baseURL + `/Payment_Receipts/getrvdata?receipt_id=${rowData}`
+//       );
+
+//       try {
+//         const response = await axios.get(
+//           baseURL + `/Payment_Receipts/getinvlist?customercode=${cust_code}`
+//         );
+
+//         setRvData((prevRvData) => ({
+//           ...prevRvData,
+//           data: {
+//             ...prevRvData.data,
+//             inv_data: response.data.Result,
+//             receipt_details: resp.data.Result,
+//             receipt_data: prevRvData.postData,
+//             receipt_id: rowData,
+//           },
+
+//         }));
+
+//       } catch (error) {
+//         console.error("Error fetching data:", error);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching data:", error);
+//     }
+//   };
+
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       if (rowData !== "") {
+//         try {
+//           const response = await axios.get(
+//             baseURL + `/Payment_Receipts/getreceipt?receipt_id=${rowData}`
+//           );
+//           getReceipts(
+//             response.data.Result[0].Cust_code,
+//             response.data.Result[0]
+//           );
+//         } catch (error) {
+//           console.error("Error making API call:", error);
+//         }
+//       }
+//     };
+
+//     fetchData();
+//   }, [rowData]);

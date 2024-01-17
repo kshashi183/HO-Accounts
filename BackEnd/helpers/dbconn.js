@@ -209,17 +209,10 @@ const hqQuery = (query, values) => {
 // });
 
 const misConn = mysql.createConnection({
-<<<<<<< HEAD
   host: dbHost,
   user: dbUser,
   password: dbPassword,
   database: dbDatabase1,
-=======
-  host: "localhost",
-  user: "root",
-  password: "password",
-  database: "magodmis",
->>>>>>> 445e63f457da15d16e0d52bfbd591b7b3277ddb9
   dateStrings: true,
 });
 
