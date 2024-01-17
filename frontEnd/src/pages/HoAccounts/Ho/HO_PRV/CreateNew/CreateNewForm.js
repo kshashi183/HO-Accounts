@@ -4,13 +4,15 @@ import { Table } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { useLocation, useNavigate } from "react-router-dom";
 import { baseURL } from "../../../../../api/baseUrl";
+import { toast } from "react-toastify";
+import { Modal } from "react-bootstrap";
 
 export default function CreateNewForm() {
   const navigate = useNavigate();
 
   const location = useLocation();
   const rowData = location.state ? location.state : "";
-  console.log("rowdata", rowData);
+  // console.log("rowdata", rowData);
   const [getUnit, setGetUnit] = useState("");
   const [getCustomer, setGetCustomer] = useState("");
   const [getCustCode, setGetCustCode] = useState("");
@@ -20,6 +22,8 @@ export default function CreateNewForm() {
   const [getCustNames, setGetCustNames] = useState([]);
   const [selectedOption, setSelectedOption] = useState([]);
   const [selectedCustOption, setSelectedCustOption] = useState([]);
+  const [unitName, setUnitName] = useState("Jigani");
+  const [showPostModal, setShowPostModal] = useState(false);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -40,14 +44,17 @@ export default function CreateNewForm() {
     postData: {
       RecdPVID: "",
       Recd_PVNo: "Draft",
-      Recd_PV_Date: new Date().toLocaleDateString("en-GB").split("/").join("-"),
-      //  Recd_PV_Date: formatDate(new Date()),
-
-      ReceiptStatus: "Draft",
+      HO_PrvId: "",
+      HoRefDate: new Date().toLocaleDateString("en-GB").split("/").join("-"),
+      //  HoRefDate: formatDate(new Date()),
+      HORefNo: "Draft",
+      HORef: "Draft",
+      // ReceiptStatus: "Draft",
+      Status: "Created",
       CustName: "",
       Cust_code: "",
       TxnType: "",
-      Amount: "",
+      Amount: 0,
       On_account: "",
       Description: "",
       selectedCustomer: "",
@@ -68,8 +75,9 @@ export default function CreateNewForm() {
   const initial = {
     RecdPVID: "",
     Recd_PVNo: "Draft",
-    Recd_PV_Date: new Date().toLocaleDateString("en-GB").split("/").join("-"),
-    // Recd_PV_Date: formatDate(new Date()),
+    HO_PrvId: "",
+    HoRefDate: new Date().toLocaleDateString("en-GB").split("/").join("-"),
+    // HoRefDate: formatDate(new Date()),
     ReceiptStatus: "Draft",
     CustName: "",
     Cust_code: "",
@@ -80,11 +88,7 @@ export default function CreateNewForm() {
     selectedCustomer: "",
   };
 
-
-
   // const [postData, setPostData] = useState(initial);
-
-
 
   // Create a new Date object
   const currentDate = new Date();
@@ -104,9 +108,13 @@ export default function CreateNewForm() {
   // Initialize a state variable to hold the input value
   const [inputValue, setInputValue] = useState(formattedDate);
 
+  const handlePostModalClose = () => {
+    setShowPostModal(false);
+  };
+
   const handleUnitNames = () => {
     axios
-      .post(baseURL + "/hoCreateNew/unitNames")
+      .get(baseURL + "/hoCreateNew/unitNames")
       .then((res) => {
         setGetUnitNames(res.data);
       })
@@ -117,7 +125,7 @@ export default function CreateNewForm() {
 
   const handleCustomerNames = () => {
     axios
-      .post(baseURL + "/hoCreateNew/customerNames")
+      .get(baseURL + "/hoCreateNew/customerNames")
       .then((res) => {
         setGetCustNames(res.data);
       })
@@ -132,11 +140,52 @@ export default function CreateNewForm() {
     setGetUnit(selectedCustomer ? selectedCustomer.UnitName : ""); // Update selected name
   };
 
-  const handleSelectCustomer = (selected) => {
+  const handleSelectCustomer = async (selected) => {
     const selectedCustomer = selected[0];
     setSelectedCustOption(selected); // Update selected option state
     setGetCustomer(selectedCustomer ? selectedCustomer.Cust_Name : ""); // Update selected Name
     setGetCustCode(selectedCustomer ? selectedCustomer.Cust_Code : ""); // Update selected Code
+
+    if (selected.length > 0) {
+      try {
+        const invoicesResponse = await axios.post(
+          baseURL + "/hoCreateNew/getInvoices",
+          {
+            unit: getUnit,
+            custCode: selectedCustomer.Cust_Code,
+          }
+        );
+
+        const hoprvIdResponse = await axios.post(
+          baseURL + "/hoCreateNew/getHOPrvId",
+          {
+            unit: getUnit,
+            custCode: selectedCustomer.Cust_Code,
+          }
+        );
+
+        console.log("hoprvIdResponse", hoprvIdResponse.data[0]?.HOPrvId);
+        console.log("Amount", hoprvIdResponse.data[0]?.Amount);
+
+        console.log("hoprvIdResponse", hoprvIdResponse.data[0]);
+
+        // Update state based on API responses
+        setRvData((prevRvData) => ({
+          ...prevRvData,
+          data: {
+            ...prevRvData.data,
+            inv_data: invoicesResponse.data,
+          },
+          postData: {
+            ...prevRvData.data,
+            HO_PrvId: hoprvIdResponse.data[0]?.HOPrvId || "",
+            // Amount: hoprvIdResponse.data[0]?.Amount || 0,
+          },
+        }));
+      } catch (error) {
+        console.log("Error in API request", error);
+      }
+    }
   };
 
   useEffect(() => {
@@ -144,15 +193,253 @@ export default function CreateNewForm() {
     handleCustomerNames();
   }, []);
 
-  // Event handler to update the input value
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+  const handleSave = async () => {
+    try {
+      // Client-side validations
+      if (!getUnit) {
+        toast.error("Please Select Unit Name.");
+        return;
+      }
+
+      if (!getCustomer) {
+        toast.error("Please Select Customer.");
+        return;
+      }
+
+      if (!rvData.postData.TxnType) {
+        toast.error("Please Select TxnType.");
+        return;
+      }
+
+      if (!rvData.postData.Description) {
+        toast.error("Add Description for Voucher");
+        return;
+      }
+
+      if (!rvData.postData.Amount) {
+        toast.error("Please provide valid Amount.");
+        return;
+      }
+
+      // If HO_PrvId is not present, it's an insert operation
+      if (!rvData.postData.HO_PrvId) {
+        const insertResponse = await axios.post(
+          baseURL + "/hoCreateNew/saveData",
+          {
+            unit: getUnit,
+            custCode: getCustCode,
+            custName: getCustomer,
+            txnType: rvData.postData.TxnType,
+            description: rvData.postData.Description,
+            Amount: 0,
+          }
+        );
+
+        console.log("Insert Response", insertResponse.data.data.insertId);
+
+        if (insertResponse.data.success) {
+          toast.success("Data inserted successfully!");
+
+          setRvData((prevRvData) => ({
+            ...prevRvData,
+            postData: {
+              ...prevRvData.postData,
+              HO_PrvId: insertResponse.data.data.insertId,
+            },
+          }));
+        } else {
+          toast.error("Failed to insert data. Please try again.");
+        }
+      } else {
+        console.log("Amount:", rvData.postData.Amount);
+        const updateResponse = await axios.post(
+          baseURL + "/hoCreateNew/updateData",
+          {
+            unit: getUnit,
+            HO_PrvId: rvData.postData.HO_PrvId,
+            custCode: getCustCode,
+            custName: getCustomer,
+            txnType: rvData.postData.TxnType,
+            description: rvData.postData.Description,
+            Amount: rvData.postData.Amount,
+          }
+        );
+
+        console.log("HO_PrvId", rvData.postData.HO_PrvId);
+        console.log("Update Response", updateResponse.data);
+
+        if (updateResponse.data.success) {
+          toast.success("Data updated successfully!");
+        } else {
+          toast.error("Failed to update data. Please try again.");
+        }
+      }
+    } catch (error) {
+      console.error("Error in save API request", error);
+    }
   };
 
   const handleTxnTYpeChange = (event) => {
     setSelectedTxntType(event.target.value);
   };
 
+  const handleCheckboxChangeSecondTable = (event, rowData) => {
+    const isChecked = event.target.checked;
+    // console.log("rowData", rowData);
+
+    if (isChecked) {
+      setRvData((prevRvData) => ({
+        ...prevRvData,
+        secondTableArray: [...prevRvData.secondTableArray, rowData],
+      }));
+    } else {
+      setRvData((prevRvData) => ({
+        ...prevRvData,
+        secondTableArray: prevRvData.secondTableArray.filter(
+          (item) => item !== rowData
+        ),
+      }));
+    }
+  };
+
+  const handleRowSelect = (data) => {
+    const selectedRow = rvData.firstTableArray.find(
+      (row) => row.RecdPvSrl === data.RecdPvSrl
+    );
+
+    setRvData({
+      ...rvData,
+      firstTableArray: selectedRow ? [] : [data],
+    });
+  };
+
+  // console.log("SecondTableArray", rvData.secondTableArray);
+
+  const addInvoice = async () => {
+    try {
+      const selectedRows = rvData.secondTableArray;
+
+      if (selectedRows.length === 0) {
+        toast.error("No rows selected for addition to voucher.");
+        return;
+      }
+
+      // Extract On Account value from rvData.postData
+
+      const rowsToAdd = [];
+
+      for (const row of selectedRows) {
+        // Check if the row is not already in receipt_details
+        const isRowAlreadyAdded = rvData.data.receipt_details.some(
+          (existingRow) => existingRow.Dc_inv_no === row.DC_Inv_No
+        );
+
+        // If the row is not already added, add it to rowsToAdd
+        if (!isRowAlreadyAdded) {
+          rowsToAdd.push(row);
+        }
+      }
+
+      // console.log("rowsToAdd:", rowsToAdd);
+
+      if (rowsToAdd.length === 0) {
+        toast.error("Row already exists");
+        return;
+      }
+
+      const response = await axios.post(baseURL + "/hoCreateNew/addInvoice", {
+        selectedRows: rowsToAdd,
+        HO_PrvId: rvData.postData.HO_PrvId,
+        unit: getUnit,
+      });
+
+      const totalReceiveNow = response.data.reduce(
+        (total, item) => total + parseFloat(item.Receive_Now || 0),
+        0
+      );
+
+      console.log("totalReceiveNow", totalReceiveNow);
+
+      setRvData((prevRvData) => ({
+        ...prevRvData,
+        data: {
+          ...prevRvData.data,
+          receipt_details: response.data,
+        },
+        secondTableArray: [],
+      }));
+
+      const selectedIndices = selectedRows?.map((selectedRow) =>
+        rvData.secondTableArray.findIndex(
+          (row) => row.DC_Inv_No === selectedRow.DC_Inv_No
+        )
+      );
+
+      selectedIndices.forEach((index) => {
+        const checkbox = document.getElementById(`checkbox_${index}`);
+        if (checkbox) {
+          checkbox.checked = false;
+        }
+      });
+
+      const updateAmount = await axios.post(
+        baseURL + "/hoCreateNew/updateAmount",
+        {
+          Amount: totalReceiveNow,
+          HO_PrvId: rvData.postData.HO_PrvId,
+        }
+      );
+
+      setRvData((prevRvData) => ({
+        ...prevRvData,
+        postData: {
+          ...prevRvData.postData,
+          Amount: updateAmount.data.updatedAmount[0]?.Amount,
+        },
+      }));
+      return response.data;
+    } catch (error) {
+      console.error("Error adding rows to voucher:", error);
+      throw error;
+    }
+  };
+
+  const handleInputChange = async (e, rowData) => {
+    const { name, value } = e.target;
+
+    const totalReceiveNow = rvData.data.receipt_details.reduce(
+      (total, item) =>
+        total +
+        (item.Inv_No === rowData.Inv_No
+          ? parseInt(value, 10) || 0
+          : parseInt(item.Receive_Now, 10) || 0),
+      0
+    );
+
+    console.log("totalReceiveNow", totalReceiveNow);
+
+    const updateAmount = await axios.post(
+      baseURL + "/hoCreateNew/updateAmount",
+      {
+        Amount: totalReceiveNow,
+        HO_PrvId: rvData.postData.HO_PrvId,
+      }
+    );
+
+    setRvData((prevRvData) => ({
+      ...prevRvData,
+      data: {
+        ...prevRvData.data,
+        receipt_details: prevRvData.data.receipt_details.map((item) =>
+          item.Inv_No === rowData.Inv_No ? { ...item, [name]: value } : item
+        ),
+      },
+      postData: {
+        ...prevRvData.postData,
+        Amount: updateAmount.data.updatedAmount[0]?.Amount,
+      },
+    }));
+  };
 
   const getReceipts = async (cust_code, postdata) => {
     setRvData((prevRvData) => ({ ...prevRvData, postData: postdata }));
@@ -173,11 +460,9 @@ export default function CreateNewForm() {
             ...prevRvData.data,
             inv_data: response.data.Result,
             receipt_details: resp.data.Result,
-
             receipt_id: rowData,
           },
         }));
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -186,6 +471,183 @@ export default function CreateNewForm() {
     }
   };
 
+  const removeInvoice = async () => {
+    try {
+      const isAnyEmptyReceiveNow = rvData.firstTableArray.some(
+        (row) => row.Receive_Now === ""
+      );
+
+      if (isAnyEmptyReceiveNow) {
+        toast.error("Receive Now cannot be empty");
+        return;
+      }
+
+      if (rvData.firstTableArray.length === 0) {
+        toast.error("No rows selected for removal of voucher.");
+        return;
+      }
+
+      const selectedRow = rvData.firstTableArray[0];
+
+      if (parseFloat(selectedRow.Receive_Now) < 0) {
+        toast.error("Incorrect Value");
+        return;
+      }
+
+      const formattedValue = parseFloat(selectedRow.Receive_Now || 0);
+      const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
+      const amountReceived = parseFloat(selectedRow.Amt_received || 0);
+
+      if (formattedValue > invoiceAmount - amountReceived) {
+        toast.error("Cannot Receive More than Invoice Amount");
+        return;
+      }
+
+      const RecdPvSrl = selectedRow.RecdPvSrl;
+      const receiveNowValue = parseFloat(selectedRow.Receive_Now || 0);
+
+      console.log("RecdPvSrl", RecdPvSrl);
+
+      const response = await axios.post(
+        baseURL + "/hoCreateNew/removeInvoice",
+        {
+          RecdPvSrl: RecdPvSrl,
+          HO_PrvId: rvData.postData.HO_PrvId,
+        }
+      );
+
+      // Convert On_account to a number, round it to 2 decimal places, then parse it back to a number
+      const roundedReceiveNow = parseFloat(
+        parseFloat(rvData.postData.Amount).toFixed(2)
+      );
+
+      // Update receipt_details and On_account after removing voucher
+      setRvData((prevRvData) => ({
+        ...prevRvData,
+        data: {
+          ...prevRvData.data,
+          receipt_details: response.data,
+        },
+        postData: {
+          ...prevRvData.postData,
+          Amount: rvData.postData.Amount - receiveNowValue,
+        },
+        firstTableArray: [],
+      }));
+
+      const updateAmount = await axios.post(
+        baseURL + "/hoCreateNew/updateAmount",
+        {
+          Amount: rvData.postData.Amount - receiveNowValue,
+          HO_PrvId: rvData.postData.HO_PrvId,
+        }
+      );
+
+      setRvData((prevRvData) => ({
+        ...prevRvData,
+        postData: {
+          ...prevRvData.postData,
+          Amount: updateAmount.data.updatedAmount[0]?.Amount,
+        },
+      }));
+    } catch (error) {
+      console.error("Error removing voucher:", error);
+    }
+  };
+
+  const getDCNo = async () => {
+    const srlType = "HO PaymentRV";
+    const ResetPeriod = "FinanceYear";
+    const ResetValue = 0;
+    const VoucherNoLength = 4;
+    const unit = "HQ";
+    try {
+      const response = await axios.post(baseURL + `/createnew/getDCNo`, {
+        unit: unit,
+        srlType: srlType,
+        ResetPeriod: ResetPeriod,
+        ResetValue: ResetValue,
+        VoucherNoLength: VoucherNoLength,
+      });
+
+      console.log("getDCNo Response", response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const postInvoice = () => {
+    if (!rvData.postData.Description) {
+      toast.error("Narration Missing");
+      return;
+    }
+
+    if (rvData.data.receipt_details.length === 0) {
+      toast.error("Select Invoices To Close");
+      return;
+    } else {
+      setShowPostModal(true);
+    }
+  };
+
+  const handlePostYes = async () => {
+    try {
+      const isAnyEmptyReceiveNow = rvData.firstTableArray.some(
+        (row) => row.Receive_Now === ""
+      );
+
+      if (isAnyEmptyReceiveNow) {
+        toast.error("Receive Now cannot be empty");
+        return;
+      }
+
+      const selectedRow = rvData.firstTableArray[0];
+
+      if (parseFloat(selectedRow.Receive_Now) < 0) {
+        toast.error("Incorrect Value");
+        return;
+      }
+
+      const formattedValue = parseFloat(selectedRow.Receive_Now || 0);
+      const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
+      const amountReceived = parseFloat(selectedRow.Amt_received || 0);
+
+      if (formattedValue > invoiceAmount - amountReceived) {
+        toast.error("Cannot Receive More than Invoice Amount");
+        return;
+      }
+
+      const srlType = "HO PaymentRV";
+      const unit = "HQ";
+
+      const response = await axios.post(baseURL + "/hoCreateNew/postInvoice", {
+        HO_PrvId: rvData.postData.HO_PrvId,
+        srlType: srlType,
+        unit: unit,
+      });
+
+      console.log("PostInvoice Response", response.data);
+
+      // Update receipt_details and On_account after removing voucher
+      setRvData((prevRvData) => ({
+        ...prevRvData,
+        data: {
+          ...prevRvData.data,
+          // receipt_details: response.data,
+        },
+        postData: {
+          ...prevRvData.data,
+          HORefNo: response.data[0].HORef,
+          Status: response.data[0].Status,
+        },
+
+        firstTableArray: [],
+        secondTableArray: [],
+      }));
+    } catch (error) {
+      console.error("Error removing voucher:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -208,12 +670,9 @@ export default function CreateNewForm() {
     fetchData();
   }, [rowData]);
 
-
-
-
   function formatAmount(amount) {
     // Assuming amount is a number
-    const formattedAmount = new Intl.NumberFormat('en-IN', {
+    const formattedAmount = new Intl.NumberFormat("en-IN", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
@@ -222,7 +681,7 @@ export default function CreateNewForm() {
   }
 
   const PaymentReceipts = useCallback((e) => {
-
+    console.log("Selected value:", e.target.value);
     const { name, value } = e.target;
 
     setRvData((prevRvData) => ({
@@ -230,10 +689,12 @@ export default function CreateNewForm() {
       postData: {
         ...prevRvData.postData,
         [name]: value,
-        // On_account: name === "Amount" ? value : prevRvData.postData.On_account,
       },
     }));
   }, []);
+
+  console.log("firstTableArray", rvData.firstTableArray);
+
   return (
     <>
       <div className="col-md-12">
@@ -247,7 +708,8 @@ export default function CreateNewForm() {
           <label className="form-label ">Create New Payment Receipt</label>
         </div>
         <div className="col-md-2">
-          <button style={{ width: '90px' }}
+          <button
+            style={{ width: "90px" }}
             className="button-style group-button "
             onClick={() => navigate("/HOAccounts")}
           >
@@ -256,23 +718,21 @@ export default function CreateNewForm() {
         </div>
       </div>
 
-
-
-
-      <div className="row col-md-12 " >
+      <div className="row col-md-12 ">
         <div className="col-md-2">
-          <label className="form-label ">Href No</label>
-          <input class="" name="HORef" placeholder="" disabled
-            value={rvData.postData.HORef} />
+          <label className="form-label ">HO Ref No</label>
+          <input
+            class=""
+            name="HORefNo"
+            placeholder=""
+            disabled
+            value={rvData.postData.HORefNo}
+          />
         </div>
 
         <div className="col-md-3">
           <label className="form-label">Date</label>
-          <input
-            className=""
-            value={inputValue}
-          // onChange={handleInputChange}
-          />
+          <input className="" value={inputValue} />
         </div>
 
         <div className="col-md-3">
@@ -280,9 +740,7 @@ export default function CreateNewForm() {
           <Typeahead
             id="basic-example"
             labelKey={(option) =>
-              option && option.UnitName
-                ? option.UnitName.toString()
-                : ""
+              option && option.UnitName ? option.UnitName.toString() : ""
             }
             options={getUnitNames}
             placeholder="Select Unit"
@@ -296,9 +754,7 @@ export default function CreateNewForm() {
           <Typeahead
             id="basic-example"
             labelKey={(option) =>
-              option && option.Cust_Name
-                ? option.Cust_Name.toString()
-                : ""
+              option && option.Cust_Name ? option.Cust_Name.toString() : ""
             }
             options={getCustNames}
             placeholder="Select Customer"
@@ -308,18 +764,13 @@ export default function CreateNewForm() {
         </div>
       </div>
 
-
-
-
-
-
-
       <div className="row col-md-12 " style={{}}>
-
         <div className="col-md-2">
           <label className="form-label">Transaction Type</label>
           <select
             className="ip-select"
+            name="TxnType"
+            id="TxnType"
             onChange={PaymentReceipts}
             value={rvData.postData.TxnType}
           >
@@ -347,52 +798,50 @@ export default function CreateNewForm() {
 
         <div className="col-md-3">
           <label className="form-label">Amount</label>
-          <input name='Amount'
+          <input
+            name="Amount"
             onChange={PaymentReceipts}
-            disabled={
-              rvData && rvData.postData.Status !== "Draft"
-                ? rvData.postData.ReceiptStatus
-                : "" || rvData.data.receipt_details.length !== 0
-            }
-            value={rvData.postData.Amount} />
+            value={rvData.postData.Amount}
+          />
         </div>
 
         <div className="col-md-3">
           <label className="form-label">HO Reference</label>
-          <input name='HORef'
+          <input
+            name="HORef"
             onChange={PaymentReceipts}
-            value={rvData.postData.HORef} />
+            value={rvData.postData.HORef}
+          />
         </div>
-
-
-
       </div>
 
-      <div className=" row col-md-12">
+      <div className=" row ">
         <div className="col-md-2">
           <label className="form-label">Status</label>
-          <input name="Status"
+          <input
+            name="Status"
             onChange={PaymentReceipts}
             disabled={
               rvData && rvData.postData.Status !== "Draft"
                 ? rvData.postData.ReceiptStatus
                 : "" || rvData.data.receipt_details.length !== 0
             }
-            value={rvData.postData.Status} />
+            value={rvData.postData.Status}
+          />
         </div>
 
+        <div className="col-md-2">
+          <label className="form-label">Reason</label>
+          <input name="reason" disabled />
+        </div>
 
-
-        <div className="col-md-3">
-          <label
-            className="form-label"
-          >
-            Description
-          </label>
+        <div className="col-md-2">
+          <label className="form-label">Description</label>
           <textarea
             className="form-control"
             rows="2"
-            id="" name='Description'
+            id=""
+            name="Description"
             onChange={PaymentReceipts}
             value={rvData.postData.Description}
             disabled={
@@ -404,43 +853,55 @@ export default function CreateNewForm() {
           ></textarea>
         </div>
 
-        <div className="col-md-7 row">
-
-          {rvData.postData.ReceiptStatus === "Draft" && (
-
-            <>
-              <div className="col-md-2">
-                <button className="button-style group-button" style={{ width: '90px' }}>Save</button>
-              </div>
-
-              <div className="col-md-2">
-                <button className="button-style group-button"
-                  style={{ width: '90px' }}>Delete</button>
-              </div>
-
-              <div className=" col-md-2 ">
-                <button className="button-style group-button" style={{ width: '90px', }}>Post</button>
-              </div>
-            </>
-          )}
-
-          <div className=" col-md-2 ">
-            <button className="button-style group-button"
-              style={{ width: '90px', }}>Print</button>
+        <div className="col-md-6 row">
+          <div className="col-md-2 mt-4">
+            <button
+              className="button-style group-button"
+              style={{ width: "90px" }}
+              onClick={handleSave}
+            >
+              Save
+            </button>
           </div>
 
-          <div className=" col-md-3 ">
-            <button className="button-style group-button"
-              style={{ width: '90px', }}>Cancel</button>
+          <div className="col-md-2 mt-4">
+            <button
+              className="button-style group-button"
+              style={{ width: "90px" }}
+            >
+              Delete
+            </button>
+          </div>
+
+          <div className=" col-md-2 mt-4">
+            <button
+              className="button-style group-button"
+              style={{ width: "90px" }}
+              onClick={postInvoice}
+            >
+              Post
+            </button>
+          </div>
+
+          <div className=" col-md-2 mt-4">
+            <button
+              className="button-style group-button"
+              style={{ width: "90px" }}
+            >
+              Print
+            </button>
+          </div>
+
+          <div className=" col-md-3 mt-4">
+            <button
+              className="button-style group-button"
+              style={{ width: "90px" }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
-
-
-
       </div>
-
-
-
 
       <div className="row col-md-12">
         <div className="col-md-6 mt-2 mb-3">
@@ -450,7 +911,17 @@ export default function CreateNewForm() {
             </div>
 
             <div className="col-md-6">
-              <button className="button-style mt-1 mb-2 group-button ms-5">
+              <button
+                className="button-style mt-1 mb-2 group-button ms-5"
+                // style={{ marginBottom: "5px" }}
+                // className={
+                //   !rvData.postData.HO_PrvId
+                //     ? "disabled-button"
+                //     : "button-style group-button "
+                // }
+                // disabled={!rvData.postData.HO_PrvId}
+                onClick={removeInvoice}
+              >
                 Remove Invoice
               </button>
             </div>
@@ -466,19 +937,18 @@ export default function CreateNewForm() {
             <Table className="table-data border">
               <thead
                 className="tableHeaderBGColor"
-                style={{ textAlign: "center" }}
+                // style={{ textAlign: "center" }}
               >
                 <tr style={{ whiteSpace: "nowrap" }}>
-                  <th style={{ whiteSpace: "nowrap" }}>Srl no</th>
-                  <th>Amount</th>
+                  <th>Srl</th>
                   <th>Invoice No</th>
                   <th>Date</th>
                   <th>Type</th>
-                  <th>Account</th>
+                  <th>Amount</th>
                   <th>Received</th>
                   <th>Receive Now</th>
                   <th>Id</th>
-                  <th>Unitname</th>
+                  {/* <th>Unitname</th>
                   <th>PVSrlID</th>
                   <th>Unit_UId</th>
                   <th>HOPrvId</th>
@@ -492,107 +962,105 @@ export default function CreateNewForm() {
                   <th>Receive_Now</th>
                   <th>InvUpdated</th>
                   <th>Inv_date</th>
-                  <th>Updated</th>
                   <th>RefNo</th>
-                  <th>UnitId</th>
+                  <th>UnitID</th> */}
                 </tr>
               </thead>
 
               <tbody className="tablebody">
                 {rvData.data.receipt_details
                   ? rvData.data.receipt_details.map((data, index) => (
-                    <>
-                      <tr
-                        style={{ whiteSpace: "nowrap" }}
-                       
-                        key={data.PVSrlID}
-                        className={
-                          rvData.firstTableArray.some(
-                            (row) => row.Dc_inv_no === data.Dc_inv_no
-                          )
-                            ? "selectedRow"
-                            : ""
-                        }
-                      >
-                        {/* <td>{data.RecdPvSrl}</td> */}
-                        <td>{index + 1}</td>
+                      <>
+                        <tr
+                          style={{ whiteSpace: "nowrap" }}
+                          onClick={() => handleRowSelect(data)}
+                          key={data.RecdPvSrl}
+                          className={
+                            rvData.firstTableArray.some(
+                              (row) => row.Dc_inv_no === data.Dc_inv_no
+                            )
+                              ? "selectedRow"
+                              : ""
+                          }
+                        >
+                          <td>{data.RecdPvSrl}</td>
+                          <td>{data.Inv_No}</td>
 
-                        <td>{data.Inv_No}</td>
+                          <td>
+                            {new Date(data.Inv_date).toLocaleDateString(
+                              "en-GB"
+                            )}
+                          </td>
 
-                        <td>
-                          {new Date(data.Inv_date)
-                            .toLocaleDateString("en-GB")
-                            .replace(/\//g, "-")}
-                        </td>
+                          <td>{data.Inv_Type}</td>
+                          <td>{formatAmount(data.Inv_Amount)}</td>
+                          <td>{formatAmount(data.Amt_received)}</td>
+                          <td>
+                            <input
+                              type="number"
+                              // onBlur={onBlurr}
+                              name={"Receive_Now"}
+                              value={data.Receive_Now}
+                              onChange={(e) => handleInputChange(e, data)}
+                            />
+                          </td>
+                          <td>{data.Id}</td>
+                          {/* <td>{data.Unitname}</td>
+                          <td>{data.Unitname}</td>
+                          <td>{data.Unitname}</td>
+                          <td>{data.HOPrvId}</td>
+                          <td>{data.RecdPvSrl}</td>
+                          <td>{data.Unitname}</td>
+                          <td>{data.Dc_inv_no}</td>
+                          <td>{data.Inv_No}</td>
+                          <td>{data.Inv_Type}</td>
+                          <td>{data.Inv_Amount}</td>
+                          <td>{data.Amt_received}</td>
+                          <td>{data.Receive_Now}</td>
+                          <td>{data.Unitname}</td>
+                          <td>
+                            {new Date(data.Inv_date).toLocaleDateString(
+                              "en-GB"
+                            )}
+                          </td>
 
-                        <td>{data.Inv_Type}</td>
-                        <td>{formatAmount(data.Inv_Amount)}</td>
-                        <td>{formatAmount(data.Amt_received)}</td>
-                        <td>
-                          <input
-                            //type="number"
-                            // onBlur={onBlurr}
-                            name="Receive_Now"
-                            value={(data.Receive_Now)}
-                            onChange={(e) =>
-                              handleInputChange(
-                                e,
-                                data.Inv_No,
-                                data.Receive_Now
-                              )
-                            }
-                            disabled={rvData && rvData.postData.ReceiptStatus !== "Draft"
-                              ? rvData.postData.ReceiptStatus
-                              : ""}
-
-                            onKeyPress={(e) => {
-                              // Allow only numbers (0-9) and backspace
-                              const isNumber = /^[0-9\b]+$/;
-                              if (!isNumber.test(e.key)) {
-                                e.preventDefault();
-                              }
-                            }}
-                          />
-                        </td>
-                        <td>{data.RefNo}</td>
-                        <td>
-                          <input
-                            type="checkbox"
-                            checked={
-                              rvData.postData.InvUpdated === 1
-                                ? rvData.postData.InvUpdated
-                                : ""
-                            }
-                          // onChange={(e) => handlesaveChange(rv.Inv_No)}
-                          />
-                        </td>
-                      </tr>
-                    </>
-                  ))
+                          <td>{data.RefNo}</td>
+                        
+                          <td>{formatAmount(data.Amt_received)}</td> */}
+                        </tr>
+                      </>
+                    ))
                   : ""}
               </tbody>
             </Table>
           </div>
         </div>
         <div className="col-md-6 mt-2">
-          <div className="row col-md-12 mb-2">
-            <label
-              className="form-label col-md-3"
-              style={{ whiteSpace: "nowrap", marginTop: "10px" }}
-            >
-              Select Invoices
-            </label>
+          <div className="row">
+            <div className="col-md-2">
+              <label
+                className="form-label "
+                style={{ whiteSpace: "nowrap", marginTop: "10px" }}
+              >
+                Select Invoices
+              </label>
+            </div>
 
-            <div className="col-md-3 mt-3">
-              <select className="ip-select">
-                <option value="option 1">MAGOD LASER</option>
-                <option value="option 2"></option>
-                <option value="option 3"></option>
+            <div className="col-md-5 mt-3">
+              <select className="ip-select" disabled>
+                <option value="option 1">{getCustomer}</option>
               </select>
             </div>
 
-            <div className=" col-md-4 ms-5 mb-1">
-              <button className="button-style group-button ">
+            <div className=" col-md-5 mb-1">
+              <button
+                onClick={addInvoice}
+                className="button-style"
+                // className={
+                //   !rvData.postData.HO_PrvId ? "disabled-button" : "button-style"
+                // }
+                // disabled={!rvData.postData.HO_PrvId}
+              >
                 Add Invoice
               </button>
             </div>
@@ -605,13 +1073,10 @@ export default function CreateNewForm() {
               overflowX: "scroll",
             }}
           >
-            <Table className="table-data border">
-              <thead
-                className="tableHeaderBGColor"
-                style={{ textAlign: "center" }}
-              >
+            <Table className="table-data border mt-1">
+              <thead className="tableHeaderBGColor">
                 <tr style={{ whiteSpace: "nowrap" }}>
-                  <th>Select</th>
+                  <th style={{ textAlign: "center" }}>Select</th>
                   <th>Type</th>
                   <th>Invoice No</th>
                   <th>Date</th>
@@ -622,19 +1087,22 @@ export default function CreateNewForm() {
 
               <tbody className="tablebody">
                 {rvData.data.inv_data?.map((row, index) => (
-                  <tr key={index}
-                    style={{ backgroundColor: row.isSelected ? '#3498db' : 'inherit', whiteSpace: "nowrap" }}
-                 
-
+                  <tr
+                    key={index}
+                    style={{
+                      backgroundColor: row.isSelected ? "#3498db" : "inherit",
+                      whiteSpace: "nowrap",
+                    }}
                   >
-
                     <td>
                       <input
                         type="checkbox"
                         className="mt-1"
                         id={`checkbox_${index}`}
+                        onChange={(e) =>
+                          handleCheckboxChangeSecondTable(e, row)
+                        }
                         checked={row.isSelected}
-                      //   onChange={(e) => handleCheckboxChange(e, row)}
                       />
                     </td>
                     <td>{row.DC_InvType}</td>
@@ -646,7 +1114,6 @@ export default function CreateNewForm() {
                     </td>
                     <td>{row.GrandTotal}</td>
                     <td>{row.PymtAmtRecd}</td>
-                    <td>{row.Balance}</td>
                   </tr>
                 ))}
               </tbody>
@@ -654,8 +1121,35 @@ export default function CreateNewForm() {
           </div>
         </div>
       </div>
+
+      <Modal show={showPostModal} onHide={handlePostModalClose} size="md">
+        <Modal.Header closeButton>
+          <Modal.Title>HO Accounts</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          Do You wish to create a HO voucher now?. Details cannot be changed
+          once created
+        </Modal.Body>
+
+        <Modal.Footer>
+          <button
+            className="button-style"
+            style={{ width: "50px" }}
+            onClick={handlePostModalClose}
+          >
+            Yes
+          </button>
+
+          <button
+            className="button-style"
+            style={{ width: "50px", backgroundColor: "rgb(173, 173, 173)" }}
+            onClick={handlePostModalClose}
+          >
+            No
+          </button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
-
-
