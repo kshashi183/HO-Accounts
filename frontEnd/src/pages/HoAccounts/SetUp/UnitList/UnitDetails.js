@@ -296,7 +296,7 @@ export default function UnitDetails() {
 
   useEffect(() => {
     if (getUnit.length > 0) {
-      setSelectRow(getUnit[0]);
+      selectedRowFun(getUnit[0],0)
     } else {
       setSelectRow(initial);
     }

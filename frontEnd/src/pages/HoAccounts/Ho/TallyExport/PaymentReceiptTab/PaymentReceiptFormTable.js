@@ -3,22 +3,24 @@ import React, { useEffect, useState } from 'react'
 import { Table } from 'react-bootstrap';
 import { Form } from 'react-bootstrap'
 import { baseURL } from '../../../../../api/baseUrl';
+import xmljs from 'xml-js';
 
-export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag }) {
+export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag, exportTally, setExportTally }) {
     const [paymentReceiptDetails, setPaymentReceiptDetails] = useState([])
     const [payment, setPayment] = useState([]);
 
 
     useEffect(() => {
+        setExportTally(false);
         if (selectedDate) {
             PaymentReceiptSubmit();
         }
 
-    }, [selectedDate])
+    }, [selectedDate, exportTally])
 
     const PaymentReceiptSubmit = () => {
         console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-        axios.get(baseURL+'/tallyExport/getPaymentReceipntData',
+        axios.get(baseURL + '/tallyExport/getPaymentReceipntData',
             {
                 params: {
                     date: selectedDate
@@ -26,7 +28,7 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
             }  // Pass selectedDate as a query parameter
         )
             .then((res) => {
-                console.log("Paymnet Receipnt", res.data.Result);
+                console.log("Paymnet Receipnt", res.data.Result[0]);
                 setPaymentReceiptDetails(res.data.Result)
             })
             .catch((err) => {
@@ -35,7 +37,7 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
     }
 
     const paymentReceipt = (Recd_PVNo) => {
-        axios.get(baseURL+'/tallyExport/getPayment',
+        axios.get(baseURL + '/tallyExport/getPayment',
             {
                 params: {
                     Recd_PVNo: Recd_PVNo
@@ -43,7 +45,7 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
             }
         )
             .then((res) => {
-               // console.log("Paymnet", res.data.Result);
+                 console.log("tax ", res.data.Result);
                 setPayment(res.data.Result)
             })
             .catch((err) => {
@@ -60,6 +62,9 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
         paymentReceipt(item.Recd_PVNo)
     }
 
+
+    
+
     const convertDateFormat = (dateString) => {
         if (dateString) {
             const parts = dateString.split('-');
@@ -69,10 +74,285 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
                 return `${dd}/${mm}/${yy}`;
             }
         }
-        
+
         return dateString;
     };
 
+
+
+    useEffect(() => {
+        if (paymentReceiptDetails.length > 0 && flag) {
+          selectedRowFun(paymentReceiptDetails[0],0)
+        } 
+        
+      }, [paymentReceiptDetails,flag]);
+
+
+    
+
+
+
+
+
+
+
+
+    // const tableToXml = () => {
+    //     /* Your payment receipt details array */;
+    
+    //     const xmlData = {
+    //         ENVELOPE: {
+    //             HEADER: {
+    //                 TALLYREQUEST: { _text: 'Import Data' }
+    //             },
+    //             BODY: {
+    //                 IMPORTDATA: {
+    //                     REQUESTDESC: {
+    //                         REPORTNAME: { _text: 'Vouchers' },
+    //                         STATICVARIABLES: {
+    //                             SVCURRENTCOMPANY: { _text: 'MLMPL_Jigani_2023_24' }
+    //                         }
+    //                     },
+    //                     TALLYMESSAGE: paymentReceiptDetails.map((voucher) => {
+                           
+    //                         return {
+    //                             _attributes: { 'xmlns:UDF': 'TallyUDF' },
+    //                             VOUCHER: {
+    //                                 _attributes: {
+    //                                     REMOTEID: `RV${voucher.RecdPVID}`,
+    //                                     VCHTYPE: "PAYMENT RECEIPT",
+    //                                     ACTION: 'Create'
+    //                                 },
+    //                                 DATE: voucher.Recd_PV_Date.replace(/-/g, ''),
+    //                                 GUID: voucher.RecdPVID,
+    //                                 NARRATION: voucher.Description,
+    //                                 VOUCHERTYPENAME: "PAYMENT RECEIPT",
+    //                                 VOUCHERNUMBER: voucher.Recd_PVNo,
+    //                                 PARTYLEDGERNAME: voucher.CustName,
+    //                                 CSTFORMISSUETYPE: "",
+    //                                 CSTFORMRECVTYPE: '',
+    //                                 FBTPAYMENTTYPE: 'Default',
+    //                                 DIFFACTUALQTY: 'No',
+    //                                 AUDITED: 'No',
+    //                                 FORJOBCOSTING: 'No',
+    //                                 ISOPTIONAL: 'No',
+    //                                 EFFECTIVEDATE: voucher.Recd_PV_Date.replace(/-/g, ''),
+    //                                 USEFORINTEREST: 'No',
+    //                                 USEFORGAINLOSS: 'No',
+    //                                 USEFORGODOWNTRANSFER: 'No',
+    //                                 USEFORCOMPOUND: 'No',
+    //                                 ALTERID: voucher.RecdPVID,
+    //                                 EXCISEOPENING: "No",
+    //                                 ISCANCELLED: 'No',
+    //                                 HASCASHFLOW: 'No',
+    //                                 ISPOSTDATED: 'No',
+    //                                 USETRACKINGNUMBER: 'No',
+    //                                 ISINVOICE: 'No',
+    //                                 MFGJOURNAL: 'No',
+    //                                 HASDISCOUNTS: 'No',
+    //                                 ASPAYSLIP: 'No',
+    //                                 ISDELETED: 'No',
+    //                                 ASORIGINAL: 'No',
+    //                                 // ALLLEDGERENTRIES_LIST: Array.isArray(voucher.TxnType) ? voucher.TxnType.map((TxnType, index) => {
+    //                                 //     return {
+    //                                 //         LEDGERNAME: TxnType,
+    //                                 //         GSTCLASS: '',
+    //                                 //         ISDEEMEDPOSITIVE: 'Yes',
+    //                                 //         LEDGERFROMITEM: 'No',
+    //                                 //         REMOVEZEROENTRIES: 'No',
+    //                                 //         ISPARTYLEDGER: 'Yes',
+    //                                 //         AMOUNT: "amount",
+    //                                 //         BILLALLOCATIONS_LIST: {
+    //                                 //             NAME: `${voucher.PreFix} / ${voucher.RefNo}`,
+    //                                 //             BILLCREDITPERIOD: 'CreditPeriod',
+    //                                 //             BILLTYPE: 'Agst Ref',
+    //                                 //             AMOUNT: voucher.Receive_Now,
+    //                                 //         },
+    //                                 //     };
+    //                                 // }) : [],
+
+    //                                 ALLLEDGERENTRIES_LIST:{
+    //                                     LEDGERNAME: voucher.CustName,
+    //                                             GSTCLASS: '',
+    //                                             ISDEEMEDPOSITIVE: 'Yes',
+    //                                             LEDGERFROMITEM: 'No',
+    //                                             REMOVEZEROENTRIES: 'No',
+    //                                             ISPARTYLEDGER: 'Yes',
+    //                                             AMOUNT: voucher.Amount,
+                                               
+
+    //                                             BILLALLOCATIONS_LIST: payment
+    //                                             .filter((item) => item.RecdPVID === voucher.RecdPVID)
+    //                                             .map((item) => {
+    //                                                 return {
+    //                                                     NAME: `${item.PreFix} / ${item.RefNo}`,
+    //                                                     BILLCREDITPERIOD: 'CreditPeriod',
+    //                                                     BILLTYPE: 'Agst Ref',
+    //                                                     AMOUNT: item.Receive_Now,
+    //                                                 };
+    //                                             }),
+                                                   
+                                                
+    //                                 },
+
+                                    
+    //                                 ALLLEDGERENTRIES_LIST:{
+    //                                     LEDGERNAME: voucher.TxnType,
+    //                                     GSTCLASS: '',
+    //                                     ISDEEMEDPOSITIVE: 'Yes',
+    //                                     LEDGERFROMITEM: 'No',
+    //                                     REMOVEZEROENTRIES: 'No',
+    //                                     ISPARTYLEDGER: 'Yes',
+    //                                     AMOUNT: voucher.Amount,
+    //                                 },
+                                   
+
+
+
+
+    //                             }
+    //                         };
+    //                     }),
+    //                 },
+    //             },
+    //         },
+    //     };
+    
+    //     const xml = xmljs.js2xml(xmlData, { compact: true, spaces: 2 });
+    //     return xml;
+    // };
+    
+    const tableToXml = () => {
+        /* Your payment receipt details array */
+    
+        const xmlData = {
+            ENVELOPE: {
+                HEADER: {
+                    TALLYREQUEST: { _text: 'Import Data' }
+                },
+                BODY: {
+                    IMPORTDATA: {
+                        REQUESTDESC: {
+                            REPORTNAME: { _text: 'Vouchers' },
+                            STATICVARIABLES: {
+                                SVCURRENTCOMPANY: { _text: 'MLMPL_Jigani_2023_24' }
+                            }
+                        },
+                        TALLYMESSAGE: paymentReceiptDetails.map((voucher) => {
+                            const billAllocationsList = payment
+                                .filter((item) => item.RecdPVID === voucher.RecdPVID)
+                                .map((item) => {
+                                    return {
+                                        NAME: `${item.PreFix} / ${item.RefNo}`,
+                                        BILLTYPE: 'Agst Ref',
+                                        AMOUNT: item.Receive_Now,
+                                    };
+                                });
+    
+                            return {
+                                _attributes: { 'xmlns:UDF': 'TallyUDF' },
+                                VOUCHER: {
+                                    _attributes: {
+                                        REMOTEID: `RV${voucher.RecdPVID}`,
+                                        VCHTYPE: 'PAYMENT RECEIPT',
+                                        ACTION: 'Create',
+                                    },
+                                    DATE: voucher.Recd_PV_Date.replace(/-/g, ''),
+                                    GUID: voucher.RecdPVID,
+                                    NARRATION: voucher.Description,
+                                    VOUCHERTYPENAME: 'PAYMENT RECEIPT',
+                                    VOUCHERNUMBER: voucher.Recd_PVNo,
+                                    PARTYLEDGERNAME: voucher.CustName,
+                                    CSTFORMISSUETYPE: '',
+                                    CSTFORMRECVTYPE: '',
+                                    FBTPAYMENTTYPE: 'Default',
+                                    DIFFACTUALQTY: 'No',
+                                    AUDITED: 'No',
+                                    FORJOBCOSTING: 'No',
+                                    ISOPTIONAL: 'No',
+                                    EFFECTIVEDATE: voucher.Recd_PV_Date.replace(/-/g, ''),
+                                    USEFORINTEREST: 'No',
+                                    USEFORGAINLOSS: 'No',
+                                    USEFORGODOWNTRANSFER: 'No',
+                                    USEFORCOMPOUND: 'No',
+                                    ALTERID: voucher.RecdPVID,
+                                    EXCISEOPENING: 'No',
+                                    ISCANCELLED: 'No',
+                                    HASCASHFLOW: 'No',
+                                    ISPOSTDATED: 'No',
+                                    USETRACKINGNUMBER: 'No',
+                                    ISINVOICE: 'No',
+                                    MFGJOURNAL: 'No',
+                                    HASDISCOUNTS: 'No',
+                                    ASPAYSLIP: 'No',
+                                    ISDELETED: 'No',
+                                    ASORIGINAL: 'No',
+    
+                                    ALLLEDGERENTRIES_LIST: [
+                                        {
+                                            LEDGERNAME: voucher.CustName,
+                                            GSTCLASS: '',
+                                            ISDEEMEDPOSITIVE: 'Yes',
+                                            LEDGERFROMITEM: 'No',
+                                            REMOVEZEROENTRIES: 'No',
+                                            ISPARTYLEDGER: 'Yes',
+                                            AMOUNT: voucher.Amount,
+                                            BILLALLOCATIONS_LIST: billAllocationsList,
+                                        },
+                                        {
+                                            LEDGERNAME: voucher.TxnType, // Assuming Bank is the ledger name
+                                            GSTCLASS: '',
+                                            ISDEEMEDPOSITIVE: 'Yes',
+                                            LEDGERFROMITEM: 'No',
+                                            REMOVEZEROENTRIES: 'No',
+                                            ISPARTYLEDGER: 'Yes',
+                                            AMOUNT: -voucher.Amount, // Assuming opposite amount for Bank
+                                        },
+                                    ],
+                                },
+                            };
+                        }),
+                    },
+                },
+            },
+        };
+    
+        const xml = xmljs.js2xml(xmlData, { compact: true, spaces: 2 });
+        return xml;
+    };
+    
+    
+
+
+
+
+
+    const handleExport = () => {
+        const xml = tableToXml();
+        const blob = new Blob([xml], { type: 'application/xml' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Jigani_Receipt_Vouchers.xml';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
+
+
+
+    if (exportTally) {
+        handleExport();
+    }
+
+const [taxTable, setTaxTable]=useState()
+    const tableRowSelect=(item, index)=>{
+        let list = { ...item, index: index }
+        setTaxTable(list)
+
+    }
+
+   
     return (
         <div>
             <div className='row col-md-12'>
@@ -97,10 +377,11 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
 
                         </thead>
 
-                        <tbody className='tablebody'>
+                        { <tbody className='tablebody'>
 
-                            {flag &&
+                            { flag && 
                                 paymentReceiptDetails.map((item, key) => {
+                                    
                                     return (
                                         <tr style={{ whiteSpace: 'nowrap' }}
                                             onClick={() => selectedRowFun(item, key)}
@@ -108,18 +389,22 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
                                             className={key === selectRow?.index ? 'selcted-row-clr' : ''}
                                         >
                                             <td>{item.Recd_PVNo}</td>
+                                            
+                                           
+                                           
                                             <td>{item.TxnType}</td>
                                             <td>{item.CustName}</td>
-                                            <td>{ }</td>
+                                            <td>{ item.LedgerName}</td>
                                             <td>{item.Amount}</td>
                                             <td>{item.On_account}</td>
                                             <td>{item.Description}</td>
                                         </tr>
                                     )
-                                })
+                                }) 
                             }
 
-                        </tbody>
+                        </tbody> }
+                        
                     </Table>
 
                 </div>
@@ -192,13 +477,13 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
                                     <th style={{ whiteSpace: 'nowrap' }}>Dc_inv_no</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Inv_No</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Inv_Type</th>
-                                   
+
                                     <th style={{ whiteSpace: 'nowrap' }}>Amt_received</th>
-                                    
+
                                     <th style={{ whiteSpace: 'nowrap' }}>InvUpdated</th>
-                                  
+
                                     <th style={{ whiteSpace: 'nowrap' }}>Updated</th>
-                                    
+
                                     <th style={{ whiteSpace: 'nowrap' }}>vouchet_type</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Prefix</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>LedgerName</th>
@@ -213,9 +498,13 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
                             <tbody className='tablebody'>
 
                                 {
-                                    payment.map((item, index) => {
+                                    payment.map((item, key) => {
                                         return (
-                                            <tr style={{whiteSpace:'nowrap'}}>
+                                            <tr style={{ whiteSpace: 'nowrap' }}
+                                            onClick={() => tableRowSelect(item, key)}
+
+                                            className={key === taxTable?.index ? 'selcted-row-clr' : ''}
+                                            >
                                                 <td>{item.RefNo}</td>
                                                 <td>{item.Inv_Type}</td>
                                                 <td>{convertDateFormat(item.Inv_date)}</td>
@@ -229,17 +518,17 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag })
                                                 <td>{item.Unit_UId}</td>
                                                 <td>{item.HOPrvId}</td>
                                                 <td>{item.RecdPvSrl}</td>
-                                                <td>{}</td>
+                                                <td>{ }</td>
                                                 <td>{item.Dc_inv_no}</td>
                                                 <td>{item.Inv_No}</td>
                                                 <td>{item.Inv_Type}</td>
                                                 <td>{item.Amt_received}</td>
-                                                <td>{<input type='checkBox'/>}</td>
-                                                <td>{<input type='checkBox'/>}</td>
+                                                <td>{<input type='checkBox' />}</td>
+                                                <td>{<input type='checkBox' />}</td>
                                                 <td>{item.voucher_type}</td>
                                                 <td>{item.PreFix}</td>
                                                 <td>{item.LedgerName}</td>
-                                                
+
                                             </tr>
                                         )
                                     })
