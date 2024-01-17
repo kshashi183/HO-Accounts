@@ -1,9 +1,6 @@
-
-
 .table-header {
   font-size: 14px;
 }
-
 
 td {
   font-size: 14px;
@@ -14,22 +11,17 @@ td {
   font-size: 1rem;
 }
 
-
-
 .tab_font {
   font-weight: 600;
 }
 
 .tableHeaderBGColor {
- 
   background-color: rgb(128, 128, 128);
   color: white;
   position: sticky !important;
   top: -1px;
   z-index: 999;
-
 }
-
 
 .checkBoxStyle {
   top: 0px;
@@ -39,7 +31,6 @@ td {
   margin-bottom: 10px !important;
 }
 
-
 @media screen and (max-width: 479px) {
   .button-style {
     width: 100%;
@@ -47,7 +38,6 @@ td {
 }
 
 .submenu_links {
-  
   gap: 10px;
   display: flex;
   justify-content: space-between;
@@ -59,7 +49,7 @@ td {
 }
 .submenu_links:hover {
   background: #707075;
- 
+
   cursor: pointer;
   color: #ffffff;
 }
@@ -70,14 +60,12 @@ td {
   gap: 10px;
   padding-left: -2px;
   border-right: 4px solid transparent;
-  
 }
 .submenu_link:hover {
   background: #707075;
   cursor: pointer;
   color: #ffffff;
   text-decoration: none;
- 
 }
 
 .disabled-button {
@@ -88,7 +76,7 @@ td {
   height: 38px;
   border: none;
   margin-right: 10px;
-  
+
   border-radius: 5px;
   padding: 3px;
   margin-top: 10px;
@@ -96,16 +84,10 @@ td {
 }
 
 .custom-checkbox {
-  width: 12px; 
-  height: 12px; 
+  width: 12px;
+  height: 12px;
 }
- */
-
-
-
-
-
- body {
+*/ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -554,9 +536,6 @@ li.nav-item {
   /* border-radius: 10px; */
 }
 
-
-
-
 .disabled-button {
   background-color: #ccc;
   color: #999;
@@ -565,7 +544,7 @@ li.nav-item {
   height: 38px;
   border: none;
   margin-right: 10px;
-  
+
   border-radius: 5px;
   padding: 3px;
   margin-top: 10px;
@@ -573,11 +552,11 @@ li.nav-item {
 }
 
 .custom-checkbox {
-  width: 12px;  /* Adjust the width as needed */
+  width: 12px; /* Adjust the width as needed */
   height: 12px; /* Adjust the height as needed */
 }
 
-.defdrop{
+.defdrop {
   border-radius: 0px !important;
   outline: none !important;
   box-shadow: none !important;
@@ -636,7 +615,9 @@ li.nav-item {
   color: #fff;
 }
 
+.selectedRow {
+  background-color: #3498db;
+  color: white;
+}
 
 /* Custom toast notification style */
-
-
