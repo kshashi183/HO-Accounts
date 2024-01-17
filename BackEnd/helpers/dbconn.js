@@ -165,11 +165,23 @@ let setupQuery = (q, callback) => {
   });
 };
 
-let hqQuery = async (q, callback) => {
-  hqConnection.connect();
-  hqConnection.query(q, (err, res, fields) => {
-    if (err) callback(err, null);
-    else callback(null, res);
+// let hqQuery = async (q, callback) => {
+//   hqConnection.connect();
+//   hqConnection.query(q, (err, res, fields) => {
+//     if (err) callback(err, null);
+//     else callback(null, res);
+//   });
+// };
+
+const hqQuery = (query, values) => {
+  return new Promise((resolve, reject) => {
+    hqConnection.query(query, values, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results);
+      }
+    });
   });
 };
 
