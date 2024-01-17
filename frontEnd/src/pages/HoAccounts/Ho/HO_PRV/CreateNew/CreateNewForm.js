@@ -12,7 +12,7 @@ export default function CreateNewForm() {
 
   const location = useLocation();
   const rowData = location.state ? location.state : "";
-  // console.log("rowdata", rowData);
+   console.log("rowdata", rowData);
   const [getUnit, setGetUnit] = useState("");
   const [getCustomer, setGetCustomer] = useState("");
   const [getCustCode, setGetCustCode] = useState("");
@@ -1189,3 +1189,5 @@ export default function CreateNewForm() {
     </>
   );
 }
+
+
