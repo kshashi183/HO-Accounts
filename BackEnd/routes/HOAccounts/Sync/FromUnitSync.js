@@ -6,10 +6,10 @@ var bodyParser = require("body-parser");
 fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
   const { unit_cust_data } = req.body;
   try {
-    const responseData = [];
+    const insertedData = [];
 
     if (unit_cust_data.length > 0) {
-      const custResponseData = await Promise.all(
+      await Promise.all(
         unit_cust_data.map(async (custItem, i) => {
           try {
             const isGovtOrgValue = custItem.IsGovtOrg ? 1 : 0;
@@ -80,18 +80,21 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
             // Retrieve Sync_HOId
             const [Sync_HOId] = await hqQuery(selectQuery);
 
-            // console.log(`Sync_HOId: ${Sync_HOId}`);
-
-            return { ...data, Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId };
+            // Add the customer details to the insertedData array
+            insertedData.push({
+              ...custItem,
+              Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+            });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
-            return { error: `Error in iteration ${i}: ${error.message}` };
+            insertedData.push({
+              error: `Error in iteration ${i}: ${error.message}`,
+            });
           }
         })
       );
 
-      responseData.push(...custResponseData);
-      res.status(200).json({ responseData });
+      res.status(200).json({ insertedData });
     } else {
       console.log("No customer data values found");
       res.status(400).json({ error: "No customer data values found" });
@@ -207,9 +210,12 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
               invItem.Unit_UId || 0,
             ]);
 
-            // console.log(`Sync_HOId: ${Sync_HOId}`);
-
-            return { ...data, Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId };
+            console.log(Sync_HOId);
+            
+            invResponseData.push({
+              ...invItem,
+              Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+            });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
             return { error: `Error in iteration ${i}: ${error.message}` };
@@ -217,7 +223,6 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
         })
       );
 
-      invResponseData.push(...invoicesResponseData);
       res.status(200).json({ invResponseData });
     } else {
       console.log("No customer data values found");
@@ -271,9 +276,10 @@ fromUnitSyncRouter.post("/saveInvTaxesDataIntoHoDB", async (req, res, next) => {
               taxItem.Unit_UId,
             ]);
 
-            // console.log(`Sync_HOId: ${Sync_HOId}`);
-
-            return { ...data, Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId };
+            taxResponseData.push({
+              ...taxItem,
+              Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+            });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
             return { error: `Error in iteration ${i}: ${error.message}` };
@@ -281,7 +287,6 @@ fromUnitSyncRouter.post("/saveInvTaxesDataIntoHoDB", async (req, res, next) => {
         })
       );
 
-      taxResponseData.push(...invTaxResponseData);
       res.status(200).json({ taxResponseData });
     } else {
       console.log("No customer data values found");
@@ -349,9 +354,10 @@ fromUnitSyncRouter.post(
                 dcItem.Unit_UId,
               ]);
 
-              // console.log(`Sync_HOId: ${Sync_HOId}`);
-
-              return { ...data, Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId };
+              dcResponseData.push({
+                ...dcItem,
+                Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+              });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
               return { error: `Error in iteration ${i}: ${error.message}` };
@@ -359,7 +365,6 @@ fromUnitSyncRouter.post(
           })
         );
 
-        dcResponseData.push(...invDcResponseData);
         res.status(200).json({ dcResponseData });
       } else {
         console.log("No customer data values found");
@@ -411,7 +416,10 @@ fromUnitSyncRouter.post("/saveCombInvDataIntoHoDB", async (req, res, next) => {
             // Insert or update the data
             const data = await hqQuery(sqlInvQuery, values);
 
-            return { ...data };
+            invDaCombResponseData.push({
+              ...invCombItem,
+              // Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+            });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
             return { error: `Error in iteration ${i}: ${error.message}` };
@@ -419,7 +427,6 @@ fromUnitSyncRouter.post("/saveCombInvDataIntoHoDB", async (req, res, next) => {
         })
       );
 
-      invDaCombResponseData.push(...daCombinvDetailsResponseData);
       res.status(200).json({ invDaCombResponseData });
     } else {
       console.log("No customer data values found");
@@ -485,8 +492,12 @@ fromUnitSyncRouter.post(
               ]);
 
               // console.log(`Sync_HOId: ${Sync_HOId}`);
+              console.log(Sync_HOId);
 
-              return { ...data, Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId };
+              receiptResponseData.push({
+                ...receiptItem,
+                Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+              });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
               return { error: `Error in iteration ${i}: ${error.message}` };
@@ -494,7 +505,6 @@ fromUnitSyncRouter.post(
           })
         );
 
-        receiptResponseData.push(...receiptRegisterResponseData);
         res.status(200).json({ receiptResponseData });
       } else {
         console.log("No customer data values found");
@@ -560,7 +570,10 @@ fromUnitSyncRouter.post(
 
               // console.log(`Sync_HOId: ${Sync_HOId}`);
 
-              return { ...data, Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId };
+              detailsResponseData.push({
+                ...receiptItem,
+                Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+              });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
               return { error: `Error in iteration ${i}: ${error.message}` };
@@ -568,7 +581,6 @@ fromUnitSyncRouter.post(
           })
         );
 
-        detailsResponseData.push(...receptDetailsResponseData);
         res.status(200).json({ detailsResponseData });
       } else {
         console.log("No customer data values found");
@@ -655,12 +667,12 @@ fromUnitSyncRouter.post(
               ]);
 
               // console.log(`Sync_HOId: ${Sync_HOId}`);
+              // console.log(Sync_HOId);
 
-              return {
-                ...data,
-                ...update,
+              canceledResponseData.push({
+                ...receiptItem,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
-              };
+              });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
               return { error: `Error in iteration ${i}: ${error.message}` };
@@ -668,7 +680,6 @@ fromUnitSyncRouter.post(
           })
         );
 
-        canceledResponseData.push(...canceledVrResponseData);
         res.status(200).json({ canceledResponseData });
       } else {
         console.log("No customer data values found");
