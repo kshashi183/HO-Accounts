@@ -3,14 +3,22 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Spinner from "../Spinner";
 import { baseURL } from "../../../../api/baseUrl";
-import xmljs from 'xml-js';
+import { xml2js, js2xml } from "xml-js";
+
 
 export default function SyncUnit() {
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [report, setReport] = useState([]);
   const [unitCustData, setUnitCustData] = useState([]);
-  const [buttonTF, setButtonTF] = useState(false)
+  const [custInsertedData, setCustInsertedData] = useState([]);
+  const [invInsertedData, setInvInsertedData] = useState([]);
+  const [invTaxInsertedData, setInvTaxInsertedData] = useState([]);
+  const [invSumInsertedData, setInvSumInsertedData] = useState([]);
+  const [receiptInsertedData, setReceiptInsertedData] = useState([]);
+  const [receiptDeInsertedData, setReceiptDeInsertedData] = useState([]);
+  const [cancelledInvInsertedData, setcancelledInvInsertedData] = useState([]);
+  const [fileName, setFileName] = useState('');
 
   const handleButtonClick = () => {
 
@@ -20,6 +28,7 @@ export default function SyncUnit() {
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
+    setFileName(file.name)
     if (file) {
       const reader = new FileReader();
 
@@ -109,130 +118,304 @@ export default function SyncUnit() {
     }
   }, [report]);
 
-  const [xmlAlldata, setXmlData] = useState({
-    custXml: [],
-    invoiceXml: [],
-    invoiceTaxXml: []
-
-  })
-  const handleInsertData = async() => {
+  const handleInsertData = async () => {
     setIsLoading(true);
 
-    const handleRequest = async (url, successMessage) => {
-      axios
-        .post(baseURL + url, report)
-        .then((res) => {
+   await axios
+      .post(baseURL + "/fromUnitSync/saveCustDataIntoHoDB", report)
+      .then((res) => {
+        // console.log(`Customer data inserted successfully`, res.data);
 
-          console.log(`${successMessage} data inserted successfully`, res.data);
-          toast.success(`${successMessage} data inserted successfully`);
+        setCustInsertedData(res.data);
 
-          if (res.data.CustData === 'saveCustData') {
-            console.log("Received responseData:", res.data.responseData)
-            const m = res.data.responseData.map((i) => {
-             // console.log("item colmn", i.CustAllData.UnitName, i.CustAllData.Sync_HOId);
-            })
+        toast.success(`Customer data inserted successfully`);
+      })
+      .catch((err) => {
+        console.log("Error in table", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-            setXmlData(prevData => ({
-              ...prevData,
-              custXml: res.data.responseData
-            }));
-       
-          }
-          else {
-            console.log("Kfghj");
-          }
+  await axios
+      .post(baseURL + "/fromUnitSync/saveInvDataIntoHoDB", report)
+      .then((res) => {
+        // console.log(`Invoice data inserted successfully`, res.data);
 
+        setInvInsertedData(res.data);
 
+        toast.success(`Invoice data inserted successfully`);
+      })
+      .catch((err) => {
+        console.log("Error in table", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-        })
-        .catch((err) => {
-          console.log("Error in table", err);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-         handleExport();
-      
-    };
+   await axios
+      .post(baseURL + "/fromUnitSync/saveInvTaxesDataIntoHoDB", report)
+      .then((res) => {
+        // console.log(`Invoice Taxes data inserted successfully`, res.data);
 
+        setInvTaxInsertedData(res.data);
 
-    // Handle each type of data insertion
-    await  handleRequest("/fromUnitSync/saveCustDataIntoHoDB", "Customer");
-    // handleRequest("/fromUnitSync/saveInvDataIntoHoDB", "Invoice");
-    // handleRequest("/fromUnitSync/saveInvTaxesDataIntoHoDB", "Invoice Taxes");
-    // handleRequest("/fromUnitSync/saveInvSummaryDataIntoHoDB", "DcInvoice");
+        toast.success(`Invoice Taxes data inserted successfully`);
+      })
+      .catch((err) => {
+        console.log("Error in table", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-    // handleRequest(
-    //   "/fromUnitSync/saveReceiptRegisterDataIntoHoDB",
-    //   "Receipt Register"
-    // );
-    // handleRequest(
-    //   "/fromUnitSync/saveReceptDetailsDataIntoHoDB",
-    //   "Receipt Details"
-    // );
-    // handleRequest(
-    //   "/fromUnitSync/saveCanceledVrListDataIntoHoDB",
-    //   "Cancelled Vr"
-    // );
+   await axios
+      .post(baseURL + "/fromUnitSync/saveInvSummaryDataIntoHoDB", report)
+      .then((res) => {
+        // console.log(`DcInvoice data inserted successfully`, res.data);
 
+        setInvSumInsertedData(res.data);
 
+        toast.success(`DcInvoice data inserted successfully`);
+      })
+      .catch((err) => {
+        console.log("Error in table", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-    // handleExport();
+    // await axios
+    // .post(baseURL + "/fromUnitSync/saveCombInvDataIntoHoDB", report)
+    // .then((res) => {
+    //   console.log(`Invoice Taxes data inserted successfully`, res.data);
+
+    //   setInvTaxInsertedData(res.data);
+
+    //   toast.success(`Invoice Taxes data inserted successfully`);
+    // })
+    // .catch((err) => {
+    //   console.log("Error in table", err);
+    // })
+    // .finally(() => {
+    //   setIsLoading(false);
+    // });
+
+  await  axios
+      .post(baseURL + "/fromUnitSync/saveReceiptRegisterDataIntoHoDB", report)
+      .then((res) => {
+        // console.log(`Receipt Register data inserted successfully`, res.data);
+
+        setReceiptInsertedData(res.data);
+
+        toast.success(`Receipt Register data inserted successfully`);
+      })
+      .catch((err) => {
+        console.log("Error in table", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+
+    // await axios
+    //   .post(baseURL + "/fromUnitSync/saveReceptDetailsDataIntoHoDB", report)
+    //   .then((res) => {
+    //     // console.log(`Receipt Details data inserted successfully`, res.data);
+
+    //     setReceiptDeInsertedData(res.data);
+
+    //     toast.success(`Receipt Details data inserted successfully`);
+    //   })
+    //   .catch((err) => {
+    //     console.log("Error in table", err);
+    //   })
+    //   .finally(() => {
+    //     setIsLoading(false);
+    //   });
+
+   await axios
+      .post(baseURL + "/fromUnitSync/saveCanceledVrListDataIntoHoDB", report)
+      .then((res) => {
+        // console.log(`Cancelled Vr data inserted successfully`, res.data);
+
+        setcancelledInvInsertedData(res.data);
+
+        toast.success(`Cancelled Vr data inserted successfully`);
+      })
+      .catch((err) => {
+        console.log("Error in table", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+
+      // await handleDownload();
   };
 
-  //console.log(report);
-  // console.log(unitCustData);
-   console.log("xml data", xmlAlldata.custXml);
+  const handleDownload = async () => {
+    try {
+      console.log("No Hello");
+      const xmlString = arrayToXML({
+        custInsertedData,
+        invInsertedData,
+        invTaxInsertedData,
+        invSumInsertedData,
+        receiptInsertedData,
+        receiptDeInsertedData,
+        cancelledInvInsertedData,
+      });
+      const finalXmlString = `<?xml version="1.0" standalone="yes"?>\n${xmlString}`;
+      const blob = new Blob([finalXmlString], { type: "text/xml" });
 
- 
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const today = new Date();
+      const formattedDate = today
+        .toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+        .replace(/\s+/g, "_"); // Replace spaces with underscores
+      const strUnitName = fileName;
+      // const strUnitName = data[0]?.UnitName || "DefaultUnit"; // Replace "DefaultUnit" with a default value if UnitName is not available
+      a.download = `${strUnitName}-updated`;
+      // const fileXml = `${strUnitName}-updated`;
+      // a.download = `${strUnitName}_to_HO_AcctsSync_${formattedDate}.xml`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
-  const tableToXml = () => {
-    
-    console.log("xml data111", xmlAlldata.custXml);
+      // const handle = await window.showSaveFilePicker({
+      //   suggestedName: fileXml,
+      //   types: [
+      //     {
+      //       description: "XML Files",
+      //       accept: {
+      //         "text/xml": [".xml"],
+      //       },
+      //     },
+      //   ],
+      // });
+
+      // const writable = await handle.createWritable();
+      // await writable.write(blob);
+      // await writable.close();
+
+      // if (
+      //   getCustInvoice === 0 &&
+      //   getInvoiceList === 0 &&
+      //   getPaymentReceipts === 0 &&
+      //   getCancelledUnit === 0
+      // ) {
+      //   toast.success("Unit Vouchers In Sync");
+      // } else {
+      //   // <SendMail/>
+      // }
+    } catch (error) {
+      console.error("Error saving file:", error);
+    }
+  };
+
+  const arrayToXML = (data) => {
+    const unitCustSyncInfo = data.custInsertedData.insertedData || [];
+    const invSyncInfo = data.invInsertedData.invResponseData || [];
+    const invTaxSyncInfo = data.invTaxInsertedData.taxResponseData || [];
+    const invSumSyncInfo = data.invSumInsertedData.dcResponseData || [];
+    const recieptSyncInfo = data.receiptInsertedData.receiptResponseData || [];
+    const recieptDetailsSyncInfo = data.receiptDeInsertedData.detailsResponseData || [];
+    const cancelledVrSyncInfo = data.cancelledInvInsertedData.canceledResponseData || [];
+
+    const options = {
+      compact: true,
+      ignoreComment: true,
+      spaces: 4,
+    };
     const xmlData = {
-      ENVELOPE: {
-          HEADER: {
-              TALLYREQUEST: { _text: 'Import Data' }
-          },
-          Unit_Cust_Data_SyncInfo: xmlAlldata.custXml.map((item, index) => ({
-        Id: item.CustAllData.Sync_HOId,
-        UnitName:item.CustAllData.UnitName
-        
-      
-      })),
-
+      AccountsDS: {
+        MagodUnits: {
+          UnitName: 'Jigani',
+          CashInHand: 0,
+        },
+        Unit_Cust_Data_SyncInfo: unitCustSyncInfo.map((item, index) => ({
+          Id: item.Sync_HOId,
+          UnitName: item.UnitName,
+          HO_Uid: item.Sync_HOId,
+          Unit_Uid: item.Cust_Code,
+        })),
+        unit_invoices_SyncInfo: invSyncInfo.map((inv, index) => ({
+          Sync_HOId: inv.Id,
+          Unit_UId: inv.Unit_UId,
+          UnitName: inv.UnitName,
+          DC_Inv_No: inv.DC_Inv_No,
+          unit_taxes_list_SyncInfo: invTaxSyncInfo.map((item, index) => ({
+          Sync_HOId: item.Sync_HOId,
+          Unit_UId: item.Unit_UId,
+          UnitName: inv.UnitName,
+          DC_Inv_No: inv.DC_Inv_No,
+          InvTaxId: item.InvTaxId,
+        })),
+        dc_inv_summary_SyncInfo: invSumSyncInfo.map((sum, index) => ({
+          Unit_UId: sum.Unit_UId,
+          Sync_HOId: sum.Sync_HOId,
+          Id: sum.Id,
+          UnitName: inv.UnitName,
+          DC_Inv_No: inv.DC_Inv_No,
+        })),
+        })),
+        unit_recipts_register_SyncInfo: recieptSyncInfo.map((vr, index) => ({
+          Unitname: vr.Unitname,
+          RecdPVID: vr.RecdPVID,
+          Sync_HOId: vr.Sync_HOId,
+          Unit_UId: vr.Unit_UId,
+        })),
+        unit_receipts_adjusted_inv_list_SyncInfo: recieptDetailsSyncInfo.map(
+          (detail, index) => ({
+            Unitname: detail.Unitname,
+            RecdPVID: detail.RecdPVID,
+            Unit_UId: detail.Unit_UId,
+            HoPvrId: detail.HoPvrId,
+            Sync_HOId: detail.Sync_HOId,
+          })
+        ),
+        canceled_vouchers_list_syncInfo: cancelledVrSyncInfo.map((vr, index) => ({
+          Id: vr.Id,
+          UnitName: vr.UnitName,
+          HO_Sync_Id: vr.HO_Sync_Id,
+          UUID: vr.UUID,
+          Unit_Uid: vr.Unit_Uid,
+        })),
       },
-    
-      
-
     };
-
-    const xml = xmljs.js2xml(xmlData, { compact: true, spaces: 2 });
-    return xml;
+    return js2xml(xmlData, options);
   };
 
+  // useEffect(() => {
+  //   if (custInsertedData > 0) {
+  //     handleDownload();
+  //   } else {
+  //     console.log('starting at zero value');
+  //   }
+  // }, [
+  //   custInsertedData,
+  //   invInsertedData,
+  //   invTaxInsertedData,
+  //   invSumInsertedData,
+  //   receiptInsertedData,
+  //   receiptDeInsertedData,
+  //   cancelledInvInsertedData
+  // ]);
 
-
-
-
-
-
-
-
-
-
-  const handleExport = () => {
-    const xml = tableToXml();
-    const blob = new Blob([xml], { type: 'application/xml' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'cust data.xml';
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    // exportInvoices(xml);
-  };
+  console.log(report);
+  console.log("hello cust", custInsertedData.insertedData);
+  console.log("hello inv", invInsertedData);
+  console.log("hello invtax", invTaxInsertedData);
+  console.log("hello invSummary", invSumInsertedData);
+  console.log("hello receipt register", receiptInsertedData);
+  console.log("hello receipt details", receiptDeInsertedData);
+  console.log("hello cancelled Inv", cancelledInvInsertedData);
 
   return (
     <>
@@ -259,6 +442,14 @@ export default function SyncUnit() {
           style={{ display: "none" }}
           onChange={handleFileSelect}
         />
+      </div>
+      <div>
+        <button
+        className="button-style group-button mt-2"
+        onClick={handleDownload}
+        >
+          download
+        </button>
       </div>
       {isLoading && <Spinner />}
     </>
