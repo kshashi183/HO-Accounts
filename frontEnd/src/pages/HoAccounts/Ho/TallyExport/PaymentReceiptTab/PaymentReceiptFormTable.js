@@ -327,7 +327,7 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag, e
 
 
 
-    const handleExport = () => {
+    const handleExportPayment = () => {
         const xml = tableToXml();
         const blob = new Blob([xml], { type: 'application/xml' });
         const url = window.URL.createObjectURL(blob);
@@ -336,13 +336,43 @@ export default function PaymentReceiptFormTable({ selectedDate, setFlag, flag, e
         a.download = 'Jigani_Receipt_Vouchers.xml';
         a.click();
         window.URL.revokeObjectURL(url);
+
+
+      //  exportPaymentReceipts(xml);
+
     };
 
+    const exportPaymentReceipts=async (xml)=>{
+      //  console.log("xml payment vreceipt",xml);
+      const tallyUrl = 'http://localhost:9000'; 
+
+
+      try {
+        const response = await fetch(`${tallyUrl}/import`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/xml',
+            },
+            body: xml,
+        });
+
+        if (response.ok) {
+            console.log('XML data successfully sent to Tally.');
+            // Handle success
+        } else {
+            console.error('Failed to send XML data to Tally.');
+            // Handle failure
+        }
+    } catch (error) {
+        console.error('Error sending XML data to Tally:', error);
+        // Handle error
+    }
+};
 
 
 
     if (exportTally) {
-        handleExport();
+        handleExportPayment();
     }
 
 const [taxTable, setTaxTable]=useState()

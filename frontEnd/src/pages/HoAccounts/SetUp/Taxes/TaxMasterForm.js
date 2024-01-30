@@ -32,7 +32,7 @@ export default function TaxMasterForm() {
 
     useEffect(() => {
 
-        axios.get(baseURL+'/taxMaster/getTaxData')
+        axios.get(baseURL + '/taxMaster/getTaxData')
             .then((res) => {
                 // console.log("unitdata",res.data);
                 if (res.data.Status === 'Success') {
@@ -95,13 +95,13 @@ export default function TaxMasterForm() {
             }
 
             else {
-                axios.put(baseURL+'/taxMaster/taxDataUpdate/' + selectRow.TaxID, selectRow)
+                axios.put(baseURL + '/taxMaster/taxDataUpdate/' + selectRow.TaxID, selectRow)
                     .then((res) => {
                         console.log("hiiiiiiiiiii");
                         console.log("update tax", res.data.status);
-                        
+
                         toast.success("Updated successfully!");
-                      
+
                         setTimeout(() => {
 
                             window.location.reload();
@@ -136,11 +136,11 @@ export default function TaxMasterForm() {
             }
 
             else {
-                axios.post(baseURL+'/taxMaster/postTaxMaster', taxPostData)
+                axios.post(baseURL + '/taxMaster/postTaxMaster', taxPostData)
                     .then((res) => {
                         if (res.data.status === 'fail') {
 
-                            
+
                         }
                         else if (res.data.status === 'query') {
                             console.log("22");
@@ -148,15 +148,15 @@ export default function TaxMasterForm() {
                             toast.warn("You must add TaxPercent and Date fields")
                         }
                         else if (res.data.status === 'success') {
-                            
+
                             toast.success("Posted Successfully");
-                    
+
                             setTimeout(() => {
 
                                 window.location.reload();
 
                             }, 1000);
-                            
+
                         }
 
                     }).catch((err) => {
@@ -168,6 +168,42 @@ export default function TaxMasterForm() {
     }
 
 
+    const requestSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+            direction = "desc";
+        }
+        setSortConfig({ key, direction });
+    };
+
+
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+    const sortedData = () => {
+        const dataCopy = [...taxData];
+
+        if (sortConfig.key) {
+            dataCopy.sort((a, b) => {
+                let valueA = a[sortConfig.key];
+                let valueB = b[sortConfig.key];
+
+
+                // if (sortConfig.key === "Amount") {
+                //   valueA = parseFloat(valueA);
+                //   valueB = parseFloat(valueB);
+                // }
+
+                if (valueA < valueB) {
+                    return sortConfig.direction === "asc" ? -1 : 1;
+                }
+                if (valueA > valueB) {
+                    return sortConfig.direction === "asc" ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        return dataCopy;
+    };
 
     return (
 
@@ -182,15 +218,16 @@ export default function TaxMasterForm() {
                             <div style={{ height: "430px", overflowY: 'scroll', overflowX: 'scroll' }}>
                                 <Table striped className="table-data border">
                                     <thead className="tableHeaderBGColor">
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>TaxName</th>
-                                            <th>PrintName</th>
-                                            <th style={{ whiteSpace: 'nowrap' }}>Tax %</th>
-                                            <th style={{ whiteSpace: 'nowrap' }}>Tax on</th>
-                                            <th style={{ whiteSpace: 'nowrap' }}>Effective From</th>
-                                            <th style={{ whiteSpace: 'nowrap' }}>Effective To</th>
-                                            <th style={{ whiteSpace: 'nowrap' }}>Acct Head</th>
+                                        <tr style={{ whiteSpace: 'nowrap' }}>
+                                            <th
+                                                onClick={() => requestSort("TaxID")}  >Id</th>
+                                            <th onClick={() => requestSort("TaxName")}  >TaxName</th>
+                                            <th onClick={() => requestSort("TaxPrintName")} >PrintName</th>
+                                            <th onClick={() => requestSort("Tax_Percent")}>Tax %</th>
+                                            <th onClick={() => requestSort("TaxOn")}>Tax on</th>
+                                            <th onClick={() => requestSort("EffectiveFrom")}>Effective From</th>
+                                            <th onClick={() => requestSort("EffectiveTO")}>Effective To</th>
+                                            <th onClick={() => requestSort("AcctHead")}>Acct Head</th>
                                             <th>Service</th>
                                             <th>Sales</th>
                                             <th style={{ whiteSpace: 'nowrap' }}>Job Work</th>
@@ -202,27 +239,33 @@ export default function TaxMasterForm() {
 
                                     <tbody>
                                         {
-                                            taxData.map((item, key) => {
+                                            sortedData().map((item, key) => {
 
                                                 const formattedEffectiveFrom = new Date(item.EffectiveFrom).toLocaleDateString('en-CA');
                                                 const formattedEffectiveTO = new Date(item.EffectiveTO).toLocaleDateString('en-CA');
 
                                                 item.EffectiveFrom = formattedEffectiveFrom;
                                                 item.EffectiveTO = formattedEffectiveTO;
+
+                                                const taxPercent = parseFloat(item.Tax_Percent);
+                                                const formattedTaxPercent =
+                                                    taxPercent % 1 !== 0
+                                                        ? taxPercent.toFixed(2)
+                                                        : taxPercent.toFixed(0);
                                                 return (
                                                     <>
                                                         <tr onClick={() => selectedRowFun(item, key)}
 
                                                             className={key === selectRow?.index ? 'selcted-row-clr' : ''}
+                                                            
                                                         >
 
                                                             <td>{item.TaxID} </td>
                                                             <td>{item.TaxName} </td>
                                                             <td>{item.TaxPrintName} </td>
-                                                            <td>{item.Tax_Percent} </td>
+                                                            <td style={{ textAlign: "right" }}>{formattedTaxPercent}</td>
                                                             <td>{item.TaxOn}</td>
-                                                            {/* <td>{item.EffectiveFrom}</td>
-                                                            <td>{item.EffectiveTO}</td> */}
+                                                           
                                                             <td>{item.FormattedEffectiveFrom}</td>
                                                             <td>{item.FormattedEffectiveTO}</td>
 
@@ -321,7 +364,12 @@ export default function TaxMasterForm() {
 
                             <div className="col-md-12 ">
                                 <label className="form-label">Tax %</label>
-                                <input className=" " value={selectRow.Tax_Percent || taxPostData.Tax_Percent}
+                                <input className=" " 
+                              value={
+                                parseFloat(selectRow.Tax_Percent) % 1 !== 0
+                                    ? parseFloat(selectRow.Tax_Percent).toFixed(2)
+                                    : parseFloat(selectRow.Tax_Percent).toFixed(0)
+                            }
                                     onChange={handleOnChange}
                                     disabled={false} name='Tax_Percent' />
                             </div>
@@ -339,7 +387,7 @@ export default function TaxMasterForm() {
                                 <input name='EffectiveFrom'
                                     type='date'
                                     value={selectRow.EffectiveFrom || taxPostData.EffectiveFrom}
-                         
+
                                     onChange={handleOnChange}
                                 />
 

@@ -16,6 +16,7 @@ u.Unitname,
 u.RecdPVID,
 u.Recd_PVNo,
 u.HOPrvId,
+u.Unit_UId,
 DATE_FORMAT(u.Recd_PV_Date, '%d-%m-%Y') AS Formatted_Recd_PV_Date,u.Cust_code,
 u.CustName,u.TxnType,u.Amount,u.DocuNo,u.Description,u.On_account,u.PRV_Status AS ReceiptStatus
 FROM
@@ -28,6 +29,8 @@ u.Id,
 u.Unitname,
 u.RecdPVID,
 u.Recd_PVNo,
+u.HOPrvId,
+u.Unit_UId,
 DATE_FORMAT(u.Recd_PV_Date, '%d-%m-%Y') AS Formatted_Recd_PV_Date,u.Cust_code,
 u.CustName,u.TxnType,u.Amount,u.DocuNo,u.Description,u.On_account,u.PRV_Status AS ReceiptStatus
 FROM

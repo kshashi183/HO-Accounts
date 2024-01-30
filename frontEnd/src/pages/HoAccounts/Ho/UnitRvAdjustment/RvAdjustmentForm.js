@@ -115,16 +115,15 @@ export default function RvAdjustmentForm() {
         // setState(true);
 
     }
+
+
     function handleButtonClick(selectRow) {
-    const select=selectRow.HOPrvId;
-        
+    const select=selectRow.Unit_UId ;
+        console.log("select rowwwww",selectRow);
         navigate("/HOAccounts/HO/HOPRV/CreateNew", {state:{ select }});
       }
       
 
-      console.log("hoprv id",selectRow.HOPrvId );
-
-      
   
       const handleUnitSelect = (selected) => {
           const selectedCustomer = selected[0];

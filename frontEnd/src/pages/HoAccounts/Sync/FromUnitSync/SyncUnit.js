@@ -3,14 +3,17 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Spinner from "../Spinner";
 import { baseURL } from "../../../../api/baseUrl";
+import xmljs from 'xml-js';
 
 export default function SyncUnit() {
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [report, setReport] = useState([]);
   const [unitCustData, setUnitCustData] = useState([]);
+  const [buttonTF, setButtonTF] = useState(false)
 
   const handleButtonClick = () => {
+
     fileInputRef.current.click();
     console.log("Xml File", fileInputRef);
   };
@@ -89,6 +92,7 @@ export default function SyncUnit() {
 
   useEffect(() => {
     try {
+
       if (
         report.unit_cust_data.length > 0 ||
         report.unit_inv_list.length > 0 ||
@@ -98,22 +102,48 @@ export default function SyncUnit() {
         report.unit_dc_summary.length > 0 ||
         report.unit_cancelled_vr_list.length > 0
       ) {
-        handleInsertData();
+     handleInsertData();
       }
     } catch (err) {
       console.log("The length is zero Initially");
     }
   }, [report]);
 
-  const handleInsertData = () => {
+  const [xmlAlldata, setXmlData] = useState({
+    custXml: [],
+    invoiceXml: [],
+    invoiceTaxXml: []
+
+  })
+  const handleInsertData = async() => {
     setIsLoading(true);
 
-    const handleRequest = (url, successMessage) => {
+    const handleRequest = async (url, successMessage) => {
       axios
         .post(baseURL + url, report)
         .then((res) => {
+
           console.log(`${successMessage} data inserted successfully`, res.data);
           toast.success(`${successMessage} data inserted successfully`);
+
+          if (res.data.CustData === 'saveCustData') {
+            console.log("Received responseData:", res.data.responseData)
+            const m = res.data.responseData.map((i) => {
+             // console.log("item colmn", i.CustAllData.UnitName, i.CustAllData.Sync_HOId);
+            })
+
+            setXmlData(prevData => ({
+              ...prevData,
+              custXml: res.data.responseData
+            }));
+       
+          }
+          else {
+            console.log("Kfghj");
+          }
+
+
+
         })
         .catch((err) => {
           console.log("Error in table", err);
@@ -121,30 +151,88 @@ export default function SyncUnit() {
         .finally(() => {
           setIsLoading(false);
         });
+         handleExport();
+      
     };
 
+
     // Handle each type of data insertion
-    handleRequest("/fromUnitSync/saveCustDataIntoHoDB", "Customer");
-    handleRequest("/fromUnitSync/saveInvDataIntoHoDB", "Invoice");
-    handleRequest("/fromUnitSync/saveInvTaxesDataIntoHoDB", "Invoice Taxes");
-    handleRequest("/fromUnitSync/saveInvSummaryDataIntoHoDB", "DcInvoice");
-    // handleRequest("/fromUnitSync/saveCombInvDataIntoHoDB", "Invoice Comb");
-    handleRequest(
-      "/fromUnitSync/saveReceiptRegisterDataIntoHoDB",
-      "Receipt Register"
-    );
-    handleRequest(
-      "/fromUnitSync/saveReceptDetailsDataIntoHoDB",
-      "Receipt Details"
-    );
-    handleRequest(
-      "/fromUnitSync/saveCanceledVrListDataIntoHoDB",
-      "Cancelled Vr"
-    );
+    await  handleRequest("/fromUnitSync/saveCustDataIntoHoDB", "Customer");
+    // handleRequest("/fromUnitSync/saveInvDataIntoHoDB", "Invoice");
+    // handleRequest("/fromUnitSync/saveInvTaxesDataIntoHoDB", "Invoice Taxes");
+    // handleRequest("/fromUnitSync/saveInvSummaryDataIntoHoDB", "DcInvoice");
+
+    // handleRequest(
+    //   "/fromUnitSync/saveReceiptRegisterDataIntoHoDB",
+    //   "Receipt Register"
+    // );
+    // handleRequest(
+    //   "/fromUnitSync/saveReceptDetailsDataIntoHoDB",
+    //   "Receipt Details"
+    // );
+    // handleRequest(
+    //   "/fromUnitSync/saveCanceledVrListDataIntoHoDB",
+    //   "Cancelled Vr"
+    // );
+
+
+
+    // handleExport();
   };
 
-  console.log(report);
+  //console.log(report);
   // console.log(unitCustData);
+   console.log("xml data", xmlAlldata.custXml);
+
+ 
+
+  const tableToXml = () => {
+    
+    console.log("xml data111", xmlAlldata.custXml);
+    const xmlData = {
+      ENVELOPE: {
+          HEADER: {
+              TALLYREQUEST: { _text: 'Import Data' }
+          },
+          Unit_Cust_Data_SyncInfo: xmlAlldata.custXml.map((item, index) => ({
+        Id: item.CustAllData.Sync_HOId,
+        UnitName:item.CustAllData.UnitName
+        
+      
+      })),
+
+      },
+    
+      
+
+    };
+
+    const xml = xmljs.js2xml(xmlData, { compact: true, spaces: 2 });
+    return xml;
+  };
+
+
+
+
+
+
+
+
+
+
+
+  const handleExport = () => {
+    const xml = tableToXml();
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cust data.xml';
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    // exportInvoices(xml);
+  };
 
   return (
     <>
@@ -152,12 +240,13 @@ export default function SyncUnit() {
         <div className="row">
           <h4 className="title">From Unit Sync</h4>
         </div>
+
+     
       </div>
       <div className="col-md-12">
         <button
-          className={`button-style mt-2 group-button ${
-            isLoading ? "loading" : ""
-          }`}
+          className={`button-style mt-2 group-button ${isLoading ? "loading" : ""
+            }`}
           onClick={handleButtonClick}
           disabled={isLoading}
         >
