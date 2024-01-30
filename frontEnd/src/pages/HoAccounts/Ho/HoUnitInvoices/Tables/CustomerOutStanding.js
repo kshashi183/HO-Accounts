@@ -10,6 +10,7 @@ import axios from 'axios';
 import { baseURL } from '../../../../../api/baseUrl';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ReactPaginate from "react-paginate";
 
 export default function CustomerOutStanding({
     selectedCustCode, searchQuery,
@@ -133,12 +134,12 @@ export default function CustomerOutStanding({
             updatedFlag = '';
         }
 
-        if (selectedCustCode === '' &&(selectedDCType!=='' || flag!=='')) {
+        if (selectedCustCode === '' && (selectedDCType !== '' || flag !== '')) {
             console.log("cust codeeeeee", selectedCustCode);
             toast.error("Select Customer")
         }
 
-  else     if (selectedDCType === '' && flag !== '') {
+        else if (selectedDCType === '' && flag !== '') {
 
 
             toast.error("Select DC Invoice Type")
@@ -146,7 +147,7 @@ export default function CustomerOutStanding({
 
         }
 
-     
+
 
         else {
 
@@ -249,6 +250,25 @@ export default function CustomerOutStanding({
 
         return formattedAmount;
     }
+
+
+
+
+
+    const itemsPerPage = 100; // Number of items per page
+    const [currentPage, setCurrentPage] = useState(0);
+
+    // Calculate the start and end indices for the current page
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    // Get the data for the current page
+    const currentPageData = filterData.slice(startIndex, endIndex);
+    console.log(currentPageData, "currentPageData");
+
+    const handlePageChange = ({ selected }) => {
+        setCurrentPage(selected);
+    };
     return (
         <div className='row col-md-12'>
             <div className='mt-3 col-md-6'>
@@ -261,14 +281,14 @@ export default function CustomerOutStanding({
                                 <th>InvoiceFor</th>
                                 <th style={{ whiteSpace: 'nowrap' }}>Invoice_Date</th>
                                 <th>Total</th>
-                                <th style={{textAlign:'right'}}>Balance</th>
-                                <th style={{textAlign:'center'}}>Due_Days</th>
+                                <th style={{ textAlign: 'right' }}>Balance</th>
+                                <th style={{ textAlign: 'center' }}>Due_Days</th>
                                 <th>Status</th>
 
                             </tr>
                         </thead>
 
-                        <tbody className='tablebody'>
+                        {/* <tbody className='tablebody'>
 
                             {filterData.map((item, index) => (
 
@@ -296,10 +316,55 @@ export default function CustomerOutStanding({
 
 
 
+                        </tbody> */}
+                        <tbody className='tablebody'>
+
+                            {currentPageData.map((item, index) => (
+
+                                <tr onClick={() => handleRowSelect(item.DC_Inv_No)}
+                                    key={index}
+
+                                    className={selectedRow === item.DC_Inv_No ? 'selcted-row-clr' : ''}
+                                >
+
+                                    <td style={{ whiteSpace: 'nowrap' }}>{item.DC_InvType}</td>
+                                    <td>{item.Inv_No}</td>
+                                    <td>{item.InvoiceFor}</td>
+                                    <td>{new Date(item.Inv_Date).toLocaleDateString('en-GB')}</td>
+                                    <td style={{ textAlign: 'right' }}>{formatAmount(item.GrandTotal)}</td>
+                                    <td style={{ textAlign: 'right' }}>{formatAmount(item.Balance)}</td>
+                                    <td style={{ textAlign: 'center' }}>{item.duedays}</td>
+                                    <td>{item.DCStatus}</td>
+
+                                </tr>
+                            ))}
+
+                            {
+
+                            }
+
+
+
                         </tbody>
                     </Table>
                 </div>
+                
+            <ReactPaginate
+        previousLabel={"previous"}
+        nextLabel={"next"}
+        breakLabel={"..."}
+        pageCount={Math.ceil(filterData.length / itemsPerPage)}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageChange}
+        containerClassName={"pagination"}
+        subContainerClassName={"pages pagination"}
+        activeClassName={"active"}
+      />
+          
             </div>
+
+           
 
             <div className="box col-md-6">
                 <CustomerOutStandingTable02

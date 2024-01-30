@@ -449,10 +449,13 @@ export default function CreateNewForm() {
         baseURL + `/createnew/getleftTable?receipt_id=${rowData}`
       );
 
+      
+
       try {
         const response = await axios.get(
           baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}`
         );
+        console.log("open inv ",resp );
 
         setRvData((prevRvData) => ({
           ...prevRvData,

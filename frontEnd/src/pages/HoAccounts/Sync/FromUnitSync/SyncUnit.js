@@ -21,6 +21,7 @@ export default function SyncUnit() {
   const [fileName, setFileName] = useState('');
 
   const handleButtonClick = () => {
+
     fileInputRef.current.click();
     console.log("Xml File", fileInputRef);
   };
@@ -100,6 +101,7 @@ export default function SyncUnit() {
 
   useEffect(() => {
     try {
+
       if (
         report.unit_cust_data.length > 0 ||
         report.unit_inv_list.length > 0 ||
@@ -109,7 +111,7 @@ export default function SyncUnit() {
         report.unit_dc_summary.length > 0 ||
         report.unit_cancelled_vr_list.length > 0
       ) {
-        handleInsertData();
+     handleInsertData();
       }
     } catch (err) {
       console.log("The length is zero Initially");
@@ -421,12 +423,13 @@ export default function SyncUnit() {
         <div className="row">
           <h4 className="title">From Unit Sync</h4>
         </div>
+
+     
       </div>
       <div className="col-md-12">
         <button
-          className={`button-style mt-2 group-button ${
-            isLoading ? "loading" : ""
-          }`}
+          className={`button-style mt-2 group-button ${isLoading ? "loading" : ""
+            }`}
           onClick={handleButtonClick}
           disabled={isLoading}
         >

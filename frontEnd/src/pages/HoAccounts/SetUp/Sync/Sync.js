@@ -52,7 +52,7 @@ export default function Sync() {
 
 
       setData({ ...data, open_inv: open_inv.Result, open_rec: open_rec.Result });
-      //console.log('Open rec:', data.open_rec);
+      console.log('Open rec:', data.open_rec);
     } catch (error) {
       console.error('Error fetching data:', error);
     }

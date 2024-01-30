@@ -106,16 +106,16 @@ WHERE
 
 
 unitReceiptList.get("/getunitName", async (req, res, next) => {
-    
+    console.log("recept");
     try {
         setupQueryMod(
-            `SELECT DISTINCT UnitName FROM magod_setup.magodlaser_units`,
+            `SELECT DISTINCT UnitName FROM magod_hq_mis.unit_cust_data`,
             (err, data) => {
                 if (err) {
                     console.log("err", err);
                 }
                 else {
-                   // console.log("dattttta", data);
+                    console.log("dattttta", data);
                     res.send(data);
                 }
             }

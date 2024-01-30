@@ -330,9 +330,28 @@ export default function CustomerPDF({ dataBasedOnCust }) {
   console.log("?????????????", dataBasedOnCust[0]?.PIN_Code);
 
 
+  
+  const rowsPerPage = 5;
+  let serialNumber = 1;
+  const columnsPerPage = 2;
+  const chunkArray = (arr, size) => {
+    return Array.from({ length: Math.ceil(arr.length / size) }, (_, index) => arr.slice(index * size, (index + 1) * size));
+  };
 
+  const paginatedData = chunkArray(dataBasedOnCust, rowsPerPage);
 
   let totalGrandTotal = 0;
+  if (paginatedData.length > 0) {
+    paginatedData.forEach((pageData) => {
+      if (pageData.length > 0) {
+        pageData.forEach((item) => {
+          // Update totalGrandTotal with the current GrandTotal value
+          totalGrandTotal += parseFloat(item.Balance);
+
+        });
+      }
+    });
+  }
 
 
 

@@ -421,7 +421,7 @@ console.log("Sum of Balances for each PO_NO:", poSumMap);
 
           <button className="button-style mt-2 group-button" type='button'
 
-            onClick={e => navigate("/UnitAccounts")} style={{ width: "80px" }}
+            onClick={e => navigate("/HOAccounts")} style={{ width: "80px" }}
           >
             Close
           </button>
