@@ -193,8 +193,8 @@ export default function ShowSyncStatus() {
       // });
 
       // const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
+      // await writable.write(blob);
+      // await writable.close();
 
       // if (
       //   getCustInvoice === 0 &&
