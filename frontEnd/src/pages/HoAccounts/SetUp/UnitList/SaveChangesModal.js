@@ -71,6 +71,8 @@ export default function SaveChangesModal(
       })
   }
 
+  console.log("sel1111", selectRow);
+
   const unitlistSubmit = () => {
     const now = Date.now();
   
@@ -91,7 +93,7 @@ export default function SaveChangesModal(
       }
     }
 
-    else if (selectRow.PIN === '' && selectRow.Unit_GSTNo === '' && selectRow.Mail_Id) {
+    else if (selectRow.PIN === null && selectRow.Unit_GSTNo === null && selectRow.Mail_Id===null) {
 
       insertData();
     }
@@ -100,11 +102,12 @@ export default function SaveChangesModal(
 
     else {
       console.log("hiiiiiiiiiiiiiiiii");
+    
       let flag = 0;
       const unitdata = {};
 
       if (selectRow.PIN !== '') {
-        console.log("uuuuuuuuuuuuuuuuuu");
+        
         unitdata.PIN = selectRow.PIN;
       }
       if (selectRow.Unit_GSTNo !== '') {

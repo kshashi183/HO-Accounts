@@ -192,7 +192,7 @@ export default function ShowSyncStatus() {
       //   ],
       // });
 
-      const writable = await handle.createWritable();
+      // const writable = await handle.createWritable();
       await writable.write(blob);
       await writable.close();
 

@@ -35,9 +35,9 @@ export default function Import(props) {
 
     reader.onload = (e) => {
       const xmlString = e.target.result;
-
+    //  console.log("xml String ", xmlString);
       const parsedData = parseXmlData(xmlString);
-      console.log("xml IMPORTED DATA ", parsedData);
+     // console.log("xml IMPORTED DATA ", parsedData);
       setReceiptData(xmlString)
       sync_data(parsedData)
     };
@@ -332,13 +332,13 @@ parsedData.open_rec.forEach(rv => {
             Import Open Sync File
           </button>
         </div>
-        <div className="col-md-4 mb-3 col-sm-12" >
+        {/* <div className="col-md-4 mb-3 col-sm-12" >
           <button className="button-style  group-button" style={{ width: "110px" }}
-          // onClick={postData}
+          
           >
             Import Tally
           </button>
-        </div>
+        </div> */}
       </div>
 
       <Tabs style={{ fontSize: "13px" }}>

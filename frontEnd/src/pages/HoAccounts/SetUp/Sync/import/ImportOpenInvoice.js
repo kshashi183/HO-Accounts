@@ -122,6 +122,47 @@ export default function ImportOpenInvoice({ data }) {
 
   console.log("cusrrent page", currentPageData);
 
+
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+
+
+
+  const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+
+
+        if (sortConfig.key === "Unit_GrandTotal" || sortConfig.key === "HO_GrandTotal"
+        || sortConfig.key === "Unit_PymtAmtRecd"
+        || sortConfig.key === "HO_PymtAmtRecd" ) {
+          valueA = parseFloat(valueA);
+          valueB = parseFloat(valueB);
+        }
+
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
+
   return (
     <div>
       <div
@@ -130,65 +171,65 @@ export default function ImportOpenInvoice({ data }) {
       >
         <Table striped className="table-data border">
           <thead className="tableHeaderBGColor">
-            <tr style={{whiteSpace:'nowrap'}}>
+            <tr style={{ whiteSpace: 'nowrap' }}>
               <th>Select</th>
-              <th>Type</th>
-              <th>Customer</th>
-              <th>Invoice No</th>
-              <th>Date</th>
-              <th>Invoice Value Unit</th>
-              <th>Invoice Value HO</th>
-              <th>Received Unit</th>
-              <th>Received HO</th>
-              <th>Unit_DC_Status</th>
-              <th>HO_DC_Status</th>
-              <th>Remarks</th>
+              <th onClick={() => requestSort("DC_InvType")}>Type</th>
+              <th onClick={() => requestSort("Cust_Name")}>Cust_Name</th>
+              <th onClick={() => requestSort("DC_InvType")}>Inv_No </th>
+              <th onClick={() => requestSort("Inv_Date")}>Date</th>
+              <th onClick={() => requestSort("Unit_GrandTotal")}>Invoice Value Unit</th>
+              <th onClick={() => requestSort("HO_GrandTotal")}>Invoice Value HO</th>
+              <th onClick={() => requestSort("Unit_PymtAmtRecd")}>Received Unit</th>
+              <th onClick={() => requestSort("HO_PymtAmtRecd")}>Received HO</th>
+              <th onClick={() => requestSort("Unit_DCStatus")}>Unit_DC_Status</th>
+              <th onClick={() => requestSort("HO_DCStatus")}>HO_DC_Status</th>
+              <th onClick={() => requestSort("Remarks")}>Remarks</th>
             </tr>
           </thead>
           <tbody className="tablebody">
-            {currentPageData
-              ? currentPageData.map((rv, key) => (
-                  // <tr key={rv.DC_Inv_No} style={rv.Remarks==='Closed or Missing in HO' ? { background : "green"} : rv.Remarks==='Closed or Missing in Unit' ? {background : 'blue'}: rv.Remarks==='Value Different' ? {background : 'red'}:{background : 'none'} } >
-                  <tr
-                    key={rv.DC_Inv_No}
-                    style={
-                      rv.HO_DCStatus === "Unknown"
-                        ? { background: "#49be25" }
-                        : { background: "#f48483", whiteSpace: "nowrap" }
-                    } //#49be25  #FF4500  #f48483
-                    onClick={() => selectedRowFun(rv, key)}
-                    className={
-                      key === selectRow?.index ? "selcted-row-clr" : ""
-                    }
-                  >
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedItems.includes(rv.DC_Inv_No)}
-                        onChange={() => handleCheckboxChange(rv.DC_Inv_No)}
-                      />
-                    </td>
-                    <td>{rv.DC_InvType}</td>
-                    <td>{rv.Cust_Name}</td>
-                    <td>{rv.Inv_No}</td>
-                    <td>{formatDate(rv.Inv_Date)}</td>
-                    <td style={{ textAlign: "right" }}>
-                      {formatAmount(rv.Unit_GrandTotal)}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      {formatAmount(rv.HO_GrandTotal)}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      {formatAmount(rv.Unit_PymtAmtRecd)}
-                    </td>
-                    <td style={{ textAlign: "right" }}>
-                      {formatAmount(parseInt(rv.HO_PymtAmtRecd))}
-                    </td>
-                    <td>{rv.Unit_DCStatus}</td>
-                    <td>{rv.HO_DCStatus}</td>
-                    <td>{rv.Remarks}</td>
-                  </tr>
-                ))
+            {sortedData()
+              ? sortedData().map((rv, key) => (
+                // <tr key={rv.DC_Inv_No} style={rv.Remarks==='Closed or Missing in HO' ? { background : "green"} : rv.Remarks==='Closed or Missing in Unit' ? {background : 'blue'}: rv.Remarks==='Value Different' ? {background : 'red'}:{background : 'none'} } >
+                <tr
+                  key={rv.DC_Inv_No}
+                  style={
+                    rv.HO_DCStatus === "Unknown"
+                      ? { background: "#49be25" }
+                      : { background: "#f48483", whiteSpace: "nowrap" }
+                  } //#49be25  #FF4500  #f48483
+                  onClick={() => selectedRowFun(rv, key)}
+                  className={
+                    key === selectRow?.index ? "selcted-row-clr" : ""
+                  }
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(rv.DC_Inv_No)}
+                      onChange={() => handleCheckboxChange(rv.DC_Inv_No)}
+                    />
+                  </td>
+                  <td>{rv.DC_InvType}</td>
+                  <td>{rv.Cust_Name}</td>
+                  <td>{rv.Inv_No}</td>
+                  <td>{formatDate(rv.Inv_Date)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(rv.Unit_GrandTotal)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(rv.HO_GrandTotal)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(rv.Unit_PymtAmtRecd)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(parseInt(rv.HO_PymtAmtRecd))}
+                  </td>
+                  <td>{rv.Unit_DCStatus}</td>
+                  <td>{rv.HO_DCStatus}</td>
+                  <td>{rv.Remarks}</td>
+                </tr>
+              ))
               : ""}
           </tbody>
         </Table>

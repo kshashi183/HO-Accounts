@@ -1,17 +1,23 @@
 const tally_Export = require("express").Router();
+const axios = require('axios');
 // const cors = require('cors');
 // const { dbco, dbco1, dbgetData, deleteUnitData, updateUnitData } = require("../../../helpers/dbconn")
 const { setupQueryMod, misQuery } = require("../../../../helpers/dbconn")
+const multer = require('multer');
+const storage = multer.memoryStorage(); // Store file data in memory
+const upload = multer({ storage: storage });
+
 
 
 tally_Export.get('/getInvoiceData', (req, res) => {
     const date = req.query.date
-    //  console.log("date", date);
+    const unit = req.query.selectedUnitName
+    //  console.log("unit", unit.UnitName);
     const sql = `SELECT u.*, t.voucher_type, t.PreFix, t.LedgerName
 FROM magod_hq_mis.tally_voucher_ref t
 JOIN magod_hq_mis.unit_invoices_list u
 ON t.inv_type = u.dc_invType
-WHERE u.UnitName='Jigani' AND u.Inv_Date = '${date}'
+WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
 ORDER BY t.voucher_type, u.Inv_no;`
 
     setupQueryMod(sql, (err, result) => {
@@ -21,7 +27,7 @@ ORDER BY t.voucher_type, u.Inv_no;`
             return res.json({ Error: " error in sql" })
         }
         else {
-          //  console.log("invoiceee",  result.LedgerName);
+            //  console.log("invoiceee",  result.LedgerName);
             return res.json({ Status: 'Success', Result: result })
         }
     })
@@ -30,12 +36,13 @@ ORDER BY t.voucher_type, u.Inv_no;`
 
 tally_Export.get('/getInvoiceTaxDetails', (req, res) => {
     const dcNo = req.query.DC_Inv_No
-    console.log("dc no", dcNo);
+    const unit = req.query.selectedUnitName
+    // console.log("dc no", dcNo);
     const sql = `SELECT m2.*, m2.Unit_Uid AS dc_invTaxId
     FROM magod_hq_mis.unit_invoices_list m1
     JOIN magod_hq_mis.unit_inv_taxtable m2
     ON m1.DC_inv_no = m2.DC_inv_no AND m1.UnitName = m2.UnitName
-    WHERE m1.UnitName = 'Jigani'  AND m1.DC_Inv_No='${dcNo}';`
+    WHERE m1.UnitName = '${unit.UnitName}'  AND m1.DC_Inv_No='${dcNo}';`
 
     setupQueryMod(sql, (err, result) => {
 
@@ -54,6 +61,7 @@ tally_Export.get('/getInvoiceTaxDetails', (req, res) => {
 
 tally_Export.get('/getPaymentReceipntData', (req, res) => {
     const date = req.query.date
+    const unit = req.query.selectedUnitName
     //   console.log("dateeeeeeeeeeee", date);
     // const sql=` SELECT p1.*, t.voucher_type, t.PreFix, t.LedgerName
     // FROM magod_hq_mis.unit_payment_recd_voucher_register p
@@ -61,11 +69,11 @@ tally_Export.get('/getPaymentReceipntData', (req, res) => {
     // JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
     // WHERE p.Unitname = 'Jigani' AND p.Recd_PV_Date =  '${date}'`
 
-      const sql1=`SELECT DISTINCT p.*, t.voucher_type, t.PreFix, t.LedgerName
+    const sql1 = `SELECT  DISTINCT p.*, t.voucher_type, t.PreFix, t.LedgerName
       FROM magod_hq_mis.unit_payment_recd_voucher_register p
       JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID AND p1.UnitName = p.UnitName
       JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
-      WHERE p.Unitname = 'Jigani' AND p.Recd_PV_Date = '${date}';
+      WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PV_Date = '${date}';
       `
 
     setupQueryMod(sql1, (err, result) => {
@@ -75,7 +83,7 @@ tally_Export.get('/getPaymentReceipntData', (req, res) => {
             return res.json({ Error: " error in sql" })
         }
         else {
-   // console.log("paymnettttt", result);
+            // console.log("paymnettttt", result);
             return res.json({ Status: 'Success', Result: result })
         }
     })
@@ -86,28 +94,94 @@ tally_Export.get('/getPaymentReceipntData', (req, res) => {
 tally_Export.get('/getPayment', (req, res) => {
 
     const Recd_PVNo = req.query.Recd_PVNo;
-    console.log("recd pvno",Recd_PVNo);
+    const unit = req.query.selectedUnitName
+    // console.log("recd pvno",Recd_PVNo);
 
-    const sql = `SELECT  p1.*, t.voucher_type, t.PreFix, t.LedgerName
+    const sql = `SELECT   p1.*, t.voucher_type, t.PreFix, t.LedgerName
     FROM magod_hq_mis.unit_payment_recd_voucher_register p
     JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID
     JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
-    WHERE p.Unitname = 'Jigani' AND p.Recd_PVNo='${Recd_PVNo}' `;
+    WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PVNo='${Recd_PVNo}' `;
 
 
     setupQueryMod(sql, (err, result) => {
-         console.log("hiii11");
+
         if (err) {
             console.log("error", err);
             return res.json({ Error: " error in sql" })
         }
         else {
-            console.log("hiii22");
-           // console.log("paymnet", result);
+
+            // console.log("paymnet", result);
             return res.json({ Status: 'Success', Result: result })
         }
     })
 
 
 })
+
+
+
+
+//EXPORT TO TALLY SOFTWARE
+
+
+// const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
+
+// tally_Export.post('/exporttally', async (req, res) => {
+//     console.log("xml", req.body);
+
+//     try {
+//         // Assuming 'req.body' contains the data you want to send to Tally
+//         const tallyResponse = await axios.post(`${tallyServerUrl}`, req.body, {
+//             // Add any headers or authentication needed for Tally
+//             headers: {
+//                 'Content-Type': 'application/xml',
+//             },
+//         });
+
+//         // Handle the Tally response as needed
+//         res.status(200).json({ success: true, tallyResponse: tallyResponse.data });
+//     } catch (error) {
+//         console.error('Error communicating with Tally:', error.message);
+//         res.status(500).json({ success: false, error: error.message });
+//     }
+// });
+
+
+tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
+   
+
+    try {
+        // Access the file data
+        const xmlFile = req.file.buffer.toString(); // Assuming the file is XML
+
+        // Process the XML data as needed
+        // console.log("xml file", xmlFile);
+
+        // Send the XML data to the Tally server URL
+        const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
+        const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
+            headers: {
+                'Content-Type': 'application/xml',
+            },
+        });
+
+        // Check the response from the Tally server
+        if (tallyResponse.ok) {
+            // Tally server responded with a success status
+            res.status(200).send('File uploaded and sent to Tally successfully');
+        }
+        else {
+            // Tally server responded with an error status
+            console.error('Error from Tally server:', tallyResponse.statusText);
+            res.status(500).send('Error communicating with Tally server');
+        }
+    } catch (error) {
+        console.error('Error handling file upload:', error);
+        res.status(500).send('Internal Server Error');
+    }
+
+});
+
 module.exports = tally_Export;

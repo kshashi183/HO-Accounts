@@ -46,23 +46,61 @@ export default function OpenInvoice({data}) {
     setSelectRow(list);
   };
   //console.log("open inmv", data);
+
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+        direction = "desc";
+    }
+    setSortConfig({ key, direction });
+};
+
+
+
+
+const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+        dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+
+
+            if (sortConfig.key === "GrandTotal" || sortConfig.key === "Balance") {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+
+            if (valueA < valueB) {
+                return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+                return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+        });
+    }
+    return dataCopy;
+};
   return (
     <>
     <div  className='mt-4' style={{height:"300px",overflowY: "scroll",overflowX:"scroll"}}>
     <Table striped className="table-data border">
       <thead className="tableHeaderBGColor">
         <tr>
-          <th style={{whiteSpace:"nowrap"}}>Invoice No</th>
-          <th>Date</th>
-          <th>Type</th>
-          <th style={{whiteSpace:"nowrap"}}>Grand Total</th>
-          <th>Balance</th>
-          <th>Customer</th>
+          <th onClick={() => requestSort("Inv_No")} style={{whiteSpace:"nowrap"}}>Invoice No</th>
+          <th onClick={() => requestSort("Inv_Date")}>Date</th>
+          <th onClick={() => requestSort("DC_InvType")}>Type</th>
+          <th onClick={() => requestSort("GrandTotal")} style={{whiteSpace:"nowrap"}}>Grand Total</th>
+          <th onClick={() => requestSort("PymtAmtRecd")}>Balance</th>
+          <th onClick={() => requestSort("Cust_Name")}>Customer</th>
         </tr>
       </thead>
       <tbody className="tablebody">
-            {currentPageData
-              ? currentPageData.map((item, key) => (
+            {sortedData()
+              ? sortedData().map((item, key) => (
                   <tr
                     key={item.DC_Inv_No}
                     style={{ whiteSpace: "nowrap" }}
