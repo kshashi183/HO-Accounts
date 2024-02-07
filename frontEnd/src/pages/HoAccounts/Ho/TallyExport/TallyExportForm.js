@@ -22,12 +22,16 @@ export default function TallyExportForm() {
   }, [])
 
   const onLoadDataClick = () => {
+    
     setFlag(true);
+  
+    
   }
 
   const tallyExportSubmit = () => {
     setExportTally(true);
   }
+ 
 
   const navigate = useNavigate();
 
@@ -42,6 +46,7 @@ export default function TallyExportForm() {
     setSelectedUnitName(selected)
   };
 
+  console.log("select unitname", selectedUnitName[0]);
   const [unitdata, setunitData] = useState([]);
   const handleUnitName = () => {
     axios
@@ -50,7 +55,7 @@ export default function TallyExportForm() {
         console.log("firstTable", res.data)
         setunitData(res.data);
         if (res.data.length > 0) {
-          setSelectedUnitName([res.data[0]]);
+          setSelectedUnitName([res.data[4]]);
         }
       })
       .catch((err) => {
@@ -121,7 +126,8 @@ export default function TallyExportForm() {
       </div>
       <hr className="horizontal-line" />
       <TallyExportTabs selectedDate={selectedDate} flag={flag} setFlag={setFlag}
-        exportTally={exportTally} setExportTally={setExportTally} />
+        exportTally={exportTally} setExportTally={setExportTally}  
+        selectedUnitName={  selectedUnitName[0]}/>
     </div>
   );
 }

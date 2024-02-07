@@ -114,6 +114,44 @@ export default function OpenReceipt({ data }) {
         setSelectedItems((prevSelectedItems) => [...prevSelectedItems, itemId]);
       }
     }
+
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const requestSort = (key) => {
+      let direction = "asc";
+      if (sortConfig.key === key && sortConfig.direction === "asc") {
+          direction = "desc";
+      }
+      setSortConfig({ key, direction });
+  };
+  
+  
+  
+  
+  const sortedData = () => {
+      const dataCopy = [...currentPageData];
+  
+      if (sortConfig.key) {
+          dataCopy.sort((a, b) => {
+              let valueA = a[sortConfig.key];
+              let valueB = b[sortConfig.key];
+  
+  
+              if (sortConfig.key === "GrandTotal" || sortConfig.key === "Balance") {
+                valueA = parseFloat(valueA);
+                valueB = parseFloat(valueB);
+              }
+  
+              if (valueA < valueB) {
+                  return sortConfig.direction === "asc" ? -1 : 1;
+              }
+              if (valueA > valueB) {
+                  return sortConfig.direction === "asc" ? 1 : -1;
+              }
+              return 0;
+          });
+      }
+      return dataCopy;
+  };
   };
 
   // Get the selected data based on selectedItems
@@ -146,6 +184,49 @@ export default function OpenReceipt({ data }) {
     setSelectRow(list);
   };
 
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+        direction = "desc";
+    }
+    setSortConfig({ key, direction });
+};
+
+
+
+
+const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+        dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+
+
+            if (sortConfig.key === "On_account" || sortConfig.key === "Amount"
+            || sortConfig.key === "Id"
+            || sortConfig.key === "Sync_HOId" 
+            || sortConfig.key === "Unit_UId"
+            || sortConfig.key === "Cust_code"
+            || sortConfig.key === "HOPrvId") {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+
+            if (valueA < valueB) {
+                return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+                return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+        });
+    }
+    return dataCopy;
+};
+
   return (
     <div>
       <div
@@ -154,38 +235,37 @@ export default function OpenReceipt({ data }) {
       >
         <Table striped className="table-data border">
           <thead className="tableHeaderBGColor">
-            <tr>
-              <th>Type</th>
-              <th>RV No</th>
-              <th>Recd_PV</th>
-              <th>Amount</th>
-              <th>On Account</th>
-              <th>Customer</th>
-              <th>Id</th>
-              <th>Unit Name</th>
-              <th>Recd PVID</th>
-              <th>Sync_HOId</th>
-              <th>Unit_UId</th>
-              <th>Recd_PVNo</th>
-              <th>Recd_PV_Date</th>
-              <th>Receipt Status</th>
-              <th>Cust_code</th>
-              <th>Cust Name</th>
-              <th>Amount</th>
-              <th>Adjusted</th>
-              <th>Document No</th>
-              <th>Description</th>
-              <th>HO Ref</th>
-              <th>HO PrvId</th>
-              <th>Tally_UId</th>
-              <th>Updated</th>
-              <th>On_account</th>
-              <th>Txn Type</th>
+            <tr style={{whiteSpace:'nowrap'}}>
+              <th onClick={() => requestSort("TxnType")}  >Type</th>
+              <th onClick={() => requestSort("Recd_PVNo")}  >RV No</th>
+              <th onClick={() => requestSort("Recd_PV_Date")}  >Recd_PV Date</th>
+              <th onClick={() => requestSort("Amount")}  >Amount</th>
+              <th onClick={() => requestSort("On_account")}  >On Account</th>
+              <th onClick={() => requestSort("CustName")}  >Customer</th>
+              <th onClick={() => requestSort("Id")}  >Id</th>
+              <th onClick={() => requestSort("UnitName")}  >Unit Name</th>
+              <th onClick={() => requestSort("RecdPVID")}  >Recd PVID</th>
+              <th onClick={() => requestSort("Sync_HOId")}  >Sync_HOId</th>
+              <th onClick={() => requestSort("Unit_UId")}  >Unit_UId</th>
+              <th onClick={() => requestSort("Recd_PVNo")}  >Recd_PVNo</th>
+              {/* <th onClick={() => requestSort("TaxName")}  >Recd_PV_Date</th> */}
+              <th onClick={() => requestSort("ReceiptStatus")}  >Receipt Status</th>
+              <th onClick={() => requestSort("Cust_code")}  >Cust_code</th>
+              {/* <th onClick={() => requestSort("TaxName")}  >Cust Name</th> */}
+              <th onClick={() => requestSort("Amount")}  >Amount</th>
+              <th   >Adjusted</th>
+              <th onClick={() => requestSort("DocuNo")}  >Document No</th>
+              <th onClick={() => requestSort("Description")}  >Description</th>
+              <th onClick={() => requestSort("HORef")}  >HO Ref</th>
+              <th onClick={() => requestSort("HOPrvId")}  >HO PrvId</th>
+              <th onClick={() => requestSort("TallyUpdate")}  >Tally_UId</th>
+              <th  >Updated</th>
+              
             </tr>
           </thead>
           <tbody className="tablebody">
-            {currentPageData
-              ? currentPageData.map((item, key) => (
+            {sortedData()
+              ? sortedData().map((item, key) => (
                   <tr
                     key={item.RecdPVID}
                     style={{ whiteSpace: "nowrap" }}
@@ -197,7 +277,8 @@ export default function OpenReceipt({ data }) {
                     {/* Render table cells with corresponding data */}
                     <td>{item.TxnType}</td>
                     <td>{item.Recd_PVNo}</td>
-                    <td>{item.Recd_PV_Date}</td>
+                    
+                    <td>{new Date(item.Recd_PV_Date).toLocaleDateString('en-GB')}</td>
                     <td style={{ textAlign: "right" }}>
                       {formatAmount(item.Amount)}
                     </td>
@@ -211,10 +292,10 @@ export default function OpenReceipt({ data }) {
                     <td>{item.Sync_HOId}</td>
                     <td>{item.Unit_UId}</td>
                     <td>{item.Recd_PVNo}</td>
-                    <td>{item.Recd_PV_Date}</td>
+                    {/* <td>{item.Recd_PV_Date}</td> */}
                     <td>{item.ReceiptStatus}</td>
                     <td>{item.Cust_code}</td>
-                    <td>{item.CustName}</td>
+                    {/* <td>{item.CustName}</td> */}
                     <td style={{ textAlign: "right" }}>
                       {formatAmount(item.Amount)}
                     </td>
@@ -231,8 +312,7 @@ export default function OpenReceipt({ data }) {
                         onChange={() => handleCheckboxChange(item.RecdPVID)}
                       />
                     </td>
-                    <td>{item.On_account}</td>
-                    <td>{item.TxnType}</td>
+                  
                     {/* Add the remaining cells based on your data structure */}
                   </tr>
                 ))

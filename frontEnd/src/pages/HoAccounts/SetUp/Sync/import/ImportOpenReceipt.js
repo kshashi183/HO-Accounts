@@ -44,28 +44,71 @@ export default function ImportOpenReceipt({data}) {
     setSelectRow(list);
   };
 
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+        direction = "desc";
+    }
+    setSortConfig({ key, direction });
+};
+
+
+
+
+const sortedData = () => {
+    const dataCopy = [...currentPageData];
+
+    if (sortConfig.key) {
+        dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+
+
+            if (sortConfig.key === "HO_Amount" || sortConfig.key === "Unit_Amount"
+            || sortConfig.key === "Unit_On_account"
+            || sortConfig.key === "HO_On_account" 
+            || sortConfig.key === "Unit_UId"
+           ) {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+
+            if (valueA < valueB) {
+                return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+                return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+        });
+    }
+    return dataCopy;
+};
+
+
   return (
     <>
     <div className="mt-4" style={{height:"300px",overflowY: "scroll",overflowX:"scroll"}}>
       <Table striped className="table-data border">
         <thead className="tableHeaderBGColor">
-          <tr>
-            <th style={{whiteSpace:"nowrap"}}>RV No</th>
-            <th>Recd_PV</th>
-            <th>Customer</th>
-            <th>Type</th>
-            <th>HO_Amount</th>
-            <th>Unit_Amount</th>
-            <th>HO_On_account</th>
-            <th>Unit_On_account</th>
-            <th>HO_Receipt_Status</th>
-            <th>Unit_Receipt_Status</th>
-            <th>Unit_UId</th>
+          <tr style={{whiteSpace:"nowrap"}}>
+            <th onClick={() => requestSort("Recd_PVNo")} >RV No</th>
+            <th onClick={() => requestSort("Recd_PV_Date")} >Recd_PV Date</th>
+            <th onClick={() => requestSort("CustName")} >Customer</th>
+            <th onClick={() => requestSort("TxnType")} >Type</th>
+            <th onClick={() => requestSort("HO_Amount")} >HO_Amount</th>
+            <th onClick={() => requestSort("Unit_Amount")} >Unit_Amount</th>
+            <th onClick={() => requestSort("HO_On_account")} >HO_On_account</th>
+            <th onClick={() => requestSort("Unit_On_account")} >Unit_On_account</th>
+            <th onClick={() => requestSort("HO_ReceiptStatus")} >HO_Receipt_Status</th>
+            <th onClick={() => requestSort("Unit_ReceiptStatus")} >Unit_Receipt_Status</th>
+            <th onClick={() => requestSort("Unit_UId")} >Unit_UId</th>
           </tr>
         </thead>
         <tbody className="tablebody">
-            {currentPageData
-              ? currentPageData.map((rv, key) => (
+            {sortedData()
+              ? sortedData().map((rv, key) => (
                   <tr
                     key={rv.RecdPVID}
                     style={{ whiteSpace: "nowrap" }}

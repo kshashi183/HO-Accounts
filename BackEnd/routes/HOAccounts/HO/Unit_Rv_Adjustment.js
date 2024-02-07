@@ -9,7 +9,7 @@ unitRV_Adjustment.get('/rvAdjustment', (req, res) => {
   
   const unitObject = req.query.selectedUnitName;
   const unit = unitObject && unitObject.length > 0 ? unitObject[0].UnitName : null;
-  console.log("unitt",unit);
+ // console.log("unitt",unit);
   const sql1 = `SELECT
 u.Id,
 u.Unitname,

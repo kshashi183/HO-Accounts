@@ -121,6 +121,7 @@ createNewRouter.post("/updateData", async (req, res, next) => {
 createNewRouter.post("/addInvoice", async (req, res, next) => {
   try {
     const { selectedRows, HO_PrvId, unit } = req.body;
+    console.log("hoid", req.body);
     const insertResults = [];
     let existingDraftIds = [];
 
@@ -129,6 +130,7 @@ createNewRouter.post("/addInvoice", async (req, res, next) => {
     const checkRecdPvSrlData = await new Promise((resolve, reject) => {
       hqQuery(checkRecdPvSrlQuery, (err, data) => {
         if (err) {
+          console.log("error1", err);
           reject(err);
         } else {
           resolve(data);
@@ -194,6 +196,7 @@ Unitname,
         await new Promise((resolve, reject) => {
           hqQuery(insertQuery, (err, data) => {
             if (err) {
+              console.log("err in insert", err);
               insertResults.push({
                 id: DC_Inv_No,
                 error: "Insert failed.",
@@ -304,7 +307,7 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
       });
     });
   } catch (error) {
-    console.log("Error:", error.message);
+    console.log("Errorrrrrr:", error.message);
     next(error);
   }
 });

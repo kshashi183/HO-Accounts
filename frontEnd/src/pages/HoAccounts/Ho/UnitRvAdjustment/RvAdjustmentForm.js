@@ -19,7 +19,7 @@ export default function RvAdjustmentForm() {
     const [showAll, setShowAll] = useState(false);
 
 
-    const [selectedUnitName, setSelectedUnitName]=useState("")
+    const [selectedUnitName, setSelectedUnitName]=useState("Jigani")
       const [selectUnit, setSelectUnit] = useState([])
       const [getName, setGetName] = useState("");
 
@@ -45,6 +45,7 @@ export default function RvAdjustmentForm() {
 
 
     console.log("selectedUnitName1111", selectedUnitName);
+
     const AdjsutmentSubmit = () => {
         if (showAll) {
             axios.get(baseURL+'/unitRV_Adjustment/rvAdjustment',)
@@ -118,9 +119,23 @@ export default function RvAdjustmentForm() {
 
 
     function handleButtonClick(selectRow) {
-    const select=selectRow.Unit_UId ;
-        console.log("select rowwwww",selectRow);
-        navigate("/HOAccounts/HO/HOPRV/CreateNew", {state:{ select }});
+    // const select=selectRow.Unit_UId ;
+    
+   
+    //const select=selectRow.Id ;
+  // const select=selectedCustCode
+   
+  //  const select=selectRow.RecdPVID
+  const select = selectRow.HOPrvId;
+    const id=selectRow.Id
+
+  const state = {
+    select: select,
+    CustCode: selectedCustCode,
+    id:id
+};
+        console.log("select rowwwww",select);
+        navigate("/HOAccounts/HO/HOPRV/CreateNew", {state: state });
       }
       
 
@@ -139,6 +154,9 @@ export default function RvAdjustmentForm() {
               .then((res) => {
                   console.log("firstTable", res.data)
                   setunitData(res.data);
+                  if (res.data.length > 0) {
+                    setSelectedUnitName(res.data[4]);
+                  }
               })
               .catch((err) => {
                   console.log("err in table", err);
@@ -149,6 +167,8 @@ export default function RvAdjustmentForm() {
           handleUnitName();
       }, []);
     
+
+      console.log("currrrrent", currentPageData);
     return (
         <div>
             
@@ -171,7 +191,9 @@ export default function RvAdjustmentForm() {
                         options={unitdata}
                         placeholder="Select Unit"
                         onChange={handleUnitSelect}
-                        selected={selectedUnitName}
+                      //  selected={selectedUnitName}
+                      selected={selectedUnitName ? [selectedUnitName] : []}
+                        
                     />
                 </div>
 
@@ -246,6 +268,8 @@ export default function RvAdjustmentForm() {
                                     <th style={{ whiteSpace: 'nowrap' }}>Rv Date</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Description</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Txn Type</th>
+                                    <th>HO_PrvId</th>
+
                                 </tr>
                             </thead>
 
@@ -270,6 +294,7 @@ export default function RvAdjustmentForm() {
                                                 <td style={{ whiteSpace: 'nowrap' }}>{item.Formatted_Recd_PV_Date}</td>
                                                 <td>{item.Description}</td>
                                                 <td>{item.TxnType}</td>
+                                                <td>{item.HO_PrvId}</td>
                                             </tr>
                                         )
                                     }) :''
