@@ -9,11 +9,12 @@ import { Modal } from "react-bootstrap";
 
 export default function CreateNewForm() {
   const navigate = useNavigate();
-  let hoprvid = '';
+
   const location = useLocation();
   // const rowData = location.state ? location.state : "";
   const { select, CustCode, id } = location.state ? location.state : "";
   console.log("rowdata", select, CustCode, id);
+  const [hoprvid, setHoprvid] = useState(0);
   const [getUnit, setGetUnit] = useState("");
   const [getCustomer, setGetCustomer] = useState("");
   const [getCustCode, setGetCustCode] = useState("");
@@ -86,7 +87,7 @@ export default function CreateNewForm() {
     if (select === 0) {
       updateHOPrvid();
     }
-  }, [select])
+  }, [])
 
   const updateHOPrvid = async () => {
     const resp = await axios.get(
@@ -94,19 +95,27 @@ export default function CreateNewForm() {
     );
 
     console.log("responsee", resp.data.nextHOPrvId);
-    hoprvid = resp.data.nextHOPrvId;
+   
+    setHoprvid(resp.data.nextHOPrvId);
+    // setRvData((prevRvData) => ({
+    //   ...prevRvData,
+
+    //   postData: {
+    //     ...prevRvData.data,
+    //     HO_PrvId: resp.data.nextHOPrvId ,
+    //     // Amount: hoprvIdResponse.data[0]?.Amount || 0,
+    //   },
+    // }));
+
+
     setRvData((prevRvData) => ({
       ...prevRvData,
-
       postData: {
-        ...prevRvData.data,
-        HO_PrvId: resp.data.nextHOPrvId || "",
-        // Amount: hoprvIdResponse.data[0]?.Amount || 0,
+        ...prevRvData.postData, // Corrected line
+        HO_PrvId: resp.data.nextHOPrvId,
       },
     }));
-
-
-
+    
 
 
     if (CustCode !== "") {
@@ -139,7 +148,8 @@ export default function CreateNewForm() {
   };
 
  
-  console.log("hoprvd post", rvData.postData);
+  console.log("hoprvd post", rvData.postData.HO_PrvId);
+  console.log("hoprvid", hoprvid);
 
   // const [postData, setPostData] = useState(initial);
 
@@ -378,7 +388,7 @@ export default function CreateNewForm() {
       }
 
       // Extract On Account value from rvData.postData
-console.log("hoprvid add ()", rvData.postData.HO_PrvId);
+console.log("hoprvid add ()", hoprvid);
       const rowsToAdd = [];
 
       for (const row of selectedRows) {
