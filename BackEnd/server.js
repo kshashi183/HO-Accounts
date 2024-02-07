@@ -86,3 +86,6 @@ app.use("/createnew", createnew);
 
 const fromUnitUpdateSyncRouter = require("./routes/HOAccounts/Sync/FromUnitUpdate");
 app.use('/fromUnitUpdate', fromUnitUpdateSyncRouter)
+
+const userRouter = require("./routes/user");
+app.use("/user", userRouter);

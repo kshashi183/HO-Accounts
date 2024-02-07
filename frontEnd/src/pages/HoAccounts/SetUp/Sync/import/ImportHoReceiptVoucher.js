@@ -15,7 +15,10 @@ export default function ImportHoReceiptVoucher() {
             <th style={{whiteSpace:"nowrap"}}>Customer Name</th>
           </tr>
         </thead>
-        <tbody className="tablebody"></tbody>
+        <tbody className="tablebody">
+
+          
+        </tbody>
       </Table>
     </div>
   );

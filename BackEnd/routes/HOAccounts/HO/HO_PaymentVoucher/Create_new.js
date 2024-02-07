@@ -31,7 +31,10 @@ createnew.get('/ho_openInvoices', (req, res) => {
 
 
   createnew.get('/getFormData', (req, res) => {
-    const receipt_id = req.query.receipt_id
+  const receipt_id = req.query.receipt_id
+  //const receipt_id = 245
+
+    
     console.log("custcodeeeee", receipt_id);
     const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' `;
     //  const sql=`

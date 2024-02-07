@@ -296,7 +296,7 @@ export default function UnitDetails() {
 
   useEffect(() => {
     if (getUnit.length > 0) {
-      setSelectRow(getUnit[0]);
+      selectedRowFun(getUnit[0],0)
     } else {
       setSelectRow(initial);
     }
@@ -426,8 +426,43 @@ export default function UnitDetails() {
   }
 
 
-
-
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+  
+  
+  
+  
+  const sortedData = () => {
+    const dataCopy = [...getUnit];
+  
+    if (sortConfig.key) {
+      dataCopy.sort((a, b) => {
+        let valueA = a[sortConfig.key];
+        let valueB = b[sortConfig.key];
+   
+       
+        // if (sortConfig.key === "Amount") {
+        //   valueA = parseFloat(valueA);
+        //   valueB = parseFloat(valueB);
+        // }
+   
+        if (valueA < valueB) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (valueA > valueB) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return dataCopy;
+  };
   return (
     <div>
       {
@@ -550,12 +585,14 @@ export default function UnitDetails() {
             >
               <thead className="tableHeaderBGColor">
                 <tr style={{ whiteSpace: "nowrap" }}>
-                  <th >Unit Id</th>
-                  <th >Unit Name</th>
-                  <th>Unit_Address</th>
+                <th onClick={() => requestSort("UnitID")} >Unit Id</th>
+                  <th 
+                   onClick={() => requestSort("UnitName")}
+                  >Unit Name</th>
+                  {/* <th>Unit_Address</th>
                   <th>Place</th>
                   <th>State</th>
-                  <th>Country</th>
+                  <th>Country</th> */}
 
 
                 </tr>
@@ -563,7 +600,7 @@ export default function UnitDetails() {
               <tbody className="tablebody">
 
                 {
-                  getUnit.map((item, key) => {
+                  sortedData().map((item, key) => {
                     return (
                       <>
                         <tr onClick={() => selectedRowFun(item, key)}
@@ -573,10 +610,10 @@ export default function UnitDetails() {
 
                           <td>{item.UnitID} </td>
                           <td>{item.UnitName} </td>
-                          <td>{item.Unit_Address}</td>
+                          {/* <td>{item.Unit_Address}</td>
                           <td>{item.Place}</td>
                           <td>{item.State}</td>
-                          <td>{item.Country}</td>
+                          <td>{item.Country}</td> */}
                         </tr>
 
                       </>

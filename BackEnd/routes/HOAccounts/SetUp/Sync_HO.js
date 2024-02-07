@@ -26,7 +26,7 @@ sync_HO.get('/openInvoice', (req,res)=>{
     FROM magod_hq_mis.unit_invoices_list u
     WHERE u.UnitName = '${selectedUnit}'
       AND u.DCStatus NOT LIKE 'Closed'
-      AND u.DCStatus NOT LIKE 'Cancelled' LIMIT 100
+      AND u.DCStatus NOT LIKE 'Cancelled'
     `
    
     setupQueryMod(sql,(err, result)=>{
@@ -44,7 +44,7 @@ sync_HO.get('/getReceipts', (req,res)=>{
     const selectedUnit = req.query.selectedUnit;
     const sql=`SELECT u.PRV_Status AS ReceiptStatus, u.*
     FROM magod_hq_mis.unit_payment_recd_voucher_register u
-    WHERE u.Unitname = '${selectedUnit}' AND u.PRV_Status NOT LIKE 'Closed' LIMIT 100;
+    WHERE u.Unitname = '${selectedUnit}' AND u.PRV_Status NOT LIKE 'Closed' ;
     `
    
     setupQueryMod(sql,(err, result)=>{

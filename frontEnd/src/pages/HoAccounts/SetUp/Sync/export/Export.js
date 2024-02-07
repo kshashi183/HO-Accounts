@@ -26,11 +26,32 @@ export default function Export({data,selectedUnit}) {
         CashInHand: 0,
       },
       unit_recipts_register: data.open_rec.map((item, index) => ({
-        Id: -1 - index,
+        Id: item.Id,
         Unitname: item.Unitname,
-       RecdPVID:item.RecdPVID
-        
-        
+       RecdPVID:item.RecdPVID,
+       selected:"0",
+       Sync_HOId:item.Sync_HOId,
+       Unit_UId:item.Unit_UId,
+       Recd_PVNo:item.Recd_PVNo,
+       Recd_PV_Date:item.Recd_PV_Date,
+       ReceiptStatus:item.ReceiptStatus,
+       Cust_code:item.Cust_code,
+       CustName:item.CustName,
+       Amount:item.Amount,
+       Adjusted:"0",
+       DocuNo:'',
+       Description:item.Description,
+       HORef:item.HORef,
+       HOPrvId:item.HOPrvId,
+       Tally_Uid:item.Tally_Uid,
+       Updated:"Updated",
+       On_account:item.On_account,
+       TxnType:item.TxnType,
+       TallyUpdate:item.TallyUpdate,
+       PRV_Status:item.ReceiptStatus
+
+
+
       })),
       unit_invoices_list: data.open_inv.map((item, index) => ({
         Id: -1 - index,

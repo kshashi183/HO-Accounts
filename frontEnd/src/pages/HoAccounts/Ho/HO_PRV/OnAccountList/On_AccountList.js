@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import {Col, Table } from "react-bootstrap";
+import { Col, Table } from "react-bootstrap";
 import { Typeahead } from 'react-bootstrap-typeahead';
 import axios from 'axios';
 import { baseURL } from '../../../../../api/baseUrl';
@@ -17,11 +17,13 @@ import { toast } from "react-toastify";
 
 export default function On_AccountList() {
   const navigate = useNavigate();
-const [onAccountList,setOnAccountList]=useState([])
+  const [onAccountList, setOnAccountList] = useState([])
 
   const [selectedUnitName, setSelectedUnitName] = useState([])
   const [selectUnit, setSelectUnit] = useState([])
   const [getName, setGetName] = useState("");
+
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
   const handleUnitSelect = (selected) => {
     const selectedCustomer = selected[0];
@@ -143,6 +145,38 @@ const [onAccountList,setOnAccountList]=useState([])
       toast.error("Select Row");
     }
   };
+
+  
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+
+  const sortedData = () => {
+    // const dataCopy = [...despatchTable];
+    // const filtered = selectedCustomer
+    //   ? dataCopy.filter((data) => data.Cust_Name === selectedCustomer.label)
+    //   : dataCopy;
+ 
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+ 
+    
+  };
   return (
     <>
 
@@ -169,7 +203,7 @@ const [onAccountList,setOnAccountList]=useState([])
 
         <button className="button-style mt-3 group-button col-md-3"
           style={{ width: "150px" }}
-         onClick={openVoucherButton}
+          onClick={openVoucherButton}
         >
           Open Voucher
         </button>
@@ -240,7 +274,7 @@ const [onAccountList,setOnAccountList]=useState([])
                       <tr
                         // key={itemIndex}
                         style={{ whiteSpace: 'nowrap' }}
-                     
+
                         className={key === selectRow?.index ? 'selcted-row-clr' : ''} key={item.RecdPVID}
                         onClick={() => selectedRowFun(item, key)}
                       >

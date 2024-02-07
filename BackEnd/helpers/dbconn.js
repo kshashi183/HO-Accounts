@@ -1,24 +1,39 @@
 var mysql = require("mysql2");
 
+require("dotenv").config();
+
+
+const dbHost = process.env.DB_HOST;
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const dbDatabase1 = process.env.DB_DATABASE_1;
+const dbDatabase2 = process.env.DB_DATABASE_2;
+const dbDatabase3 = process.env.DB_DATABASE_3;
+const dbDatabase4 = process.env.DB_DATABASE_4;
+const dbDatabase5 = process.env.DB_DATABASE_5;
+const dbDatabase6 = process.env.DB_DATABASE_6;
+const dbDatabase7 = process.env.DB_DATABASE_7
+
+
 var dailyReport = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "magodmis",
+  host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database:dbDatabase1,
 });
 
 var setupConn = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "magod_setup",
+  host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbDatabase2,
 });
 
 var hqConnection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "magod_hq_mis",
+  host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbDatabase7,
 });
 
 // const setupConn = mysql.createConnection({
@@ -194,10 +209,10 @@ const hqQuery = (query, values) => {
 // });
 
 const misConn = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "magodmis",
+  host: dbHost,
+  user: dbUser,
+  password: dbPassword,
+  database: dbDatabase1,
   dateStrings: true,
 });
 
