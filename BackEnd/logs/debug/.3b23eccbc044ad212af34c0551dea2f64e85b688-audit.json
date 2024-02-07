@@ -236,6 +236,7 @@
             "hash": "b8e86f02e99224fd78c729caaaf45e6ebb742c328a4e58c3bad4c022fc4a038f"
         },
         {
+<<<<<<< HEAD
             "date": 1706681045907,
             "name": "logs\\debug\\2024-01-31-11.log",
             "hash": "071ea183157077ff4db60de37f99b3f01dd5090c0a6b402ab93107c5eafcc945"
@@ -324,6 +325,11 @@
             "date": 1707278198498,
             "name": "logs\\debug\\2024-02-07-09.log",
             "hash": "f7abdb973c9c90e1dd52950893ae7eacb8d5d0452ec410cafd3b7318fbb1df2c"
+=======
+            "date": 1707278720777,
+            "name": "logs\\debug\\2024-02-07-09.log",
+            "hash": "6f541e32edf8771a58dff343c1f50f7de89f936ff9ebc89b3dc5d8a091fae769"
+>>>>>>> 5dd90d10b150aa8cd1675919c85c995f125c32e5
         }
     ],
     "hashType": "sha256"
