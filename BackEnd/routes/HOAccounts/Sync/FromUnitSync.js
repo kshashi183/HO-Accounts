@@ -85,7 +85,7 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
 
             // Add the customer details to the insertedData array
             insertedData.push({
-              ...custItem,
+              // ...data,
               Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
             });
           } catch (error) {
@@ -321,10 +321,10 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
               invItem.Unit_UId || 0,
             ]);
 
-            console.log(Sync_HOId);
+            // console.log(Sync_HOId);
             
             invResponseData.push({
-              ...invItem,
+              // ...data,
               Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
             });
           } catch (error) {
@@ -388,7 +388,7 @@ fromUnitSyncRouter.post("/saveInvTaxesDataIntoHoDB", async (req, res, next) => {
             ]);
 
             taxResponseData.push({
-              ...taxItem,
+              // ...data,
               Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
             });
           } catch (error) {
@@ -465,7 +465,7 @@ fromUnitSyncRouter.post("/saveInvSummaryDataIntoHoDB",
               ]);
 
               dcResponseData.push({
-                ...dcItem,
+                // ...data,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
               });
             } catch (error) {
@@ -527,8 +527,8 @@ fromUnitSyncRouter.post("/saveCombInvDataIntoHoDB", async (req, res, next) => {
             const data = await hqQuery(sqlInvQuery, values);
 
             invDaCombResponseData.push({
-              ...invCombItem,
-              // Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+              // ...data,
+              Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
             });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
@@ -601,10 +601,10 @@ fromUnitSyncRouter.post("/saveReceiptRegisterDataIntoHoDB",
               ]);
 
               // console.log(`Sync_HOId: ${Sync_HOId}`);
-              console.log(Sync_HOId);
+              // console.log(Sync_HOId);
 
               receiptResponseData.push({
-                ...receiptItem,
+                // ...data,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
               });
             } catch (error) {
@@ -679,7 +679,7 @@ fromUnitSyncRouter.post("/saveReceptDetailsDataIntoHoDB",
               // console.log(`Sync_HOId: ${Sync_HOId}`);
 
               detailsResponseData.push({
-                ...receiptItem,
+                // ...data,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
               });
             } catch (error) {
@@ -764,9 +764,9 @@ fromUnitSyncRouter.post("/saveCanceledVrListDataIntoHoDB",
               ];
 
               // Insert or update the data
-              const data = await hqQuery(sqlInvQuery, values);
-
               const update = await hqQuery(updateQuery);
+              
+              const data = await hqQuery(sqlInvQuery, values);
 
               // Retrieve Sync_HOId
               const [Sync_HOId] = await hqQuery(selectInvQuery, [
@@ -777,7 +777,7 @@ fromUnitSyncRouter.post("/saveCanceledVrListDataIntoHoDB",
               // console.log(Sync_HOId);
 
               canceledResponseData.push({
-                ...receiptItem,
+                // ...data,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
               });
             } catch (error) {
