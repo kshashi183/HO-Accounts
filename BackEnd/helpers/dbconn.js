@@ -2,9 +2,9 @@ var mysql = require("mysql2");
 
 require("dotenv").config();
 
-
 const dbHost = process.env.DB_HOST;
 const dbUser = process.env.DB_USER;
+const dbPort = process.env.DB_PORT;
 const dbPassword = process.env.DB_PASSWORD;
 const dbDatabase1 = process.env.DB_DATABASE_1;
 const dbDatabase2 = process.env.DB_DATABASE_2;
@@ -12,19 +12,20 @@ const dbDatabase3 = process.env.DB_DATABASE_3;
 const dbDatabase4 = process.env.DB_DATABASE_4;
 const dbDatabase5 = process.env.DB_DATABASE_5;
 const dbDatabase6 = process.env.DB_DATABASE_6;
-const dbDatabase7 = process.env.DB_DATABASE_7
-
+const dbDatabase7 = process.env.DB_DATABASE_7;
 
 var dailyReport = mysql.createConnection({
   host: dbHost,
   user: dbUser,
+  port: dbPort,
   password: dbPassword,
-  database:dbDatabase1,
+  database: dbDatabase1,
 });
 
 var setupConn = mysql.createConnection({
   host: dbHost,
   user: dbUser,
+  port: dbPort,
   password: dbPassword,
   database: dbDatabase2,
 });
@@ -32,6 +33,7 @@ var setupConn = mysql.createConnection({
 var hqConnection = mysql.createConnection({
   host: dbHost,
   user: dbUser,
+  port: dbPort,
   password: dbPassword,
   database: dbDatabase7,
 });
@@ -209,17 +211,11 @@ const hqQuery = (query, values) => {
 // });
 
 const misConn = mysql.createConnection({
-<<<<<<< HEAD
   host: dbHost,
   user: dbUser,
+  port: dbPort,
   password: dbPassword,
   database: dbDatabase1,
-=======
-  host: "localhost",
-  user: "root",
-  password: "password",
-  database: "magodmis",
->>>>>>> 445e63f457da15d16e0d52bfbd591b7b3277ddb9
   dateStrings: true,
 });
 
