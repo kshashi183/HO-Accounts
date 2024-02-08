@@ -86,6 +86,45 @@ export default function UnitReceiptListForm() {
 
 
 
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const requestSort = (key) => {
+      let direction = "asc";
+      if (sortConfig.key === key && sortConfig.direction === "asc") {
+        direction = "desc";
+      }
+      setSortConfig({ key, direction });
+    };
+    
+    
+    
+    
+    const sortedData = () => {
+      const dataCopy = [...getClosedInvoices];
+    
+      if (sortConfig.key) {
+        dataCopy.sort((a, b) => {
+          let valueA = a[sortConfig.key];
+          let valueB = b[sortConfig.key];
+     
+         
+          if ( sortConfig.key === "Receive_Now"
+          || sortConfig.key === "Amt_received" 
+          || sortConfig.key === "Inv_Amount" ) {
+            valueA = parseFloat(valueA);
+            valueB = parseFloat(valueB);
+          }
+     
+          if (valueA < valueB) {
+            return sortConfig.direction === "asc" ? -1 : 1;
+          }
+          if (valueA > valueB) {
+            return sortConfig.direction === "asc" ? 1 : -1;
+          }
+          return 0;
+        });
+      }
+      return dataCopy;
+    };
 
  
     return (
@@ -252,21 +291,21 @@ export default function UnitReceiptListForm() {
 
                     <Table striped className="table-data border">
                         <thead className="tableHeaderBGColor">
-                            <tr>
+                            <tr style={{ whiteSpace: 'nowrap' }}>
 
 
-                                <th style={{ whiteSpace: 'nowrap' }}>Srl</th>
+                                <th onClick={() => requestSort("Recd_PVNo")}>Srl</th>
 
-                                <th style={{ whiteSpace: 'nowrap' }}>Inv No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Date</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Type</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Amount</th>
+                                <th onClick={() => requestSort("Inv_No")}>Inv No</th>
+                                <th onClick={() => requestSort("Formatted_Inv_date")}>Date</th>
+                                <th onClick={() => requestSort("Inv_Type")}>Type</th>
+                                <th onClick={() => requestSort("Inv_Amount")}>Amount</th>
 
-                                <th style={{ whiteSpace: 'nowrap' }}>Received</th>
+                                <th onClick={() => requestSort("Amt_received")}>Received</th>
 
-                                <th style={{ whiteSpace: 'nowrap' }}>Receivew Now</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Ref No</th>
-                                <th style={{ whiteSpace: 'nowrap' }}>Inv Updated</th>
+                                <th onClick={() => requestSort("Receive_Now")}>Receivew Now</th>
+                                <th onClick={() => requestSort("RefNo")}>Ref No</th>
+                                <th >Inv Updated</th>
 
 
                             </tr>
@@ -276,7 +315,7 @@ export default function UnitReceiptListForm() {
                         <tbody className='tablebody'>
 
                             {
-                                getClosedInvoices.map((item, index) => {
+                                sortedData().map((item, index) => {
                                     return (
                                         <tr style={{ whiteSpace: 'nowrap' }}>
                                             <td>{index + 1}</td>

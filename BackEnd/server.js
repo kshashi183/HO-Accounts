@@ -6,7 +6,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 
 const dailyReportRouter = require("./routes/HOAccounts/Unit/DailyReport");
 const monthlyReportRouter = require("./routes/HOAccounts/Ho/MonthlyReportHO");
-const createNewRouter = require("./routes/HOAccounts/Ho/HOprvCreateNew");
+
 
 require("dotenv").config();
 
@@ -53,7 +53,7 @@ app.use("/customerOutstanding", customerOutstanding);
 
 app.use("/dailyReport", dailyReportRouter);
 app.use("/monthlyReportData", monthlyReportRouter);
-app.use("/hoCreateNew", createNewRouter);
+
 
 const unitRV_Adjustment = require("./routes/HOAccounts/HO/Unit_Rv_Adjustment");
 app.use("/unitRV_Adjustment", unitRV_Adjustment);
@@ -84,5 +84,11 @@ app.use("/prvListdata", prvListdata);
 const createnew = require("./routes/HOAccounts/HO/HO_PaymentVoucher/Create_new");
 app.use("/createnew", createnew);
 
+const fromUnitUpdateSyncRouter = require("./routes/HOAccounts/Sync/FromUnitUpdate");
+app.use('/fromUnitUpdate', fromUnitUpdateSyncRouter)
+
 const userRouter = require("./routes/user");
 app.use("/user", userRouter);
+
+const createNewRouter = require("./routes/HOAccounts/HO/HOprvCreateNew");
+app.use("/hoCreateNew", createNewRouter);

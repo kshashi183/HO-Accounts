@@ -6,13 +6,17 @@ const { setupQueryMod, misQuery } = require("../../../helpers/dbconn")
 
 unitRV_Adjustment.get('/rvAdjustment', (req, res) => {
   const custcode = req.query.selectedCustCode;
-  //  console.log("rvadjust custcode",custcode);
+  
+  const unitObject = req.query.selectedUnitName;
+  const unit = unitObject && unitObject.length > 0 ? unitObject[0].UnitName : null;
+ // console.log("unitt",unit);
   const sql1 = `SELECT
 u.Id,
 u.Unitname,
 u.RecdPVID,
 u.Recd_PVNo,
 u.HOPrvId,
+u.Unit_UId,
 DATE_FORMAT(u.Recd_PV_Date, '%d-%m-%Y') AS Formatted_Recd_PV_Date,u.Cust_code,
 u.CustName,u.TxnType,u.Amount,u.DocuNo,u.Description,u.On_account,u.PRV_Status AS ReceiptStatus
 FROM
@@ -25,12 +29,14 @@ u.Id,
 u.Unitname,
 u.RecdPVID,
 u.Recd_PVNo,
+u.HOPrvId,
+u.Unit_UId,
 DATE_FORMAT(u.Recd_PV_Date, '%d-%m-%Y') AS Formatted_Recd_PV_Date,u.Cust_code,
 u.CustName,u.TxnType,u.Amount,u.DocuNo,u.Description,u.On_account,u.PRV_Status AS ReceiptStatus
 FROM
 magod_hq_mis.unit_payment_recd_voucher_register u
 WHERE
-u.PRV_Status = 'Created' AND Unitname='Jigani'  LIMIT 1000;`
+u.PRV_Status = 'Created' AND Unitname='Jigani'  ;`
 
 
 

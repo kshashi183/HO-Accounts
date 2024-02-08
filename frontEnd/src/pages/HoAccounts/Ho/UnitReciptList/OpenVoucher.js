@@ -92,7 +92,7 @@ export default function OpenVoucher() {
         axios.get(baseURL + '/unitReceiptList/receiptBasedOnCustomer', {
             params: {
                 selectedCustCode: selectedCustCode,
-                selectedUnitName:selectedUnitName
+                selectedUnitName: selectedUnitName
             },
         })
             .then((res) => {
@@ -109,7 +109,7 @@ export default function OpenVoucher() {
 
     // const [selectedOption, setSelectedOption] = useState([{ Cust_name: 'MAGOD LASER MACHINING PVT LTD' }]);
     const [selectedOption, setSelectedOption] = useState([]);
-    const [selectedUnitName, setSelectedUnitName]=useState([])
+    const [selectedUnitName, setSelectedUnitName] = useState([])
     const handleTypeaheadChange = (selectedOptions) => {
         if (selectedOptions && selectedOptions.length > 0) {
             const selectedCustomer = selectedOptions[0];
@@ -154,9 +154,9 @@ export default function OpenVoucher() {
     }
 
 
-    
 
-    const[selectUnit, setSelectUnit]=useState([])
+
+    const [selectUnit, setSelectUnit] = useState([])
     const [getName, setGetName] = useState("");
 
     const handleUnitSelect = (selected) => {
@@ -164,18 +164,18 @@ export default function OpenVoucher() {
         setSelectUnit(selected); // Update selected option state
         setGetName(selectedCustomer ? selectedCustomer.UnitName : "");
         setSelectedUnitName(selected)
-      };
+    };
 
     const [unitdata, setunitData] = useState([]);
     const handleUnitName = () => {
         axios
             .get(baseURL + '/unitReceiptList/getunitName')
             .then((res) => {
-                 console.log("firstTable", res.data)
+                console.log("firstTable", res.data)
                 setunitData(res.data);
                 if (res.data.length > 0) {
-                    setSelectedUnitName([res.data[0]]);
-                  }
+                    setSelectedUnitName([res.data[4]]);
+                }
             })
             .catch((err) => {
                 console.log("err in table", err);
@@ -185,6 +185,45 @@ export default function OpenVoucher() {
     useEffect(() => {
         handleUnitName();
     }, []);
+
+
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const requestSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+          direction = "desc";
+        }
+        setSortConfig({ key, direction });
+      };
+      
+      
+      
+      
+      const sortedData = () => {
+        const dataCopy = [...currentPageData];
+      
+        if (sortConfig.key) {
+          dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+       
+           
+            if (sortConfig.key === "Amount" || sortConfig.key === "On_account"  ) {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+       
+            if (valueA < valueB) {
+              return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+              return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+        return dataCopy;
+      };
     return (
         <div>
             <div className='col-md-12'>
@@ -231,7 +270,7 @@ export default function OpenVoucher() {
             <div className='row'>
                 <div className='col-md-3'>
                     <label className="form-label">Select Unit</label>
-                    
+
 
                     <Typeahead
                         id="basic-example"
@@ -249,7 +288,7 @@ export default function OpenVoucher() {
 
                 <div className='col-md-3'>
                     <label className="form-label">Select Customer</label>
-                    
+
                     <Typeahead
 
                         id="basic-example"
@@ -270,17 +309,17 @@ export default function OpenVoucher() {
 
                 <Table striped className="table-data border">
                     <thead className="tableHeaderBGColor">
-                        <tr >
-                            <th style={{ whiteSpace: 'nowrap' }}>Receipt VrNo</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Receipt Status</th>
+                        <tr style={{ whiteSpace: 'nowrap' }} >
+                            <th onClick={() => requestSort("Recd_PVNo")} >Receipt VrNo</th>
+                            <th >Receipt Status</th>
 
 
-                            <th style={{ whiteSpace: 'nowrap' }}>Date</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Customer</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Transaction Type</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Amount</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>On Account</th>
-                            <th style={{ whiteSpace: 'nowrap' }}>Description</th>
+                            <th onClick={() => requestSort("Formatted_Recd_PV_Date")}>Date</th>
+                            <th onClick={() => requestSort("CustName")}>Customer</th>
+                            <th onClick={() => requestSort("TxnType")}>Transaction Type</th>
+                            <th onClick={() => requestSort("Amount")}>Amount</th>
+                            <th onClick={() => requestSort("On_account")}>On Account</th>
+                            <th onClick={() => requestSort("Description")}>Description</th>
 
 
                         </tr>
@@ -290,7 +329,7 @@ export default function OpenVoucher() {
                     <tbody className='tablebody'>
 
                         {
-                            currentPageData.map((item, key) => {
+                            sortedData().map((item, key) => {
                                 return (
                                     <tr
                                         onClick={() => {

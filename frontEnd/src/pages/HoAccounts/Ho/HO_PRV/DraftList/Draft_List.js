@@ -15,6 +15,7 @@ const [drftListData, setDraftListData]=useState([])
     
 const itemsPerPage = 100; // Number of items per page
 const [currentPage, setCurrentPage] = useState(0);
+const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
 // Calculate the start and end indices for the current page
 const startIndex = currentPage * itemsPerPage;
@@ -68,6 +69,77 @@ useEffect(() => {
       };
 
       console.log("sel", selectRow);
+
+
+      const requestSort = (key) => {
+        let direction = "asc";
+        if (sortConfig.key === key && sortConfig.direction === "asc") {
+          direction = "desc";
+        }
+        setSortConfig({ key, direction });
+      };
+    
+    
+      // const sortedData = () => {
+      //    const dataCopy = [...currentPageData];
+        
+     
+      //   // if (sortConfig.key) {
+      //   //   dataCopy.sort((a, b) => {
+      //   //     if (a[sortConfig.key] < b[sortConfig.key]) {
+      //   //       return sortConfig.direction === "asc" ? -1 : 1;
+      //   //     }
+      //   //     if (a[sortConfig.key] > b[sortConfig.key]) {
+      //   //       return sortConfig.direction === "asc" ? 1 : -1;
+      //   //     }
+      //   //     return 0;
+      //   //   });
+      //   // }
+  
+      //   if (sortConfig.key) {
+      //     dataCopy.sort((a, b) => {
+      //       const valueA = a[sortConfig.key];
+      //       const valueB = b[sortConfig.key];
+       
+      //       if (typeof valueA === 'number' && typeof valueB === 'number') {
+      //         // If both values are numbers, perform numerical comparison
+      //         return (valueA - valueB) * (sortConfig.direction === 'asc' ? 1 : -1);
+      //       } else {
+      //         // If one or both values are not numbers, fall back to string comparison
+      //         return valueA.toString().localeCompare(valueB.toString()) * (sortConfig.direction === 'asc' ? 1 : -1);
+      //       }
+      //     });
+      //   }
+  
+      //   return dataCopy;
+      // }
+  
+      const sortedData = () => {
+        const dataCopy = [...currentPageData];
+        
+        if (sortConfig.key) {
+          dataCopy.sort((a, b) => {
+            let valueA = a[sortConfig.key];
+            let valueB = b[sortConfig.key];
+       
+            // Convert only for the "DC_No" column
+            if (sortConfig.key === "Amount") {
+              valueA = parseFloat(valueA);
+              valueB = parseFloat(valueB);
+            }
+       
+            if (valueA < valueB) {
+              return sortConfig.direction === "asc" ? -1 : 1;
+            }
+            if (valueA > valueB) {
+              return sortConfig.direction === "asc" ? 1 : -1;
+            }
+            return 0;
+          });
+        }
+        return dataCopy;
+      };
+  
     return (
         <>
      
@@ -103,11 +175,17 @@ useEffect(() => {
                     <thead className="tableHeaderBGColor">
                         <tr style={{whiteSpace:'nowrap'}}>
                             <th>HO Ref</th>
-                            <th>Date</th>
+                            <th
+                            onClick={() => requestSort("HoRefDate")}
+                            >Date</th>
 
                             <th>Unitname</th>
-                            <th>Customer</th>
-                            <th>Amount</th>
+                            <th
+                              onClick={() => requestSort("CustName")}
+                            >Customer</th>
+                            <th
+                             onClick={() => requestSort("Amount")}
+                            >Amount</th>
                             <th>Description</th>
                             <th>Status</th>
 
@@ -116,8 +194,8 @@ useEffect(() => {
 
                     <tbody className='tablebody'>
                        {
-                        currentPageData
-                        ? currentPageData.map((item,key)=>(
+                       sortedData()
+                       ? sortedData().map((item,key)=>(
                            
                                 <>
                                 <tr style={{whiteSpace:'nowrap'}}

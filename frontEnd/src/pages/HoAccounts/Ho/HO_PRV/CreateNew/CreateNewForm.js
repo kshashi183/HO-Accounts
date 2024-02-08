@@ -11,8 +11,10 @@ export default function CreateNewForm() {
   const navigate = useNavigate();
 
   const location = useLocation();
-  const rowData = location.state ? location.state : "";
-  // console.log("rowdata", rowData);
+  // const rowData = location.state ? location.state : "";
+  const { select, CustCode, id } = location.state ? location.state : "";
+  console.log("rowdata", select, CustCode, id);
+  const [hoprvid, setHoprvid] = useState(0);
   const [getUnit, setGetUnit] = useState("");
   const [getCustomer, setGetCustomer] = useState("");
   const [getCustCode, setGetCustCode] = useState("");
@@ -25,13 +27,6 @@ export default function CreateNewForm() {
   const [unitName, setUnitName] = useState("Jigani");
   const [showPostModal, setShowPostModal] = useState(false);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
 
   const [rvData, setRvData] = useState({
     apiData: null,
@@ -87,6 +82,74 @@ export default function CreateNewForm() {
     Description: "",
     selectedCustomer: "",
   };
+
+  useEffect(() => {
+    if (select === 0) {
+      updateHOPrvid();
+    }
+  }, [])
+
+  const updateHOPrvid = async () => {
+    const resp = await axios.get(
+      baseURL + `/createnew/updateHoprvID`
+    );
+
+    console.log("responsee", resp.data.nextHOPrvId);
+   
+    setHoprvid(resp.data.nextHOPrvId);
+    // setRvData((prevRvData) => ({
+    //   ...prevRvData,
+
+    //   postData: {
+    //     ...prevRvData.data,
+    //     HO_PrvId: resp.data.nextHOPrvId ,
+    //     // Amount: hoprvIdResponse.data[0]?.Amount || 0,
+    //   },
+    // }));
+
+
+    setRvData((prevRvData) => ({
+      ...prevRvData,
+      postData: {
+        ...prevRvData.postData, // Corrected line
+        HO_PrvId: resp.data.nextHOPrvId,
+      },
+    }));
+    
+
+
+    if (CustCode !== "") {
+      try {
+        const response = await axios.get(
+          baseURL + `/createnew/getFormData?cust_code=${CustCode}`
+        );
+        console.log("cudtt", response.data.Result[0].Cust_code);
+        getReceipts(
+          response.data.Result[0].Cust_code,
+          response.data.Result[0]
+        );
+      } catch (error) {
+        console.error("Error making API call:", error);
+      }
+    }
+
+
+
+  }
+
+
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+ 
+  console.log("hoprvd post", rvData.postData.HO_PrvId);
+  console.log("hoprvid", hoprvid);
 
   // const [postData, setPostData] = useState(initial);
 
@@ -325,7 +388,7 @@ export default function CreateNewForm() {
       }
 
       // Extract On Account value from rvData.postData
-
+console.log("hoprvid add ()", hoprvid);
       const rowsToAdd = [];
 
       for (const row of selectedRows) {
@@ -349,7 +412,8 @@ export default function CreateNewForm() {
 
       const response = await axios.post(baseURL + "/hoCreateNew/addInvoice", {
         selectedRows: rowsToAdd,
-        HO_PrvId: rvData.postData.HO_PrvId,
+        // HO_PrvId: rvData.postData.HO_PrvId,
+        HO_PrvId: hoprvid,
         unit: getUnit,
       });
 
@@ -446,13 +510,16 @@ export default function CreateNewForm() {
 
     try {
       const resp = await axios.get(
-        baseURL + `/createnew/getleftTable?receipt_id=${rowData}`
+        baseURL + `/createnew/getleftTable?receipt_id=${hoprvid}`
       );
+
+
 
       try {
         const response = await axios.get(
           baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}`
         );
+        console.log("open inv ", resp);
 
         setRvData((prevRvData) => ({
           ...prevRvData,
@@ -460,7 +527,7 @@ export default function CreateNewForm() {
             ...prevRvData.data,
             inv_data: response.data.Result,
             receipt_details: resp.data.Result,
-            receipt_id: rowData,
+          //  receipt_id: rowData,
           },
         }));
       } catch (error) {
@@ -649,26 +716,49 @@ export default function CreateNewForm() {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (rowData !== "") {
-        try {
-          const response = await axios.get(
-            baseURL + `/createnew/getFormData?receipt_id=${rowData}`
-          );
-          console.log("cudtt", response.data.Result[0]);
-          getReceipts(
-            response.data.Result[0].Cust_code,
-            response.data.Result[0]
-          );
-        } catch (error) {
-          console.error("Error making API call:", error);
-        }
-      }
-    };
+  // useEffect(() => {
+  //   console.log("row dataaaaaaa", rowData.select);
+  //   const fetchData = async () => {
+  //     if (rowData !== "") {
+  //       try {
+  //         const response = await axios.get(
+  //           baseURL + `/createnew/getFormData?receipt_id=${rowData.select}`
+  //         );
+  //         console.log("cudtt", response.data.Result[0]);
+  //         getReceipts(
+  //           response.data.Result[0].Cust_code,
+  //           response.data.Result[0]
+  //         );
+  //       } catch (error) {
+  //         console.error("Error making API call:", error);
+  //       }
+  //     }
+  //   };
 
-    fetchData();
-  }, [rowData]);
+  //   fetchData();
+  // }, [rowData]);
+
+  // useEffect(() => {
+  //   console.log("row dataaaaaaa", rowData.select);
+  //   const fetchData = async () => {
+  //     if (rowData !== "") {
+  //       try {
+  //         const response = await axios.get(
+  //           baseURL + `/createnew/getFormData?cust_code=${rowData.select}`
+  //         );
+  //         console.log("cudtt", response.data.Result[0]);
+  //         getReceipts(
+  //           response.data.Result[0].Cust_code,
+  //           response.data.Result[0]
+  //         );
+  //       } catch (error) {
+  //         console.error("Error making API call:", error);
+  //       }
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [rowData]);
 
   function formatAmount(amount) {
     // Assuming amount is a number
@@ -748,11 +838,11 @@ export default function CreateNewForm() {
             placeholder="Select Unit"
             onChange={handleSelectUnit}
             selected={selectedOption}
-            disabled={
-              rvData.postData.Status != "Draft"
-                ? rvData.postData.Status
-                : ""
-            }
+          // disabled={
+          //   rvData.postData.Status != "Draft"
+          //     ? rvData.postData.Status
+          //     : ""
+          // }
           />
         </div>
 
@@ -767,11 +857,11 @@ export default function CreateNewForm() {
             placeholder="Select Customer"
             onChange={handleSelectCustomer}
             selected={selectedCustOption}
-            disabled={
-              rvData.postData.Status != "Draft"
-                ? rvData.postData.Status
-                : ""
-            }
+          // disabled={
+          //   rvData.postData.Status != "Draft"
+          //     ? rvData.postData.Status
+          //     : ""
+          // }
           />
         </div>
       </div>
@@ -785,11 +875,11 @@ export default function CreateNewForm() {
             id="TxnType"
             onChange={PaymentReceipts}
             value={rvData.postData.TxnType}
-            disabled={
-              rvData.postData.Status != "Draft"
-                ? rvData.postData.Status
-                : ""
-            }
+          // disabled={
+          //   rvData.postData.Status != "Draft"
+          //     ? rvData.postData.Status
+          //     : ""
+          // }
           >
             <option value="">Select</option>
             <option value="Bank">Bank</option>
@@ -810,12 +900,12 @@ export default function CreateNewForm() {
 
         <div className="col-md-3 ">
           <label className="form-label">Receive Form</label>
-          <input className="" value={rvData.postData.CustName} 
-           disabled={
-            rvData.postData.Status != "Draft"
-              ? rvData.postData.Status
-              : ""
-          }
+          <input className="" value={rvData.postData.CustName}
+            disabled={
+              rvData.postData.Status != "Draft"
+                ? rvData.postData.Status
+                : ""
+            }
           />
         </div>
 
@@ -825,9 +915,9 @@ export default function CreateNewForm() {
             name="Amount"
             onChange={PaymentReceipts}
 
-            value={rvData.postData.Amount}
+          // value={rvData.postData.Amount}
           />
-           
+
         </div>
 
         <div className="col-md-3">
@@ -870,12 +960,14 @@ export default function CreateNewForm() {
             id=""
             name="Description"
             onChange={PaymentReceipts}
-            value={rvData.postData.Description}
-            disabled={
-              rvData && rvData.postData.Status !== "Draft"
-                ? rvData.postData.Status
-                : "" 
-            }
+            // value={rvData.postData.Description}
+
+            // disabled={
+            //   rvData && rvData.postData.Status !== "Draft"
+            //     ? rvData.postData.Status
+            //     : "" 
+            // }
+            value="Amount Adjusted 16/17 / 1071"
             style={{ height: "70px", resize: "none" }}
           ></textarea>
         </div>
@@ -967,7 +1059,7 @@ export default function CreateNewForm() {
             <Table className="table-data border">
               <thead
                 className="tableHeaderBGColor"
-                // style={{ textAlign: "center" }}
+              // style={{ textAlign: "center" }}
               >
                 <tr style={{ whiteSpace: "nowrap" }}>
                   <th>Srl</th>
@@ -1001,42 +1093,42 @@ export default function CreateNewForm() {
                 {rvData.data.receipt_details
                   ? rvData.data.receipt_details.map((data, index) => (
 
-                      <>
-                        <tr
-                          style={{ whiteSpace: "nowrap" }}
-                          onClick={() => handleRowSelect(data)}
-                          key={data.RecdPvSrl}
-                          className={
-                            rvData.firstTableArray.some(
-                              (row) => row.Dc_inv_no === data.Dc_inv_no
-                            )
-                              ? "selectedRow"
-                              : ""
-                          }
-                        >
-                          <td>{data.RecdPvSrl}</td>
-                          <td>{data.Inv_No}</td>
+                    <>
+                      <tr
+                        style={{ whiteSpace: "nowrap" }}
+                        onClick={() => handleRowSelect(data)}
+                        key={data.RecdPvSrl}
+                        className={
+                          rvData.firstTableArray.some(
+                            (row) => row.Dc_inv_no === data.Dc_inv_no
+                          )
+                            ? "selectedRow"
+                            : ""
+                        }
+                      >
+                        <td>{data.RecdPvSrl}</td>
+                        <td>{data.Inv_No}</td>
 
-                          <td>
-                            {new Date(data.Inv_date).toLocaleDateString(
-                              "en-GB"
-                            )}
-                          </td>
+                        <td>
+                          {new Date(data.Inv_date).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </td>
 
-                          <td>{data.Inv_Type}</td>
-                          <td>{formatAmount(data.Inv_Amount)}</td>
-                          <td>{formatAmount(data.Amt_received)}</td>
-                          <td>
-                            <input
-                              type="number"
-                              // onBlur={onBlurr}
-                              name={"Receive_Now"}
-                              value={data.Receive_Now}
-                              onChange={(e) => handleInputChange(e, data)}
-                            />
-                          </td>
-                          <td>{data.Id}</td>
-                          {/* <td>{data.Unitname}</td>
+                        <td>{data.Inv_Type}</td>
+                        <td>{formatAmount(data.Inv_Amount)}</td>
+                        <td>{formatAmount(data.Amt_received)}</td>
+                        <td>
+                          <input
+                            type="number"
+                            // onBlur={onBlurr}
+                            name={"Receive_Now"}
+                            value={data.Receive_Now}
+                            onChange={(e) => handleInputChange(e, data)}
+                          />
+                        </td>
+                        <td>{data.Id}</td>
+                        {/* <td>{data.Unitname}</td>
                           <td>{data.Unitname}</td>
                           <td>{data.Unitname}</td>
                           <td>{data.HOPrvId}</td>
@@ -1058,9 +1150,9 @@ export default function CreateNewForm() {
                           <td>{data.RefNo}</td>
                         
                           <td>{formatAmount(data.Amt_received)}</td> */}
-                        </tr>
-                      </>
-                    ))
+                      </tr>
+                    </>
+                  ))
 
                   : ""}
               </tbody>
@@ -1070,7 +1162,7 @@ export default function CreateNewForm() {
         <div className="col-md-6 mt-2">
 
           <div className="row">
-            <div className="col-md-2">
+            <div className="col-md-4">
               <label
                 className="form-label "
                 style={{ whiteSpace: "nowrap", marginTop: "10px" }}
@@ -1079,20 +1171,20 @@ export default function CreateNewForm() {
               </label>
             </div>
 
-            <div className="col-md-5 mt-3">
+            {/* <div className="col-md-5 mt-3">
               <select className="ip-select" disabled>
                 <option value="option 1">{getCustomer}</option>
               </select>
-            </div>
+            </div> */}
 
             <div className=" col-md-5 mb-1">
               <button
                 onClick={addInvoice}
                 className="button-style"
-                // className={
-                //   !rvData.postData.HO_PrvId ? "disabled-button" : "button-style"
-                // }
-                // disabled={!rvData.postData.HO_PrvId}
+              // className={
+              //   !rvData.postData.HO_PrvId ? "disabled-button" : "button-style"
+              // }
+              // disabled={!rvData.postData.HO_PrvId}
 
               >
                 Add Invoice
@@ -1189,3 +1281,5 @@ export default function CreateNewForm() {
     </>
   );
 }
+
+

@@ -12,6 +12,7 @@ export default function PRV_List() {
 
 const [prvListData,setPRVListData]=useState([])
 
+
 const itemsPerPage = 100; // Number of items per page
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -67,6 +68,46 @@ useEffect(() => {
       }
     };
 
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const requestSort = (key) => {
+      let direction = "asc";
+      if (sortConfig.key === key && sortConfig.direction === "asc") {
+        direction = "desc";
+      }
+      setSortConfig({ key, direction });
+    };
+  
+  
+  
+
+    const sortedData = () => {
+      const dataCopy = [...currentPageData];
+
+      if (sortConfig.key) {
+        dataCopy.sort((a, b) => {
+          let valueA = a[sortConfig.key];
+          let valueB = b[sortConfig.key];
+     
+      
+          if (sortConfig.key === "Amount") {
+            valueA = parseFloat(valueA);
+            valueB = parseFloat(valueB);
+          }
+     
+          if (valueA < valueB) {
+            return sortConfig.direction === "asc" ? -1 : 1;
+          }
+          if (valueA > valueB) {
+            return sortConfig.direction === "asc" ? 1 : -1;
+          }
+          return 0;
+        });
+      }
+      return dataCopy;
+    };
+
+
+   // console.log("soretd data", sortedData());
     return (
         <>
             <div className="row col-md-12 "   >
@@ -101,11 +142,17 @@ useEffect(() => {
                     <thead className="tableHeaderBGColor">
                         <tr style={{whiteSpace:'nowrap'}}>
                             <th>HO Ref</th>
-                            <th>Date</th>
+                            <th
+                            onClick={() => requestSort("HoRefDate")}
+                            >Date</th>
 
                             <th>Unitname</th>
-                            <th>Customer</th>
-                            <th>Amount</th>
+                            <th
+                              onClick={() => requestSort("CustName")}
+                            >Customer</th>
+                            <th
+                             onClick={() => requestSort("Amount")}
+                            >Amount</th>
                             <th>Description</th>
                             <th>Status</th>
 
@@ -114,8 +161,8 @@ useEffect(() => {
 
                     <tbody className='tablebody'>
                        {
-                        currentPageData
-                        ? currentPageData.map((item,key)=>(
+                        sortedData()
+                        ? sortedData().map((item,key)=>(
                            
                                 <>
                                 <tr 
