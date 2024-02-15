@@ -7,7 +7,7 @@ monthlyReportRouter.post("/custNames", async (req, res, next) => {
   const date = req.body.date;
   try {
     hqQuery(
-      `SELECT DISTINCT UnitName FROM magod_hq_mis.unit_cust_data;`,
+      `SELECT DISTINCT UnitName FROM magod_setup.magodlaser_units;`,
       (err, data) => {
         res.send(data);
       }
