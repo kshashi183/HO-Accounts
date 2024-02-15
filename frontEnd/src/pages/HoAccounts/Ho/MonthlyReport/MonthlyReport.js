@@ -318,7 +318,7 @@ export default function MonthlyReport() {
                   option && option.UnitName ? option.UnitName.toString() : ""
                 }
                 options={getCustNames}
-                placeholder="Select Customer"
+                placeholder="Select Unit"
                 onChange={handleNames}
                 selected={selectedOption}
               />
