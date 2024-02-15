@@ -115,43 +115,8 @@ export default function OpenReceipt({ data }) {
       }
     }
 
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-    const requestSort = (key) => {
-      let direction = "asc";
-      if (sortConfig.key === key && sortConfig.direction === "asc") {
-          direction = "desc";
-      }
-      setSortConfig({ key, direction });
-  };
-  
-  
-  
-  
-  const sortedData = () => {
-      const dataCopy = [...currentPageData];
-  
-      if (sortConfig.key) {
-          dataCopy.sort((a, b) => {
-              let valueA = a[sortConfig.key];
-              let valueB = b[sortConfig.key];
-  
-  
-              if (sortConfig.key === "GrandTotal" || sortConfig.key === "Balance") {
-                valueA = parseFloat(valueA);
-                valueB = parseFloat(valueB);
-              }
-  
-              if (valueA < valueB) {
-                  return sortConfig.direction === "asc" ? -1 : 1;
-              }
-              if (valueA > valueB) {
-                  return sortConfig.direction === "asc" ? 1 : -1;
-              }
-              return 0;
-          });
-      }
-      return dataCopy;
-  };
+   
+
   };
 
   // Get the selected data based on selectedItems
