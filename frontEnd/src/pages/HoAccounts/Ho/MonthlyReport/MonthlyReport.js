@@ -11,6 +11,7 @@ import MaterialSalesSummary from "./MonthlyReportTabs/MaterialSalesSummary";
 import { Tab, Tabs } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { baseURL } from "../../../../api/baseUrl";
 
@@ -20,7 +21,7 @@ export default function MonthlyReport() {
   const [getName, setGetName] = useState("");
   const [month, setMonth] = useState("");
   const [wordMonth, setWordMonth] = useState("");
-  const [year, setYear] = useState("");
+  const [year, setYear] = useState(new Date().getFullYear().toString());
   const [getInvoiceValues, setGetIvoiceValues] = useState([]);
   const [getClearanceValues, setGetClearanceValues] = useState([]);
   const [getTaxValues, setGetTaxValues] = useState([]);
@@ -93,7 +94,12 @@ export default function MonthlyReport() {
 
   const handleYear = (e) => {
     const inputYear = e.target.value;
-    if (inputYear <= getCurrentYear()) {
+    const currentYear = new Date().getFullYear();
+
+    if (inputYear < 2014) {
+      toast.error("Please select a year after 2014");
+    } else if (inputYear <= currentYear) {
+      // Set the year if it's less than or equal to the current year
       setYear(inputYear);
     }
   };
@@ -215,8 +221,6 @@ export default function MonthlyReport() {
       console.error("Error in table", error);
     }
   };
-
-  console.log("Addition", year);
 
   return (
     <div>
