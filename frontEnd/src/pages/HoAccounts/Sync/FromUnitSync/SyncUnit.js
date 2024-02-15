@@ -6,7 +6,6 @@ import Spinner from "../Spinner";
 import { xml2js, js2xml } from "xml-js";
 import { baseURL } from "../../../../api/baseUrl";
 
-
 export default function SyncUnit() {
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,17 +18,16 @@ export default function SyncUnit() {
   const [receiptInsertedData, setReceiptInsertedData] = useState([]);
   const [receiptDeInsertedData, setReceiptDeInsertedData] = useState([]);
   const [cancelledInvInsertedData, setcancelledInvInsertedData] = useState([]);
-  const [fileName, setFileName] = useState('');
+  const [fileName, setFileName] = useState("");
 
   const handleButtonClick = () => {
-
     fileInputRef.current.click();
     console.log("Xml File", fileInputRef);
   };
 
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
-    setFileName(file.name)
+    setFileName(file.name);
     if (file) {
       const reader = new FileReader();
 
@@ -102,7 +100,6 @@ export default function SyncUnit() {
 
   useEffect(() => {
     try {
-
       if (
         report.unit_cust_data.length > 0 ||
         report.unit_inv_list.length > 0 ||
@@ -112,7 +109,7 @@ export default function SyncUnit() {
         report.unit_dc_summary.length > 0 ||
         report.unit_cancelled_vr_list.length > 0
       ) {
-     handleInsertData();
+        handleInsertData();
       }
     } catch (err) {
       console.log("The length is zero Initially");
@@ -122,7 +119,7 @@ export default function SyncUnit() {
   const handleInsertData = async () => {
     setIsLoading(true);
 
-   await axios
+    await axios
       .post(baseURL + "/fromUnitSync/saveCustDataIntoHoDB", report)
       .then((res) => {
         // console.log(`Customer data inserted successfully`, res.data);
@@ -138,7 +135,7 @@ export default function SyncUnit() {
         setIsLoading(false);
       });
 
-  await axios
+    await axios
       .post(baseURL + "/fromUnitSync/saveInvDataIntoHoDB", report)
       .then((res) => {
         // console.log(`Invoice data inserted successfully`, res.data);
@@ -154,7 +151,7 @@ export default function SyncUnit() {
         setIsLoading(false);
       });
 
-   await axios
+    await axios
       .post(baseURL + "/fromUnitSync/saveInvTaxesDataIntoHoDB", report)
       .then((res) => {
         // console.log(`Invoice Taxes data inserted successfully`, res.data);
@@ -170,7 +167,7 @@ export default function SyncUnit() {
         setIsLoading(false);
       });
 
-   await axios
+    await axios
       .post(baseURL + "/fromUnitSync/saveInvSummaryDataIntoHoDB", report)
       .then((res) => {
         // console.log(`DcInvoice data inserted successfully`, res.data);
@@ -202,7 +199,7 @@ export default function SyncUnit() {
     //   setIsLoading(false);
     // });
 
-  await  axios
+    await axios
       .post(baseURL + "/fromUnitSync/saveReceiptRegisterDataIntoHoDB", report)
       .then((res) => {
         // console.log(`Receipt Register data inserted successfully`, res.data);
@@ -218,23 +215,23 @@ export default function SyncUnit() {
         setIsLoading(false);
       });
 
-    // await axios
-    //   .post(baseURL + "/fromUnitSync/saveReceptDetailsDataIntoHoDB", report)
-    //   .then((res) => {
-    //     // console.log(`Receipt Details data inserted successfully`, res.data);
+    await axios
+      .post(baseURL + "/fromUnitSync/saveReceptDetailsDataIntoHoDB", report)
+      .then((res) => {
+        // console.log(`Receipt Details data inserted successfully`, res.data);
 
-    //     setReceiptDeInsertedData(res.data);
+        setReceiptDeInsertedData(res.data);
 
-    //     toast.success(`Receipt Details data inserted successfully`);
-    //   })
-    //   .catch((err) => {
-    //     console.log("Error in table", err);
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   });
+        toast.success(`Receipt Details data inserted successfully`);
+      })
+      .catch((err) => {
+        console.log("Error in table", err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
-   await axios
+    await axios
       .post(baseURL + "/fromUnitSync/saveCanceledVrListDataIntoHoDB", report)
       .then((res) => {
         // console.log(`Cancelled Vr data inserted successfully`, res.data);
@@ -250,7 +247,7 @@ export default function SyncUnit() {
         setIsLoading(false);
       });
 
-      // await handleDownload();
+    // await handleDownload();
   };
 
   const handleDownload = async () => {
@@ -326,8 +323,10 @@ export default function SyncUnit() {
     const invTaxSyncInfo = data.invTaxInsertedData.taxResponseData || [];
     const invSumSyncInfo = data.invSumInsertedData.dcResponseData || [];
     const recieptSyncInfo = data.receiptInsertedData.receiptResponseData || [];
-    const recieptDetailsSyncInfo = data.receiptDeInsertedData.detailsResponseData || [];
-    const cancelledVrSyncInfo = data.cancelledInvInsertedData.canceledResponseData || [];
+    const recieptDetailsSyncInfo =
+      data.receiptDeInsertedData.detailsResponseData || [];
+    const cancelledVrSyncInfo =
+      data.cancelledInvInsertedData.canceledResponseData || [];
 
     const options = {
       compact: true,
@@ -337,34 +336,28 @@ export default function SyncUnit() {
     const xmlData = {
       AccountsDS: {
         MagodUnits: {
-          UnitName: 'Jigani',
+          UnitName: "Jigani",
           CashInHand: 0,
         },
-        Unit_Cust_Data_SyncInfo: unitCustSyncInfo.map((item, index) => ({
-          Id: item.Sync_HOId,
-          UnitName: item.UnitName,
-          HO_Uid: item.Sync_HOId,
-          Unit_Uid: item.Cust_Code,
-        })),
         unit_invoices_SyncInfo: invSyncInfo.map((inv, index) => ({
-          Sync_HOId: inv.Id,
+          Sync_HOId: inv.Sync_HOId,
           Unit_UId: inv.Unit_UId,
           UnitName: inv.UnitName,
           DC_Inv_No: inv.DC_Inv_No,
           unit_taxes_list_SyncInfo: invTaxSyncInfo.map((item, index) => ({
-          Sync_HOId: item.Sync_HOId,
-          Unit_UId: item.Unit_UId,
-          UnitName: inv.UnitName,
-          DC_Inv_No: inv.DC_Inv_No,
-          InvTaxId: item.InvTaxId,
-        })),
-        dc_inv_summary_SyncInfo: invSumSyncInfo.map((sum, index) => ({
-          Unit_UId: sum.Unit_UId,
-          Sync_HOId: sum.Sync_HOId,
-          Id: sum.Id,
-          UnitName: inv.UnitName,
-          DC_Inv_No: inv.DC_Inv_No,
-        })),
+            Sync_HOId: item.Sync_HOId,
+            Unit_UId: item.Unit_UId,
+            UnitName: inv.UnitName,
+            DC_Inv_No: inv.DC_Inv_No,
+            InvTaxId: item.InvTaxId,
+          })),
+          dc_inv_summary_SyncInfo: invSumSyncInfo.map((sum, index) => ({
+            Unit_UId: sum.Unit_UId,
+            Sync_HOId: sum.Sync_HOId,
+            Id: sum.Id,
+            UnitName: inv.UnitName,
+            DC_Inv_No: sum.DC_Inv_No,
+          })),
         })),
         unit_recipts_register_SyncInfo: recieptSyncInfo.map((vr, index) => ({
           Unitname: vr.Unitname,
@@ -381,13 +374,21 @@ export default function SyncUnit() {
             Sync_HOId: detail.Sync_HOId,
           })
         ),
-        canceled_vouchers_list_syncInfo: cancelledVrSyncInfo.map((vr, index) => ({
-          Id: vr.Id,
-          UnitName: vr.UnitName,
-          HO_Sync_Id: vr.HO_Sync_Id,
-          UUID: vr.UUID,
-          Unit_Uid: vr.Unit_Uid,
+        Unit_Cust_Data_SyncInfo: unitCustSyncInfo.map((item, index) => ({
+          Id: item.Sync_HOId,
+          UnitName: item.UnitName,
+          HO_Uid: item.Sync_HOId,
+          Unit_Uid: item.Cust_Code,
         })),
+        canceled_vouchers_list_syncInfo: cancelledVrSyncInfo.map(
+          (vr, index) => ({
+            Id: -1 - index,
+            UnitName: vr.UnitName,
+            HO_Sync_Id: vr.Sync_HOId,
+            UUID: vr.UUID,
+            Unit_Uid: vr.Unit_Uid,
+          })
+        ),
       },
     };
     return js2xml(xmlData, options);
@@ -424,13 +425,12 @@ export default function SyncUnit() {
         <div className="row">
           <h4 className="title">From Unit Sync</h4>
         </div>
-
-     
       </div>
       <div className="col-md-12">
         <button
-          className={`button-style mt-2 group-button ${isLoading ? "loading" : ""
-            }`}
+          className={`button-style mt-2 group-button ${
+            isLoading ? "loading" : ""
+          }`}
           onClick={handleButtonClick}
           disabled={isLoading}
         >
@@ -446,8 +446,8 @@ export default function SyncUnit() {
       </div>
       <div>
         <button
-        className="button-style group-button mt-2"
-        onClick={handleDownload}
+          className="button-style group-button mt-2"
+          onClick={handleDownload}
         >
           download
         </button>
