@@ -51,11 +51,11 @@ const SidebarComp = () => {
     JSON.parse(localStorage.getItem("LazerUser"))
   );
  
-  console.log(lazerUser.data.access);
+ // console.log(lazerUser.data.access);
   useEffect(() => {
     function filterSidebarData(data, accessPaths) {
-      console.log("first", data);
-      console.log("second", accessPaths);
+    //  console.log("first", data);
+    //  console.log("second", accessPaths);
       const filterSidebar = [];
       let previousMenu = null;
  
@@ -89,7 +89,7 @@ const SidebarComp = () => {
       newSideBarData,
       lazerUser.data.access
     );
-    console.log(filterSidebar);
+   // console.log(filterSidebar);
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     setAccessSideBarData(filterSidebar);
     // setAccessSideBarData(quotationSidebar)
