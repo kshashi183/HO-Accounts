@@ -6,8 +6,8 @@ var bodyParser = require("body-parser");
 
 fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
   const { unit_cust_data } = req.body;
-  console.log("custtttttt" );
-  const CustData="saveCustData"
+  console.log("custtttttt");
+  const CustData = "saveCustData";
   try {
     const insertedData = [];
 
@@ -29,7 +29,7 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
      CreditLimit = ?,CURRENT = ?, LastBilling = IFNULL(?, NULL), FirstBilling = IFNULL(?, NULL),
      PAN_No = ?, CustStatus = ?, IsBranch = ?, Unit_UId = ?;`;
 
-            const selectQuery = `SELECT Id AS Sync_HOId FROM magod_hq_mis.unit_cust_data
+            const selectQuery = `SELECT Id AS Sync_HOId, Cust_Code, UnitName FROM magod_hq_mis.unit_cust_data
      WHERE UnitName = '${custItem.UnitName}' AND Cust_Code = '${custItem.Cust_Code}';`;
 
             const values = [
@@ -87,6 +87,8 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
             insertedData.push({
               // ...data,
               Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+              UnitName: Sync_HOId && Sync_HOId.UnitName,
+              Cust_Code: Sync_HOId && Sync_HOId.Cust_Code,
             });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
@@ -108,7 +110,6 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
   }
 });
 
-
 // fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
 //   const { unit_cust_data } = req.body;
 //   console.log("custtttttt");
@@ -126,11 +127,11 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
 //             const isBranchValue = custItem.IsBranch ? 1 : 0;
 
 //             const sqlCustQuery = `INSERT INTO magod_hq_mis.unit_cust_data (UnitName, Cust_Code, Cust_name,
-//                  Branch, Address, City, State, StateID,IsGovtOrg, IsForiegn, GSTNo, Country, Pin_Code, 
-//                  CreditTerms, CreditLimit,CURRENT, LastBilling, FirstBilling, PAN_No, CustStatus, IsBranch, 
+//                  Branch, Address, City, State, StateID,IsGovtOrg, IsForiegn, GSTNo, Country, Pin_Code,
+//                  CreditTerms, CreditLimit,CURRENT, LastBilling, FirstBilling, PAN_No, CustStatus, IsBranch,
 //                  Unit_UId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//                  ON DUPLICATE KEY UPDATE Branch = ?, Address = ?, City = ?, State = ?, StateID = ?, 
-//                  IsGovtOrg = ?, IsForiegn = ?, GSTNo = ?, Country = ?, Pin_Code = ?, CreditTerms = ?, 
+//                  ON DUPLICATE KEY UPDATE Branch = ?, Address = ?, City = ?, State = ?, StateID = ?,
+//                  IsGovtOrg = ?, IsForiegn = ?, GSTNo = ?, Country = ?, Pin_Code = ?, CreditTerms = ?,
 //                  CreditLimit = ?,CURRENT = ?, LastBilling = IFNULL(?, NULL), FirstBilling = IFNULL(?, NULL),
 //                  PAN_No = ?, CustStatus = ?, IsBranch = ?, Unit_UId = ?;`;
 
@@ -198,8 +199,6 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
 //         })
 //       );
 
-
-     
 //       responseData.push(...custResponseData);
 //     //  console.log("res", responseData);
 
@@ -214,11 +213,10 @@ fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
 //   }
 // });
 
-
 //Saving Invoices to HO Mysql DB, Ignore if already exists
 fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
   const { unit_inv_list } = req.body;
-  const unit_inv="unit_inv"
+  const unit_inv = "unit_inv";
   try {
     const invResponseData = [];
 
@@ -245,7 +243,7 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
               ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON DUPLICATE KEY UPDATE Unit_UId = ?;`;
 
-            const selectInvQuery = `SELECT Id, Id AS Sync_HOId
+            const selectInvQuery = `SELECT Id, Id AS Sync_HOId, UnitName, DC_Inv_No, Unit_UId
             FROM magod_hq_mis.unit_invoices_list
             WHERE UnitName = ? AND Unit_UId = ?;`;
 
@@ -322,10 +320,13 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
             ]);
 
             // console.log(Sync_HOId);
-            
+
             invResponseData.push({
               // ...data,
               Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+              UnitName: Sync_HOId && Sync_HOId.UnitName,
+              DC_Inv_No: Sync_HOId && Sync_HOId.DC_Inv_No,
+              Unit_UId: Sync_HOId && Sync_HOId.Unit_UId,
             });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
@@ -360,7 +361,7 @@ fromUnitSyncRouter.post("/saveInvTaxesDataIntoHoDB", async (req, res, next) => {
                 TaxPercent, TaxAmt, AcctHead, Unit_UId)
           VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE Unit_Uid = ?;`;
 
-            const selectInvQuery = `SELECT InvTaxId, InvTaxId AS Sync_HOId
+            const selectInvQuery = `SELECT InvTaxId, InvTaxId AS Sync_HOId, UnitName, Unit_UId, DC_Inv_No
             FROM magod_hq_mis.unit_inv_taxtable u
             WHERE u.UnitName = ? AND u.Unit_UId = ?;`;
 
@@ -390,6 +391,10 @@ fromUnitSyncRouter.post("/saveInvTaxesDataIntoHoDB", async (req, res, next) => {
             taxResponseData.push({
               // ...data,
               Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+              InvTaxId: Sync_HOId && Sync_HOId.InvTaxId,
+              UnitName: Sync_HOId && Sync_HOId.UnitName,
+              Unit_UId: Sync_HOId && Sync_HOId.Unit_UId,
+              DC_Inv_No: Sync_HOId && Sync_HOId.DC_Inv_No,
             });
           } catch (error) {
             console.error(`Error in iteration ${i}: ${error.message}`);
@@ -410,7 +415,8 @@ fromUnitSyncRouter.post("/saveInvTaxesDataIntoHoDB", async (req, res, next) => {
 });
 
 //Saving Inv Summary to HO Mysql DB, Ignore if already exists
-fromUnitSyncRouter.post("/saveInvSummaryDataIntoHoDB",
+fromUnitSyncRouter.post(
+  "/saveInvSummaryDataIntoHoDB",
   async (req, res, next) => {
     const { unit_dc_summary } = req.body;
     try {
@@ -427,7 +433,7 @@ fromUnitSyncRouter.post("/saveInvSummaryDataIntoHoDB",
           VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON DUPLICATE KEY UPDATE Unit_Uid = ?;`;
 
-              const selectInvQuery = `SELECT Id, Id AS Sync_HOId
+              const selectInvQuery = `SELECT Id, Id AS Sync_HOId, Unit_UId, UnitName, DC_Inv_No
               FROM magod_hq_mis.unit_inv_summary u
               WHERE u.UnitName = ? AND u.Unit_UId = ?;`;
 
@@ -467,6 +473,10 @@ fromUnitSyncRouter.post("/saveInvSummaryDataIntoHoDB",
               dcResponseData.push({
                 // ...data,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+                Id: Sync_HOId && Sync_HOId.Id,
+                UnitName: Sync_HOId && Sync_HOId.UnitName,
+                Unit_UId: Sync_HOId && Sync_HOId.Unit_UId,
+                DC_Inv_No: Sync_HOId && Sync_HOId.DC_Inv_No,
               });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
@@ -549,9 +559,10 @@ fromUnitSyncRouter.post("/saveCombInvDataIntoHoDB", async (req, res, next) => {
 });
 
 //Saving unit_receipt_register to HO Mysql DB, Ignore if already exists
-fromUnitSyncRouter.post("/saveReceiptRegisterDataIntoHoDB",
+fromUnitSyncRouter.post(
+  "/saveReceiptRegisterDataIntoHoDB",
   async (req, res, next) => {
-    const { unit_receipt_register } = req.body;
+    const { unit_receipt_register, unit_receipt_adjusted_list } = req.body;
     try {
       const receiptResponseData = [];
 
@@ -566,7 +577,7 @@ fromUnitSyncRouter.post("/saveReceiptRegisterDataIntoHoDB",
             ON DUPLICATE KEY UPDATE Unit_UId = ?;
             `;
 
-              const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId
+              const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId, Unitname, RecdPVID, Unit_UId
               FROM magod_hq_mis.unit_payment_recd_voucher_register u
               WHERE u.Unitname = ? AND u.Unit_UId = ?;
               `;
@@ -606,6 +617,10 @@ fromUnitSyncRouter.post("/saveReceiptRegisterDataIntoHoDB",
               receiptResponseData.push({
                 // ...data,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+                Id: Sync_HOId && Sync_HOId.Id,
+                Unit_UId: Sync_HOId && Sync_HOId.Unit_UId,
+                RecdPVID: Sync_HOId && Sync_HOId.RecdPVID,
+                Unitname: Sync_HOId && Sync_HOId.Unitname,
               });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
@@ -627,13 +642,16 @@ fromUnitSyncRouter.post("/saveReceiptRegisterDataIntoHoDB",
 );
 
 //Saving unit_receipt_adjusted_list to HO Mysql DB, Ignore if already exists
-fromUnitSyncRouter.post("/saveReceptDetailsDataIntoHoDB",
+fromUnitSyncRouter.post(
+  "/saveReceptDetailsDataIntoHoDB",
   async (req, res, next) => {
     const { unit_receipt_adjusted_list } = req.body;
     try {
       const detailsResponseData = [];
 
-      if (unit_receipt_adjusted_list.length > 0) {
+      console.log(unit_receipt_adjusted_list.PvrId);
+
+      if (unit_receipt_adjusted_list && unit_receipt_adjusted_list.length > 0) {
         const receptDetailsResponseData = await Promise.all(
           unit_receipt_adjusted_list.map(async (receiptItem, i) => {
             try {
@@ -644,7 +662,7 @@ fromUnitSyncRouter.post("/saveReceptDetailsDataIntoHoDB",
             ON DUPLICATE KEY UPDATE Unit_UId = ?;
               `;
 
-              const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId
+              const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId, Unitname, RecdPVID, Unit_UId, HoPvrId
                 FROM magod_hq_mis.unit_payment_recd_voucher_details u
                 WHERE u.Unitname = ? AND u.Unit_UId = ?;
                 `;
@@ -681,6 +699,10 @@ fromUnitSyncRouter.post("/saveReceptDetailsDataIntoHoDB",
               detailsResponseData.push({
                 // ...data,
                 Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+                Unitname: Sync_HOId && Sync_HOId.Unitname,
+                RecdPVID: Sync_HOId && Sync_HOId.RecdPVID,
+                Unit_UId: Sync_HOId && Sync_HOId.Unit_UId,
+                HoPvrId: Sync_HOId && Sync_HOId.HoPvrId,
               });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
@@ -702,7 +724,8 @@ fromUnitSyncRouter.post("/saveReceptDetailsDataIntoHoDB",
 );
 
 //Saving CanceledVrList to HO Mysql DB, Ignore if already exists
-fromUnitSyncRouter.post("/saveCanceledVrListDataIntoHoDB",
+fromUnitSyncRouter.post(
+  "/saveCanceledVrListDataIntoHoDB",
   async (req, res, next) => {
     const { unit_cancelled_vr_list } = req.body;
     try {
@@ -732,7 +755,7 @@ fromUnitSyncRouter.post("/saveCanceledVrListDataIntoHoDB",
               SET HO_Sync_Id = Id
               WHERE UUID = '${receiptItem.UUID}';`;
 
-              const selectInvQuery = `SELECT Id AS HO_Sync_Id
+              const selectInvQuery = `SELECT Id AS HO_Sync_Id, UnitName, UUID, Unit_Uid
               FROM magod_hq_mis.canceled_vouchers_list
               WHERE UUID = ?;`;
 
@@ -765,7 +788,7 @@ fromUnitSyncRouter.post("/saveCanceledVrListDataIntoHoDB",
 
               // Insert or update the data
               const update = await hqQuery(updateQuery);
-              
+
               const data = await hqQuery(sqlInvQuery, values);
 
               // Retrieve Sync_HOId
@@ -778,7 +801,10 @@ fromUnitSyncRouter.post("/saveCanceledVrListDataIntoHoDB",
 
               canceledResponseData.push({
                 // ...data,
-                Sync_HOId: Sync_HOId && Sync_HOId.Sync_HOId,
+                Sync_HOId: Sync_HOId && Sync_HOId.HO_Sync_Id,
+                UnitName: Sync_HOId && Sync_HOId.UnitName,
+                UUID: Sync_HOId && Sync_HOId.UUID,
+                Unit_Uid: Sync_HOId && Sync_HOId.Unit_Uid,
               });
             } catch (error) {
               console.error(`Error in iteration ${i}: ${error.message}`);
