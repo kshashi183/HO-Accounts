@@ -229,9 +229,9 @@ const setupQueryMod = async (q, values, callback) => {
 
         callback(err, null);
       } else {
-        // console.log("result", res);
+      console.log("result call back", res);
 
-        callback(null, res);
+       // callback(null, res);
       }
     });
   } catch (error) {

@@ -132,7 +132,8 @@ export default function RvAdjustmentForm() {
   const state = {
     select: select,
     CustCode: selectedCustCode,
-    id:id
+    id:id,
+     adjustmentRows:selectRow
 };
         console.log("select rowwwww",select);
         navigate("/HOAccounts/HO/HOPRV/CreateNew", {state: state });
