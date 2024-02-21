@@ -16,12 +16,12 @@ export default function CreateNewForm() {
   const { adjustmentRows } = location.state ? location.state : "";
   let onAccountValue1 = adjustmentRows ? parseInt(adjustmentRows.On_account) : 0
 
+  let sum=0;
+ 
 
 
-  const [onacc, setOnacc] = useState()
 
-
-
+const[sumofReceive, setSumofReceive]=useState()
  
   const [hoprvid, setHoprvid] = useState(0);
   const [getUnit, setGetUnit] = useState("");
@@ -108,7 +108,7 @@ export default function CreateNewForm() {
   }, [])
 
   
-  console.log("insert to form", id);
+  console.log("insert to form", adjustmentRows);
 
   const insertToForm = async () => {
 
@@ -151,9 +151,13 @@ export default function CreateNewForm() {
   const getleftandRightTabledata = async (cust_code, hoprvID) => {
        console.log("CUST CODE AND HOPRVID", cust_code, hoprvID);
     try {
-      const resp = await axios.get(
-        baseURL + `/createnew/getleftTable?receipt_id=${hoprvID}`
+      const resp = await axios.post(
+        baseURL + '/createnew/getleftTable',{
+          receipt_id:hoprvID
+        }
       );
+
+    
 
        console.log("left table daat", resp);
 
@@ -300,75 +304,15 @@ export default function CreateNewForm() {
   }, []);
 
 
-  // const stopsFlow=()=>{
-  //   let stopExecution = false;
-  // let  sumOfReceive_Now=0
-  //   if (rvData.data.receipt_details) {
-
-  //     rvData.data.receipt_details.forEach((selectedRow) => {
-  //       if (stopExecution) return
-
-        
-  //       // Your code logic for each item goes here
-  //       if (parseFloat(selectedRow.Receive_Now) < 0) {
-  //         toast.error("Incorrect Value");
-  //         return;
-  //       }
-
-  //       const formattedValue = parseFloat(selectedRow.Receive_Now || 0);
-  //       const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
-  //       const amountReceived = parseFloat(selectedRow.Amt_received || 0);
-
-  //       sumOfReceive_Now += formattedValue;
-
-  //       if (formattedValue > invoiceAmount - amountReceived) {
-  //         toast.error("Cannot Receive More than Invoice Amount");
-  //         stopExecution = true; // Set flag to true to stop execution
-
-  //         return;
-  //       }
-
-
-  //       else if (formattedValue > onAccountValue1) {
-  //         toast.error("Cannot Receive More than On_account Amount");
-  //         stopExecution = true;
-  //         return;
-  //       }
-
-  //       else if(sumOfReceive_Now>onAccountValue1){
-  //         toast.error("Cannot Receive More than On_account Amount");
-  //         stopExecution = true;
-  //         return;
-  //       }
-  //     });
-  //   }
-  //   if (stopExecution) return;
-  // }
+  
 
   const handleSave = async () => {
     let stopExecution = false;
 
     try {
-      // Client-side validations
+      
 
-      // if (!getUnit) {
-      //   toast.error("Please Select Unit Name.");
-      //   return;
-      // }
-
-      // if (!getCustomer) {
-      //   toast.error("Please Select Customer.");
-      //   return;
-      // }
-
-      // const isAnyEmptyReceiveNow2 = rvData.data.receipt_details.some(
-      //   (row) => row.Receive_Now > adjustmentRows.On_account
-      // );
-
-      // if (isAnyEmptyReceiveNow2) {
-      //   toast.error("Can not receve");
-      //   return;
-      // }
+     
       console.log("save error recpt detais", rvData.data.receipt_details);
       console.log("save error firsttable arry", rvData.firstTableArray,);
 
@@ -583,132 +527,7 @@ export default function CreateNewForm() {
 
   const nav = useNavigate();
 
-  // const deleteLeftTable = () => {
-    
-  //   let stopExecution = false;
-  //   if (rvData.data.receipt_details) {
-
-  //     rvData.data.receipt_details.forEach((selectedRow) => {
-  //       if (stopExecution) return
-  //       // Your code logic for each item goes here
-  //       if (parseFloat(selectedRow.Receive_Now) < 0) {
-  //         toast.error("Incorrect Value");
-  //         return;
-  //       }
-
-  //       const formattedValue = parseFloat(selectedRow.Receive_Now || 0);
-  //       const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
-  //       const amountReceived = parseFloat(selectedRow.Amt_received || 0);
-
-  //       if (formattedValue > invoiceAmount - amountReceived) {
-  //         toast.error("Cannot Receive More than Invoice Amount");
-  //         stopExecution = true; // Set flag to true to stop execution
-
-  //         return;
-  //       }
-
-
-  //       else if (formattedValue > onAccountValue1) {
-  //         toast.error("Cannot Receive More than On_account Amount");
-  //         stopExecution = true;
-  //         return;
-  //       }
-
-
-  //       else{
-          
-  //       }
-  //     });
-  //   }
-
-
-
-
-  //   if (stopExecution) return;
-
-  //   axios.delete(
-  //     baseURL + "/createnew/deleteleft",
-
-  //     { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: onAccountValue1 } }
-
-  //   ).then(resp => {
-  //     console.log("Response data:", resp.data);
-
-  //     if (resp.data?.Status === 'Success') {
-  //       setRvData((prevData) => ({
-  //         ...prevData,
-
-  //         data: {
-  //           receipt_details: [],
-            
-  //         },
-  //         //firstTableArray: [],
-  //         postData: {
-  //           Amount: 0,
-            
-  //         },
-
-
-
-  //       }));
-
-  //       nav("/HOAccounts/HO/RvAdjustment")
-  //     }
-  //   })
-  //     .catch(error => {
-  //       console.error("Error:", error);
-  //     });
-  //   // console.log("resp.data",resp.data)
-
-
-
-
-
-  //   //  const res=   axios
-  //   //     .delete(
-  //   //       baseURL + "/hoCreateNew/deleteleft/" + rvData.postData.HO_PrvId
-  //   //     )
-  //   //     .then((res) => {
-  //   //       if (res.data.Status === "Success") {
-
-  //   //         setRvData((prevData) => ({
-  //   //           ...prevData,
-
-  //   //           data: {
-  //   //             receipt_details: [],
-  //   //             receipt_id: "",
-  //   //             receipt_data: null,
-  //   //           },
-
-  //   //           postData: {
-  //   //             RecdPVID: "",
-  //   //             Recd_PVNo: "Draft",
-  //   //             Recd_PV_Date: formatDate(new Date()),
-  //   //             ReceiptStatus: "Draft",
-  //   //             CustName: "",
-  //   //             Cust_code: "",
-  //   //             TxnType: "",
-  //   //             Amount: "",
-  //   //             On_account: "",
-  //   //             Description: "",
-  //   //             selectedCustomer: "",
-  //   //             RecdPvSrl: 0,
-  //   //             PVSrlID: "",
-  //   //             InvUpdated: 0,
-  //   //             Sync_Hold: 0,
-  //   //           },
-
-  //   //         }));
-
-  //   //         toast.success("Deleted Successfully");
-  //   //       //  window.location.reload();
-
-  //   //       } else {
-  //   //         alert("error");
-  //   //       }
-  //   //     })
-  //   //     .catch((err) => console.log("select unit"));
-  // }
+  
 
 
   const deleteLeftTable = () => {
@@ -1214,6 +1033,8 @@ useEffect(()=>{
   }
 
   const cancelYes = () => {
+
+  
     if(reason.length>15){
       setCancelPopup(false)
       cancelllationSubmit();
@@ -1226,17 +1047,42 @@ useEffect(()=>{
     
   }
 
+  console.log("ho prv iddddddd", rvData.postData.HO_PrvId,rvData.postData.CustName);
+  const hprvd=rvData.postData.HO_PrvId;
+  const cu=rvData.postData.CustName;
+  console.log("after cancel post ",hprvd,cu );
+
+
+
   const cancelllationSubmit = async () => {
+    console.log("rece now sum cancel ()",sumofReceive );
     const cancelData = await axios.post(
       baseURL + "/createNew/cancelUpdate",
       {
 
         HO_PrvId: rvData.postData.HO_PrvId,
-        r:rvData.data.receipt_details
-
+        
+custName:rvData.postData.CustName,
+totalReceiveNow:sumofReceive,
+id:id
 
       }
     );
+
+    console.log("data after cancel ",cancelData.data.StatusCancel);
+
+    setRvData((prevRvData) => ({
+      ...prevRvData,
+      
+      postData: {
+        ...prevRvData.postData,
+        Status: cancelData.data.StatusCancel,
+      },
+    }));
+
+
+
+    
   }
 
  
@@ -1423,14 +1269,17 @@ useEffect(()=>{
         VoucherNoLength: VoucherNoLength,
       });
 
-      console.log("getDCNo Response", response.data);
+      console.log("getDCNo Responseeeeeeeeeeeeee", response.data);
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
+ 
+
 
   const postInvoice = () => {
+    
     if (!rvData.postData.Description) {
       toast.error("Narration Missing");
       return;
@@ -1459,6 +1308,9 @@ useEffect(()=>{
         const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
         const amountReceived = parseFloat(selectedRow.Amt_received || 0);
 
+       
+       
+
         if (formattedValue > invoiceAmount - amountReceived) {
           toast.error("Cannot Receive More than Invoice Amount");
           stopExecution = true; // Set flag to true to stop execution
@@ -1486,11 +1338,14 @@ useEffect(()=>{
     }
   };
 
- 
+  
 
   console.log("rectttttttttt", rvData.data.receipt_details);
 
   const handlePostYes = async () => {
+
+    console.log("rece now sum post yes",sumofReceive );
+    
     setShowPostModal(false);
     let stopExecution = false;
     try {
@@ -1508,6 +1363,8 @@ useEffect(()=>{
           const formattedValue = parseFloat(selectedRow.Receive_Now || 0);
           const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
           const amountReceived = parseFloat(selectedRow.Amt_received || 0);
+          sum += formattedValue;
+          
 
           if (formattedValue > invoiceAmount - amountReceived) {
             toast.error("Cannot Receive More than Invoice Amount");
@@ -1533,13 +1390,16 @@ useEffect(()=>{
       const srlType = "HO PaymentRV";
       const unit = "HQ";
 
+      setSumofReceive(sum);
+
       const response = await axios.post(baseURL + "/hoCreateNew/postInvoice", {
         HO_PrvId: rvData.postData.HO_PrvId,
         srlType: srlType,
         unit: unit,
         receipt_details: rvData.data.receipt_details,
         onacc: onAccountValue22,
-        id: id
+        id: id,
+        
       });
 
       console.log("PostInvoice Response", response.data);
@@ -1555,6 +1415,9 @@ useEffect(()=>{
           ...prevRvData.data,
           HORefNo: response.data[0].HORef,
           Status: response.data[0].Status,
+          Amount:response.data[0].Amount,
+          CustName:response.data[0].CustName,
+          HO_PrvId:response.data[0].HOPrvId,
         },
 
         firstTableArray: [],
@@ -1640,7 +1503,7 @@ useEffect(()=>{
 
       <div className="row col-md-12">
         <div className="col-md-10">
-          <label className="form-label ">Create New Payment Receipt</label>
+          <label className="form-label ">Adjustment Voucher</label>
         </div>
         <div className="col-md-2">
           <button
@@ -1683,11 +1546,8 @@ useEffect(()=>{
             placeholder="Select Unit"
             onChange={handleSelectUnit}
             selected={selectedOption}
-          // disabled={
-          //   rvData.postData.Status != "Draft"
-          //     ? rvData.postData.Status
-          //     : ""
-          // }
+           disabled
+          
           />
         </div>
 
@@ -1702,11 +1562,7 @@ useEffect(()=>{
             placeholder="Select Customer"
             onChange={handleSelectCustomer}
             selected={selectedCustOption}
-          // disabled={
-          //   rvData.postData.Status != "Draft"
-          //     ? rvData.postData.Status
-          //     : ""
-          // }
+            disabled
           />
         </div>
       </div>
@@ -1897,7 +1753,7 @@ useEffect(()=>{
               style={{ width: "90px" }}
               onClick={canacleButton}
               disabled={
-                rvData && rvData.postData.Status !== "Pending"
+                rvData && rvData.postData.Status !== "Pending" ||  rvData.postData.Status==='Cancelled'
 
               }
             >

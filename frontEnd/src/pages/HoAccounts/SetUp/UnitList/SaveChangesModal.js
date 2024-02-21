@@ -71,7 +71,8 @@ export default function SaveChangesModal(
       })
   }
 
-  console.log("sel1111", selectRow);
+  console.log("sel1111", selectRow.PIN, selectRow.Unit_GSTNo, selectRow.Mail_Id);
+  console.log("selctrowwwww", selectRow);
 
   const unitlistSubmit = () => {
     const now = Date.now();
@@ -94,6 +95,11 @@ export default function SaveChangesModal(
     }
 
     else if (selectRow.PIN === null && selectRow.Unit_GSTNo === null && selectRow.Mail_Id===null) {
+
+      insertData();
+    }
+
+    else if (selectRow.PIN === '' && selectRow.Unit_GSTNo === '' && selectRow.Mail_Id==='') {
 
       insertData();
     }

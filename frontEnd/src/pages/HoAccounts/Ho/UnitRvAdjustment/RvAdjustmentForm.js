@@ -136,7 +136,7 @@ export default function RvAdjustmentForm() {
      adjustmentRows:selectRow
 };
         console.log("select rowwwww",select);
-        navigate("/HOAccounts/HO/HOPRV/CreateNew", {state: state });
+        navigate("/HOAccounts/HO/HOPRV/Adjustment", {state: state });
       }
       
 
