@@ -218,9 +218,11 @@ const misConn = mysql.createConnection({
 
 const setupQueryMod = async (q, values, callback) => {
   try {
+  
     misConn.connect();
 
     misConn.query(q, values, (err, res, fields) => {
+      
       if (err) {
         console.log("err", err);
 
@@ -228,10 +230,11 @@ const setupQueryMod = async (q, values, callback) => {
       } else {
       console.log("result call back", res);
 
-       // callback(null, res);
+       callback(null, res);
       }
     });
   } catch (error) {
+    
     callback(error, null);
   }
 };

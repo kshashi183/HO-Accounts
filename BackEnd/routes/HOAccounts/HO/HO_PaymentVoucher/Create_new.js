@@ -1,6 +1,6 @@
 const createnew = require("express").Router();
 
-const { setupQueryMod, misQuery } = require("../../../../helpers/dbconn")
+const { setupQueryMod, misQuery,setupQuery } = require("../../../../helpers/dbconn")
 
 
 
@@ -30,36 +30,18 @@ createnew.get('/ho_openInvoices', (req, res) => {
 
 
 
-// createnew.get('/getFormData', (req, res) => {
-// const receipt_id = req.query.receipt_id
-// //const receipt_id = 245
 
 
-//   console.log("receipt_id  hoprvid", receipt_id);
-//   // const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' `;
-//   const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE Unit_RecdPVid='${receipt_id}' `;
-//   //  const sql=`
-//   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
-//   setupQueryMod(sql, (err, result) => {
-//     if (err) {
-//       console.log("err in query", err);
-//     }
-//     else {
-//      // console.log("form data", result);
-//       return res.json({ Result: result });
-//     }
-//   })
-// })
 
-
-createnew.get('/getFormData', (req, res) => {
-  const receipt_id = req.query.cust_code
+createnew.post('/getFormData', (req, res) => {
+  const { receipt_id, custCode } = req.body
   //const receipt_id = 245
 
 
-  console.log("receipt_id  hoprvid", receipt_id);
+  console.log("receipt_id  hoprvid form", req.body)
+  //const receipt_id = 245);
   // const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' `;
-  const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE Cust_code='${receipt_id}' `;
+  const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' AND Cust_code='${custCode}' `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
@@ -67,18 +49,20 @@ createnew.get('/getFormData', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      // console.log("form data", result);
+      console.log("form data", result);
       return res.json({ Result: result });
     }
   })
 })
 
 
-createnew.get('/getleftTable', (req, res) => {
-  const receipt_id = req.query.receipt_id
+createnew.post('/getleftTable', (req, res) => {
+  const { receipt_id } = req.body
   // const receipt_id=1
-  // console.log("custcodeeeee", receipt_id);
-  const sql = `SELECT * FROM magod_hq_mis.ho_paymentrv_details   WHERE HOPrvId='${receipt_id}' `;
+  
+  const unit='Jigani'
+  console.log(" left table data", receipt_id, unit);
+  const sql = `SELECT * FROM magod_hq_mis.ho_paymentrv_details   WHERE HOPrvId='${receipt_id}' AND UnitName='${unit}' `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
@@ -86,7 +70,7 @@ createnew.get('/getleftTable', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      //console.log("left table", result);
+      console.log("left table", result);
       return res.json({ Result: result });
     }
   })
@@ -171,10 +155,12 @@ createnew.get('/getleftTable', (req, res) => {
 createnew.post('/insertToparentForm', (req, res) => {
   const rows = req.body.adjustmentRows;
 
-  //console.log("rowsss", rows);
+  console.log("rowsss", rows);
 
   // Check if any records exist with the same Unit_RecdPVid
-  const selectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE Unit_RecdPVid = '${rows.RecdPVID}'  `;
+  const selectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE
+   Unit_RecdPVid = '${rows.RecdPVID}'   AND Status <> 'Pending'
+   AND Status <> 'Cancelled'  `;
   setupQueryMod(selectQuery, (err, selectResult) => {
     if (err) {
       console.log("Error in select query:", err);
@@ -202,7 +188,7 @@ createnew.post('/insertToparentForm', (req, res) => {
           return res.status(500).json({ error: "Failed to insert record" });
         }
 
-        const sql2 = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE Unit_RecdPVid ='${rows.RecdPVID}'`
+        const sql2 = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE Unit_RecdPVid ='${rows.RecdPVID}'   AND Status NOT IN ('Pending', 'Cancelled')`
         setupQueryMod(sql2, (fetchingErr, fetchedData) => {
           if (fetchingErr) {
             console.log("err", fetchingErr);
@@ -304,13 +290,13 @@ createnew.put('/updateReceiveNowAmount', (req, res) => {
   console.log("recept update", req.body);
 
   recept.forEach(item => {
-    const { Dc_inv_no, Receive_Now } = item;
+    const { Dc_inv_no, Receive_Now, HOPrvId } = item;
 
     // Construct the SQL query to update the Receive_Now field
     const sql = `
     UPDATE magod_hq_mis.ho_paymentrv_details 
     SET Receive_Now = ${Receive_Now} 
-    WHERE Dc_inv_no = ${Dc_inv_no}
+    WHERE Dc_inv_no = ${Dc_inv_no}  AND HOPrvId=${HOPrvId}
   `;
 
     // Execute the SQL query
@@ -513,38 +499,49 @@ createnew.put('/updateReceiveNowAmount', (req, res) => {
 // });
 
 createnew.post('/cancelUpdate', async (req, res) => {
+  const { HO_PrvId, custName, totalReceiveNow, id } = req.body;
+  console.log("req body cancel ", HO_PrvId, custName, req.body);
 
-  
-  let totalReceiveNow=0;
 
-  const fetchLeft = `SELECT * FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId=2524`;
+
+  const fetchLeft = `SELECT * FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId='${HO_PrvId}'`;
 
   const rightTable = `SELECT u.*
                       FROM magod_hq_mis.unit_invoices_list u
                       WHERE u.UnitName = 'Jigani'
-                        AND u.Cust_Code = 2291`;
+                        AND u.Cust_Name = '${custName}'`;
 
   setupQueryMod(rightTable, (rightErr, rightRes) => {
     if (rightErr) {
       // Handle error if needed
+      console.log("right table error after cancel", rightErr);
     } else {
+
+
+      // console.log("right table result cancel after",rightRes);
       setupQueryMod(fetchLeft, (leftErr, leftResult) => {
         if (leftErr) {
-          // Handle error if needed
+          console.log("left table error after cancel", leftErr);
         } else {
+          // console.log("left table res after cancel",leftResult);
+
           leftResult.forEach((item, index) => {
-            const matchingEntry = rightRes.find(entry => entry.Dc_inv_no === item.Dc_inv_No);
+            const receiveNowNumeric = parseFloat(item.Receive_Now);
+            const matchingEntry = rightRes.find(entry => entry.DC_Inv_No === item.Dc_inv_no);
             if (matchingEntry) {
-              totalReceiveNow += matchingEntry.Receive_Now;
+
+
+              console.log("matched inv", item.Receive_Now, totalReceiveNow);
               // Execute an update query to update the entry in the unit_invoices_list table
               const updateQuery = `UPDATE magod_hq_mis.unit_invoices_list 
-                                   SET PymtAmtRecd=PymtAmtRecd-${matchingEntry.Receive_Now} ,
+                                   SET PymtAmtRecd=PymtAmtRecd-${receiveNowNumeric} ,
                                    DCStatus = CASE 
-                                                    WHEN GrandTotal - ${matchingEntry.Receive_Now} = 0 THEN 'Closed'
-                                                    WHEN GrandTotal - ${matchingEntry.Receive_Now} > 0 THEN 'Despatched'
+                                                    WHEN GrandTotal - ${receiveNowNumeric} = 0 THEN 'Closed'
+                                                    WHEN GrandTotal - ${receiveNowNumeric} > 0 THEN 'Despatched'
                                                     ELSE 'OverPaid'
                                                  END 
-                                   WHERE DC_Inv_No = ${matchingEntry.Dc_inv_no}`;
+                                   WHERE DC_Inv_No = ${item.Dc_inv_no}`;
+              console.log("update right table query", updateQuery);
 
               setupQueryMod(updateQuery, (updateErr, updateRes) => {
                 if (updateErr) {
@@ -554,39 +551,52 @@ createnew.post('/cancelUpdate', async (req, res) => {
                   console.log("update right table after cancel");
 
 
-                  const cancelForm=`UPDATE magod_hq_mis.ho_paymentrv_register  
-                  SET Status='Cancelled' where HOPrvId=${matchingEntry.HOPrvId}`
 
-                  setupQueryMod(cancelForm,(formErr,formRes)=>{
-                    if(formErr){
-
-                    }
-                    else{
-                      console.log("update form after cancell");
-                    }
-
-                  })
-
-
-                  const adjustmentForm=`UPDATE magod_hq_mis.unit_payment_recd_voucher_register 
-                  SET On_account=On_account+${totalReceiveNow} where HOPrvId=${matchingEntry.HOPrvId}`
-
-                  setupQueryMod(adjustmentForm,(adjustmentFormErr,adjustmentFormRes)=>{
-                    if(adjustmentFormErr){
-
-                    }
-                    else{
-                      console.log("update adjustment  button form after cancell");
-                    }
-
-                  })
                 }
               });
 
             }
+
+            else {
+              console.log("there is no matched data");
+            }
           });
         }
       });
+
+
+
+      //update the form data and adjustmemt voucher form data 
+
+      console.log("adj totalReceiveNow", totalReceiveNow);
+      const cancelForm = `UPDATE magod_hq_mis.ho_paymentrv_register  
+      SET Status='Cancelled' where HOPrvId='${HO_PrvId}'`
+
+      setupQueryMod(cancelForm, (formErr, formRes) => {
+        if (formErr) {
+
+        }
+        else {
+          console.log("update form after cancell");
+        }
+
+      })
+
+
+      const adjustmentForm = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register 
+      SET On_account=On_account+${totalReceiveNow} where Id='${id}'`
+
+      console.log("adjustmentForm query", adjustmentForm, totalReceiveNow);
+      setupQueryMod(adjustmentForm, (adjustmentFormErr, adjustmentFormRes) => {
+        if (adjustmentFormErr) {
+
+        }
+        else {
+          console.log("update adjustment  button form after cancell");
+          res.send({ StatusCancel: "Cancelled" })
+        }
+
+      })
     }
   });
 });
@@ -625,6 +635,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
   //   req.body;
   const { unit, srlType, ResetPeriod, ResetValue, VoucherNoLength } =
     req.body;
+  console.log("UNIT NAME=", unit, srlType);
 
   const prefix = 'JG';
 
@@ -667,6 +678,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
       }
 
       const count = selectResult[0]["COUNT(Id)"];
+      console.log("counttttttttttt", count);
 
       if (count === 0) {
         // If count is 0, execute the INSERT query
@@ -680,13 +692,18 @@ createnew.post("/getDCNo", async (req, res, next) => {
         setupQueryMod(insertQuery, (insertError, insertResult) => {
           if (insertError) {
             logger.error(insertError);
+            console.log("error in insert fro running no", insertError);
             return next(insertResult);
           }
+          else {
 
-          res.json({ message: "Record inserted successfully." });
+            res.json({ message: "Record inserted successfully." });
+          }
         });
-      } else {
-        res.json({ message: "Record already exists." });
+      }
+
+      else {
+        res.json({ message: "Record already existsssssssssss." });
       }
     });
   } catch (error) {
@@ -695,4 +712,374 @@ createnew.post("/getDCNo", async (req, res, next) => {
   }
 });
 
+
+
+//--------------------------------------------------------------------
+
+//new form for cretae screen 
+
+
+createnew.post("/saveReceipt", (req, res) => {
+   console.log("qqqqqqqqqq", req.body);
+  if (req.body.HO_PrvId != "") {
+    if (req.body.Amount == "") {
+      amount = 0.0;
+    } else {
+      amount = req.body.Amount;
+    }
+    //  console.log("amount", amount);
+    const updat =
+      "UPDATE magod_hq_mis.ho_paymentrv_register set TxnType=?, Amount=?, On_account=?, Description=?  WHERE HOPrvId =?";
+
+    setupQueryMod(
+      updat,
+      [
+        req.body.TxnType,
+        amount,
+        req.body.On_account,
+        req.body.Description,
+        req.body.HO_PrvId,
+      ],
+      (e, r) => {
+        //console.log(e, r)
+        if (e) {
+          //  console.log("33");
+          return res.json({ status: "query", Error: "inside signup query" });
+        } else {
+          // console.log("4121", r);
+
+          return res.json({
+            Status: "Success",
+            result: { insertId: req.body.HO_PrvId },
+          });
+        }
+      }
+    );
+  }
+  else {
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
+
+    //Check if the data already exists in the database
+    const currentDate = new Date().toISOString().slice(0, 10);
+    //  console.log("formatDate", currentDate);
+    setupQueryMod(
+      "SELECT HOPrvId FROM magod_hq_mis.ho_paymentrv_register",
+      (error, results) => {
+        // console.log(results, 'jhjkkj');
+        if (req.body.Amount == "") {
+          amount = 0.0;
+        } else {
+          amount = req.body.Amount;
+        }
+        const sqlpost =
+          "INSERT INTO magod_hq_mis.ho_paymentrv_register(Unitname,Recd_PV_Date, Cust_code, CustName, TxnType, Amount, Description, Status,On_account, HORefDate) VALUES (?   )";
+        const values = [
+          req.body.Unitname,
+          currentDate,
+          req.body.Cust_code,
+          req.body.CustName,
+          req.body.TxnType,
+          amount,
+          req.body.Description,
+          req.body.Status,
+          req.body.On_account,
+          currentDate,
+        ];
+        // console.log("values", values);
+        setupQueryMod(sqlpost, [values], (err, result) => {
+          if (err) {
+            //console.log("33");
+            console.log(err);
+            return res.json({ status: "query", Error: "inside signup query" });
+          } else {
+            console.log("55");
+            console.log("result after insert", result);
+            return res.json({ Status: "Success", result: result });
+          }
+        });
+      }
+    );
+  }
+});
+
+
+
+
+
+createnew.get("/getreceipt", (req, res) => {
+  const receipt_id = req.query.receipt_id; // Access the query parameter "customercode"
+  // console.log(receipt_id);
+  const sql =
+    "SELECT  * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId=?;";
+  setupQueryMod(sql, [receipt_id], (err, result) => {
+    if (err) {
+      console.log("error", err);
+      return res.json({ Error: " error in sql" });
+    } else {
+      //console.log("result", result);
+      return res.json({ Status: "Success", Result: result });
+    }
+  });
+});
+
+
+//Delete form data  button API
+// createnew.post("/deleteButton", (req, res) => {
+//   const {receipt_id} = req.body; // Access the query parameter "customercode"
+//  console.log("deleeeeeee",receipt_id,);
+
+//   const sql =
+//   `DELETE FROM magod_hq_mis.ho_paymentrv_details  WHERE HOPrvId ='${receipt_id}'`;
+//   setupQueryMod(sql,  (err, result) => {
+//     if (err) {
+//       console.log("error", err);
+//       return res.json({ Error: " error in sql" });
+//     } else {
+//       //console.log("result", result);
+
+//       const formDelete= `DELETE FROM magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId ='${receipt_id}'`;
+//       setupQueryMod(formDelete,(e,r)=>{
+//         if(e){
+
+//         }else{
+//           console.log("delete successfuklyy");
+//           return res.json({ Status: "Success", Result: r });
+//         }
+//       })
+
+
+//     }
+//   });
+// });
+
+
+
+createnew.post("/deleteButton", (req, res) => {
+  const { receipt_id } = req.body; // Access the query parameter "customercode"
+  console.log("deleeeeeee", receipt_id,);
+
+  
+//delet left tale data
+  const fetchleft = `SELECT * from  magod_hq_mis.ho_paymentrv_details WHERE HOPrvId=?`
+
+      setupQueryMod(fetchleft,[receipt_id] ,(fetche, fetchres) => {
+        if (fetche) {
+          console.log("err in query ", fetche);
+        }
+        else {
+          console.log("fetch left table data", fetchres );
+          if (fetchres.length > 0) {
+            const sql =
+              `DELETE FROM magod_hq_mis.ho_paymentrv_details  WHERE HOPrvId =?`;
+            setupQueryMod(sql, [receipt_id],(e, r) => {
+              if (e) {
+                console.log("err in dlt", e);
+              } else {
+                console.log("delete successfuklyy");
+               
+              }
+            })
+          }
+          else {
+console.log("can not get left table data for delete");
+          }
+        }
+      })
+
+
+
+
+      const formDelete = `DELETE FROM magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId =?`;
+
+  setupQueryMod(formDelete,[receipt_id], (err, result) => {
+    if (err) {
+      console.log("error", err);
+      
+    } else {
+      
+      return res.json({ Status: "Success", Result: result});
+      console.log("resultTTTTTTTT deleted form data");
+    }
+
+  });
+  
+  
+ 
+});
+
+
+createnew.post('/leftTable', (req, res) => {
+  const { receipt_id, unit } = req.body
+  // const receipt_id=1
+  console.log(" left table data", receipt_id, unit);
+  const sql = `SELECT * FROM magod_hq_mis.ho_paymentrv_details   WHERE HOPrvId='${receipt_id}' AND UnitName='${unit}' `;
+  //  const sql=`
+  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("err in query", err);
+    }
+    else {
+      console.log("left table", result);
+      return res.json({ Result: result });
+    }
+  })
+})
+
+
+
+//post data
+createnew.post("/postInvoiceCreateNew", async (req, res, next) => {
+  const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
+console.log("req body after post", req.body);
+  const date = new Date();
+  // const date = new Date("2024-04-01");
+  const year = date.getFullYear();
+
+  const getYear =
+    date.getMonth() >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+  const yearParts = getYear.split("-");
+  const startYearShort = yearParts[0].slice(-2);
+  const endYearShort = yearParts[1].slice(-2);
+  const finYear = `${startYearShort}/${endYearShort}`;
+
+  console.log("finYear", finYear);
+
+  try {
+    const selectQuery = `
+    SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
+    `;
+
+    setupQueryMod(selectQuery, async (selectError, selectResult) => {
+      if (selectError) {
+        logger.error(selectError);
+        return next(selectResult);
+      }
+
+      let newHrefNo = "";
+
+      console.log("select result",selectResult);
+      if (selectResult && selectResult.length > 0) {
+        const lastRunNo = selectResult[0].Running_No;
+        const numericPart = parseInt(lastRunNo) + 1;
+
+        const paddedNumericPart = numericPart.toString().padStart(4, "0");
+
+        newHrefNo = `HO RV/ ${paddedNumericPart}`;
+        console.log("New HrefNo:", newHrefNo);
+
+        // Update Running_No in magod_setup.magod_runningno
+        const updateRunningNoQuery = `
+          UPDATE magod_setup.magod_runningno
+          SET Running_No = ${numericPart}
+          WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
+        `;
+
+        setupQueryMod(updateRunningNoQuery, (updateError, updateResult) => {
+          if (updateError) {
+            logger.error(updateError);
+            return next(updateResult);
+          }
+        });
+      }
+
+
+
+
+      //update open invoice table(right side table)
+
+
+      if (receipt_details.length > 0) {
+
+        receipt_details.forEach((item, index) => {
+
+
+          const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
+          SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
+              u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
+          WHERE u.UnitName = 'Jigani' AND u.DC_Inv_No = ${item.Dc_inv_no};
+          `
+
+          setupQueryMod(updateRightTable, (rightError, rightResult) => {
+            if (rightError) {
+              console.log("righterror", rightError);
+            }
+
+            else {
+
+              console.log("update right table successfully");
+            }
+          })
+
+        })
+
+
+
+      }
+
+
+
+      // Your existing update query
+      setupQueryMod(
+        `UPDATE magod_Hq_Mis.ho_paymentrv_register
+        SET HoRefDate = curdate(), Unitname='${unit}',
+        HORef = '${newHrefNo}',
+        
+        Status = 'Pending'
+        WHERE HOPrvId = '${HO_PrvId}'`,
+        async (updateError, updateResult) => {
+          if (updateError) {
+            logger.error(updateError);
+            return next(updateResult);
+          }
+
+          // Your existing select query after update
+          const postUpdateSelectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId = ${HO_PrvId}`;
+          setupQueryMod(
+            postUpdateSelectQuery,
+            (postUpdateSelectError, postUpdateSelectResult) => {
+              if (postUpdateSelectError) {
+                logger.error(postUpdateSelectError);
+                return next(postUpdateSelectResult);
+              }
+
+              res.json(postUpdateSelectResult);
+            }
+          );
+        }
+      );
+    });
+  } catch (error) {
+    console.error("An error occurred:", error);
+    next(error);
+  }
+});
+
+
+//get details from  rowData through drfts
+
+createnew.get('/getFormByRowData', (req, res) => {
+  const receipt_id = req.query.receipt_id;
+  
+  console.log("req body rowdata", receipt_id);
+ 
+  const sql = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId ='${receipt_id}' `;
+ 
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("err in query", err);
+    }
+    else {
+      console.log("result row data", result);
+      return res.json({ Result: result });
+    }
+  })
+})
 module.exports = createnew;

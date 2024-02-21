@@ -137,7 +137,7 @@ useEffect(() => {
 
 
             <hr className="horizontal-line mt-2" />
-            <div className='col-md-12' style={{ overflowY: 'scroll', overflowX: 'scroll', height: '300px', }}>
+            <div className='col-md-12' style={{ overflowY: 'scroll', overflowX: 'scroll', height: '260px', }}>
                 <Table striped className="table-data border">
                     <thead className="tableHeaderBGColor">
                         <tr style={{whiteSpace:'nowrap'}}>
