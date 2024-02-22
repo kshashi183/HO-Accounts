@@ -39,7 +39,7 @@ export default function TaxDeleteModal({deleteID, setDeleteID, selectRow}) {
           <Modal.Title>WARNING</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body> WARNING-You are about Delete {selectRow.TaxName} from dtabase.Are you sure?
+        <Modal.Body> WARNING-You are about Delete {selectRow.TaxName} .Are you sure?
 
         </Modal.Body>
 

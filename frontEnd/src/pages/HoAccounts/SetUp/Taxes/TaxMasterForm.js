@@ -17,7 +17,7 @@ import { baseURL } from '../../../../api/baseUrl';
 
 
 const initial = {
-    TaxID: '', TaxName: '', Tax_Percent: 0, TaxOn: '', EffectiveFrom: '', EffectiveTO: '', AcctHead: '',
+    TaxID: '', TaxName: '', Tax_Percent: 0,TaxPrintName:'', TaxOn: '', EffectiveFrom: '', EffectiveTO: '', AcctHead: '',
     TallyAcctCreated: 0, UnderGroup: '', Service: 0, Sales: 0, JobWork: 0, IGST: 0
 }
 
@@ -38,6 +38,7 @@ export default function TaxMasterForm() {
                 if (res.data.Status === 'Success') {
                    
                     setTaxData(res.data.Result)
+                    // selectedRowFun(res.data.Result[0], 0);
                 }
             })
             .catch(err => console.log(err))
@@ -92,13 +93,13 @@ console.log("stateeee", state);
         }
     }
 
-    // useEffect(() => {
-    //     if (taxData.length > 0) {
-    //         selectedRowFun(taxData[0], 0)
-    //     } else {
-    //         setSelectRow(initial);
-    //     }
-    // }, [taxData]);
+    useEffect(() => {
+        if (taxData.length > 0) {
+            selectedRowFun(taxData[0], 0)
+        } else {
+            setSelectRow(initial);
+        }
+    }, [taxData]);
 
 
     const updateTaxData = () => {
@@ -226,7 +227,7 @@ console.log("stateeee", state);
     const addNewTax = () => {
         setSelectRow(initial);
         setTaxPostData(initial)
-
+setState(false)
     }
     return (
 
@@ -386,7 +387,7 @@ console.log("stateeee", state);
                                 <input className=" "
                                     value={selectRow.TaxName || taxPostData.TaxName}
 
-                                    disabled={false} onChange={handleOnChange}
+                                     onChange={handleOnChange}
                                     name='TaxName' />
 
                             </div>
@@ -396,7 +397,7 @@ console.log("stateeee", state);
                                 <label className="form-label">Print Name</label>
                                 <input className=" " name='TaxPrintName'
                                     value={selectRow.TaxPrintName || taxPostData.TaxPrintName} onChange={handleOnChange}
-                                    disabled={false} />
+                                     />
                             </div>
                         </div>
 

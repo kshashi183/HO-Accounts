@@ -77,85 +77,12 @@ createnew.post('/getleftTable', (req, res) => {
 })
 
 
-//   createnew.get('/updateHoprvID', (req, res) => {
 
-//    const sql = `SELECT MAX(HOPrvId) AS maxHOPrvId FROM magod_hq_mis.unit_payment_recd_voucher_register `;
-//    //  const sql=`
-//    // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
-//    setupQueryMod(sql, (err, result) => {
-//      if (err) {
-//        console.log("err in query", err);
-//      }
-//      else {
-//       // console.log("left table", result);
-//       const maxHOPrvId = result[0].maxHOPrvId || 0; // Default to 0 if no max HOPrvId found
-//       const nextHOPrvId = maxHOPrvId + 1;
-//       console.log("hoprvid",nextHOPrvId );
-//       res.json({ nextHOPrvId });
-//      }
-//    })
-//  })
-
-
-
-// Unit RV Adjustment backend code 
-// createnew.post('/insertToparentForm', (req, res) => {
-//   const rows = req.body.adjustmentRows
-//   // const receipt_id=1
-//   rows.Amount = 0;
-//   rows.Description = `Adjustment Against Receipt  ${rows.Recd_PVNo}`;
-//   rows.TxnType = 'Adjustment'
-
-
-
-//   const selectQuery11 = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE Unit_RecdPVid = '${rows.RecdPVID}'`;
-//   setupQueryMod(selectQuery11, (fetcherr, fetchRes) => {
-//     if (fetcherr) {
-//       console.log("errr", fetcherr);
-//     }
-//     else {
-
-//     }
-
-//   })
-
-
-
-//   console.log("insert to form", rows.Id);
-//   const sql = `INSERT INTO magod_hq_mis.ho_paymentrv_register
-//  (Unitname,  Cust_code, CustName, TxnType, Amount, Description, HoRefDate,Unit_RecdPVid ) 
-//  VALUES ('${rows.Unitname}', '${rows.Cust_code}' , '${rows.CustName}','${rows.TxnType}', '${rows.Amount}',
-//   '${rows.Description}', CURDATE(), '${rows.RecdPVID}' ) `;
-
-//   setupQueryMod(sql, (err, result) => {
-//     if (err) {
-//       console.log("Error in insert query:", err);
-//       return res.status(500).json({ error: "Failed to insert record" });
-//     }
-
-//     const selectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE Unit_RecdPVid ='${rows.RecdPVID}' `;
-
-//     setupQueryMod(selectQuery, (er, selectResult) => {
-
-//       if (er) {
-//         console.log("Error in select query:", selectErr);
-//         return res.status(500).json({ error: "Failed to fetch inserted record" });
-//       }
-
-//       else {
-//         //console.log("fetch res", selectResult);
-//         res.json({ insertedRecord: selectResult });
-//       }
-//     })
-
-//   })
-
-// })
 
 createnew.post('/insertToparentForm', (req, res) => {
   const rows = req.body.adjustmentRows;
 
-  console.log("rowsss", rows);
+  console.log("rowsss", req.body.unit);
 
   // Check if any records exist with the same Unit_RecdPVid
   const selectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE
@@ -179,9 +106,10 @@ createnew.post('/insertToparentForm', (req, res) => {
       // Construct the SQL query to insert a new record
       const insertQuery = `INSERT INTO magod_hq_mis.ho_paymentrv_register
                            (Unitname, Cust_code, CustName, TxnType, Amount, Description, HoRefDate, Unit_RecdPVid) 
-                           VALUES ('${rows.Unitname}', '${rows.Cust_code}', '${rows.CustName}', '${rows.TxnType}', '${rows.Amount}', '${rows.Description}', CURDATE(), '${rows.RecdPVID}')`;
+                           VALUES ('${req.body.unit}', '${rows.Cust_code}', '${rows.CustName}', '${rows.TxnType}', '${rows.Amount}', '${rows.Description}', CURDATE(), '${rows.RecdPVID}')`;
 
       // Execute the insert query
+      console.log("insert query",insertQuery);
       setupQueryMod(insertQuery, (insertErr, insertResult) => {
         if (insertErr) {
           console.log("Error in insert query:", insertErr);
@@ -237,7 +165,7 @@ createnew.delete("/deleteleft", (req, res) => {
 
 
   const update = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
-SET u.On_account = '${req.body.onacc}'
+SET u.On_account =u.On_account+'${req.body.onacc}'
    
 WHERE u.Id = '${req.body.id}';
  `;
@@ -919,7 +847,7 @@ createnew.post('/leftTable', (req, res) => {
   const { receipt_id, unit } = req.body
   // const receipt_id=1
   console.log(" left table data", receipt_id, unit);
-  const sql = `SELECT * FROM magod_hq_mis.ho_paymentrv_details   WHERE HOPrvId='${receipt_id}' AND UnitName='${unit}' `;
+  const sql = `SELECT * FROM magod_hq_mis.ho_paymentrv_details   WHERE HOPrvId='${receipt_id}'  `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {

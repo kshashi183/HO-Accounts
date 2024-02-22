@@ -13,21 +13,22 @@ export default function CreateNewForm() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { adjustmentRows } = location.state ? location.state : "";
+  const { adjustmentRows, adj_unit } = location.state ? location.state : "";
   let onAccountValue1 = adjustmentRows ? parseInt(adjustmentRows.On_account) : 0
+  console.log("adj unit", adj_unit);
 
-  let sum=0;
- 
+  let sum = 0;
 
 
 
-const[sumofReceive, setSumofReceive]=useState()
- 
+
+  const [sumofReceive, setSumofReceive] = useState()
+
   const [hoprvid, setHoprvid] = useState(0);
   const [getUnit, setGetUnit] = useState("");
   const [getCustomer, setGetCustomer] = useState("");
   const [getCustCode, setGetCustCode] = useState("");
-  
+
   const [selectedTxntType, setSelectedTxntType] = useState("");
   const [getUnitNames, setGetUnitNames] = useState([]);
   const [getCustNames, setGetCustNames] = useState([]);
@@ -107,7 +108,7 @@ const[sumofReceive, setSumofReceive]=useState()
     }
   }, [])
 
-  
+
   console.log("insert to form", adjustmentRows);
 
   const insertToForm = async () => {
@@ -115,7 +116,8 @@ const[sumofReceive, setSumofReceive]=useState()
     const response = await axios.post(
       baseURL + "/createnew/insertToparentForm",
       {
-        adjustmentRows: adjustmentRows
+        adjustmentRows: adjustmentRows,
+        unit: adj_unit
       }
     );
 
@@ -149,17 +151,17 @@ const[sumofReceive, setSumofReceive]=useState()
 
 
   const getleftandRightTabledata = async (cust_code, hoprvID) => {
-       console.log("CUST CODE AND HOPRVID", cust_code, hoprvID);
+    console.log("CUST CODE AND HOPRVID", cust_code, hoprvID);
     try {
       const resp = await axios.post(
-        baseURL + '/createnew/getleftTable',{
-          receipt_id:hoprvID
-        }
+        baseURL + '/createnew/getleftTable', {
+        receipt_id: hoprvID
+      }
       );
 
-    
 
-       console.log("left table daat", resp);
+
+      console.log("left table daat", resp);
 
       try {
         const response = await axios.get(
@@ -185,7 +187,7 @@ const[sumofReceive, setSumofReceive]=useState()
     }
 
   }
-  
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -198,7 +200,7 @@ const[sumofReceive, setSumofReceive]=useState()
 
 
 
- 
+
 
   // Create a new Date object
   const currentDate = new Date();
@@ -304,19 +306,19 @@ const[sumofReceive, setSumofReceive]=useState()
   }, []);
 
 
-  
+
 
   const handleSave = async () => {
     let stopExecution = false;
 
     try {
-      
 
-     
+
+
       console.log("save error recpt detais", rvData.data.receipt_details);
       console.log("save error firsttable arry", rvData.firstTableArray,);
 
-    
+
       if (rvData.data.receipt_details) {
 
         rvData.data.receipt_details.forEach((selectedRow) => {
@@ -479,7 +481,7 @@ const[sumofReceive, setSumofReceive]=useState()
     setSelectedTxntType(event.target.value);
   };
 
-  
+
 
 
 
@@ -527,14 +529,14 @@ const[sumofReceive, setSumofReceive]=useState()
 
   const nav = useNavigate();
 
-  
+
 
 
   const deleteLeftTable = () => {
-    let  sumOfReceive_Now=0
-    let sum=0
+    let sumOfReceive_Now = 0
+    let sum = 0
     let stopExecution = false;
-    alert("entrr")
+
 
     if (rvData.data.receipt_details && rvData.data.receipt_details.length > 0) {
 
@@ -567,86 +569,87 @@ const[sumofReceive, setSumofReceive]=useState()
         }
 
 
-        else{
-           sum=sumOfReceive_Now+onAccountValue22
-          
-          console.log("onaccount value aftr delete",sumOfReceive_Now,sum, onAccountValue22, onAccountValue1);
-          
-axios.delete(
-      baseURL + "/createnew/deleteleft",
-
-      { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: sum } }
-
-    ).then(resp => {
-      console.log("Response data:", resp.data);
-
-      if (resp.data?.Status === 'Success') {
-        setRvData((prevData) => ({
-          ...prevData,
-
-          data: {
-            receipt_details: [],
-            
-          },
-          //firstTableArray: [],
-          postData: {
-            Amount: 0,
-            
-          },
-
-
-
-        }));
-
-        nav("/HOAccounts/HO/RvAdjustment")
-      }
-    })
-      .catch(error => {
-        console.error("Error:", error);
-      });
-
-        }
        
+
       });
+
+
+      sum = sumOfReceive_Now + onAccountValue22
+
+      console.log("onaccount value aftr delete", sumOfReceive_Now, sum, onAccountValue22, onAccountValue1);
+
+      axios.delete(
+        baseURL + "/createnew/deleteleft",
+
+        { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: sumOfReceive_Now } }
+
+      ).then(resp => {
+        console.log("Response data:", resp.data);
+
+        if (resp.data?.Status === 'Success') {
+          setRvData((prevData) => ({
+            ...prevData,
+
+            data: {
+              receipt_details: [],
+
+            },
+            //firstTableArray: [],
+            postData: {
+              Amount: 0,
+
+            },
+
+
+
+          }));
+
+          nav("/HOAccounts/HO/RvAdjustment")
+        }
+      })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+      
     }
 
 
 
 
-    else{
-      alert("d")
+    else {
+
       axios.delete(
-      baseURL + "/createnew/deleteleft",
+        baseURL + "/createnew/deleteleft",
 
-      { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: onAccountValue1 } }
+        { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: 0 } }
 
-    ).then(resp => {
-      console.log("Response data:", resp.data);
+      ).then(resp => {
+        console.log("Response data:", resp.data);
 
-      if (resp.data?.Status === 'Success') {
-        setRvData((prevData) => ({
-          ...prevData,
+        if (resp.data?.Status === 'Success') {
+          setRvData((prevData) => ({
+            ...prevData,
 
-          data: {
-            receipt_details: [],
-            
-          },
-          //firstTableArray: [],
-          postData: {
-            Amount: 0,
-            
-          },
+            data: {
+              receipt_details: [],
+
+            },
+            //firstTableArray: [],
+            postData: {
+              Amount: 0,
+
+            },
 
 
 
-        }));
+          }));
 
-        nav("/HOAccounts/HO/RvAdjustment")
-      }
-    })
-      .catch(error => {
-        console.error("Error:", error);
-      });
+          nav("/HOAccounts/HO/RvAdjustment")
+        }
+      })
+        .catch(error => {
+          console.error("Error:", error);
+        });
     }
 
 
@@ -668,12 +671,12 @@ axios.delete(
 
     //       data: {
     //         receipt_details: [],
-            
+
     //       },
     //       //firstTableArray: [],
     //       postData: {
     //         Amount: 0,
-            
+
     //       },
 
 
@@ -686,14 +689,14 @@ axios.delete(
     //   .catch(error => {
     //     console.error("Error:", error);
     //   });
-     
+
   }
-  
+
 
   let onAccountValue = onAccountValue1
   const [onAccountValue22, setOnAccountValue] = useState(onAccountValue1);
 
-  
+
 
   const addInvoice = async () => {
     console.log("noeie", onAccountValue22);
@@ -855,7 +858,7 @@ axios.delete(
   };
 
 
- 
+
 
 
 
@@ -912,8 +915,8 @@ axios.delete(
 
     rvData.firstTableArray = [];
 
-  
- // handleSave();
+
+    // handleSave();
 
 
   };
@@ -921,25 +924,25 @@ axios.delete(
 
   console.log("handle change onccount value", onAccountValue22);
 
-//update the Receive_now value when onchange
-useEffect(()=>{
-  if (rvData.data.receipt_details.length > 0) {
+  //update the Receive_now value when onchange
+  useEffect(() => {
+    if (rvData.data.receipt_details.length > 0) {
 
-    const updateReceive_Now =  axios.put(
-      baseURL + "/createnew/updateReceiveNowAmount",
-      {
-        receipt_details: rvData.data.receipt_details
-      }
-    );
+      const updateReceive_Now = axios.put(
+        baseURL + "/createnew/updateReceiveNowAmount",
+        {
+          receipt_details: rvData.data.receipt_details
+        }
+      );
 
-  }
-},[rvData.data.receipt_details])
-
-
- 
+    }
+  }, [rvData.data.receipt_details])
 
 
-  
+
+
+
+
 
 
 
@@ -1034,46 +1037,46 @@ useEffect(()=>{
 
   const cancelYes = () => {
 
-  
-    if(reason.length>15){
+
+    if (reason.length > 15) {
       setCancelPopup(false)
       cancelllationSubmit();
     }
-    else{
+    else {
       toast.error("Need more than 15 chracters")
     }
 
-    
-    
+
+
   }
 
-  console.log("ho prv iddddddd", rvData.postData.HO_PrvId,rvData.postData.CustName);
-  const hprvd=rvData.postData.HO_PrvId;
-  const cu=rvData.postData.CustName;
-  console.log("after cancel post ",hprvd,cu );
+  console.log("ho prv iddddddd", rvData.postData.HO_PrvId, rvData.postData.CustName);
+  const hprvd = rvData.postData.HO_PrvId;
+  const cu = rvData.postData.CustName;
+  console.log("after cancel post ", hprvd, cu);
 
 
 
   const cancelllationSubmit = async () => {
-    console.log("rece now sum cancel ()",sumofReceive );
+    console.log("rece now sum cancel ()", sumofReceive);
     const cancelData = await axios.post(
       baseURL + "/createNew/cancelUpdate",
       {
 
         HO_PrvId: rvData.postData.HO_PrvId,
-        
-custName:rvData.postData.CustName,
-totalReceiveNow:sumofReceive,
-id:id
+
+        custName: rvData.postData.CustName,
+        totalReceiveNow: sumofReceive,
+        id: id
 
       }
     );
 
-    console.log("data after cancel ",cancelData.data.StatusCancel);
+    console.log("data after cancel ", cancelData.data.StatusCancel);
 
     setRvData((prevRvData) => ({
       ...prevRvData,
-      
+
       postData: {
         ...prevRvData.postData,
         Status: cancelData.data.StatusCancel,
@@ -1082,10 +1085,10 @@ id:id
 
 
 
-    
+
   }
 
- 
+
 
   let totalamnt = 0;
 
@@ -1251,7 +1254,7 @@ id:id
 
   console.log("total onaccount valuw2", onAccountValue22);
 
- 
+
 
 
   const getDCNo = async () => {
@@ -1275,11 +1278,11 @@ id:id
     }
   };
 
- 
+
 
 
   const postInvoice = () => {
-    
+
     if (!rvData.postData.Description) {
       toast.error("Narration Missing");
       return;
@@ -1308,8 +1311,8 @@ id:id
         const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
         const amountReceived = parseFloat(selectedRow.Amt_received || 0);
 
-       
-       
+
+
 
         if (formattedValue > invoiceAmount - amountReceived) {
           toast.error("Cannot Receive More than Invoice Amount");
@@ -1338,18 +1341,18 @@ id:id
     }
   };
 
-  
+
 
   console.log("rectttttttttt", rvData.data.receipt_details);
 
   const handlePostYes = async () => {
 
-    console.log("rece now sum post yes",sumofReceive );
-    
+    console.log("rece now sum post yes", sumofReceive);
+
     setShowPostModal(false);
     let stopExecution = false;
     try {
-      
+
       if (rvData.data.receipt_details) {
 
         rvData.data.receipt_details.forEach((selectedRow) => {
@@ -1364,7 +1367,7 @@ id:id
           const invoiceAmount = parseFloat(selectedRow.Inv_Amount || 0);
           const amountReceived = parseFloat(selectedRow.Amt_received || 0);
           sum += formattedValue;
-          
+
 
           if (formattedValue > invoiceAmount - amountReceived) {
             toast.error("Cannot Receive More than Invoice Amount");
@@ -1399,7 +1402,7 @@ id:id
         receipt_details: rvData.data.receipt_details,
         onacc: onAccountValue22,
         id: id,
-        
+
       });
 
       console.log("PostInvoice Response", response.data);
@@ -1415,9 +1418,9 @@ id:id
           ...prevRvData.data,
           HORefNo: response.data[0].HORef,
           Status: response.data[0].Status,
-          Amount:response.data[0].Amount,
-          CustName:response.data[0].CustName,
-          HO_PrvId:response.data[0].HOPrvId,
+          Amount: response.data[0].Amount,
+          CustName: response.data[0].CustName,
+          HO_PrvId: response.data[0].HOPrvId,
         },
 
         firstTableArray: [],
@@ -1454,7 +1457,7 @@ id:id
   console.log("firstTableArray", rvData.firstTableArray);
 
 
-//store your postdata into  receipt_data
+  //store your postdata into  receipt_data
   useEffect(() => {
     if (rvData.postData) {
       setRvData((prevRvData) => ({
@@ -1484,7 +1487,7 @@ id:id
   }
 
 
-  
+
 
 
   return (
@@ -1492,8 +1495,8 @@ id:id
 
       {
         pdfVoucher && <PdfModal
-          setPdfVoucher={setPdfVoucher} pdfVoucher={pdfVoucher} data={rvData.data} data2={rvData.postData} 
-          setRvData={setRvData}/>
+          setPdfVoucher={setPdfVoucher} pdfVoucher={pdfVoucher} data={rvData.data} data2={rvData.postData}
+          setRvData={setRvData} />
       }
       <div className="col-md-12">
         <div className="row">
@@ -1546,8 +1549,8 @@ id:id
             placeholder="Select Unit"
             onChange={handleSelectUnit}
             selected={selectedOption}
-           disabled
-          
+            disabled
+
           />
         </div>
 
@@ -1674,7 +1677,7 @@ id:id
         </div>
 
 
-        <div className="col-md-6 row" style={{gap:'10px'}}>
+        <div className="col-md-6 row" style={{ gap: '10px' }}>
           <div className="col-md-2 mt-4">
             <button
               className={
@@ -1753,7 +1756,7 @@ id:id
               style={{ width: "90px" }}
               onClick={canacleButton}
               disabled={
-                rvData && rvData.postData.Status !== "Pending" ||  rvData.postData.Status==='Cancelled'
+                rvData && rvData.postData.Status !== "Pending" || rvData.postData.Status === 'Cancelled'
 
               }
             >
