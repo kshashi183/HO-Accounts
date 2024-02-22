@@ -63,7 +63,7 @@ unitlist.post("/postUnitDetails", (req, res) => {
     const Cust_Code = 0;
     const GST_URL = 'http://www.magodlaserWELD.in';
 
-    console.log("postdata", req.body);
+   // console.log("postdata", req.body);
     let store = 0;
 
 
@@ -87,7 +87,7 @@ unitlist.post("/postUnitDetails", (req, res) => {
         }
     })
 
-    const sqlquery = `SELECT  UnitID, UnitName FROM magod_setup.magodlaser_units`;
+    const sqlquery = `SELECT  UnitID, UnitName, UnitIntial FROM magod_setup.magodlaser_units`;
 
     setupQueryMod(sqlquery, (err, results) => {
 
@@ -95,7 +95,7 @@ unitlist.post("/postUnitDetails", (req, res) => {
         for (let i = 0; i < results.length; i++) {
             console.log("hi");
 
-            if (results[i].UnitID === req.body.UnitID  ||results[i].UnitName === req.body.UnitName ) {
+            if (results[i].UnitID === req.body.UnitID  ||results[i].UnitName === req.body.UnitName || req.body.UnitIntial===results[i].UnitIntial ) {
                 console.log("database", results[i].UnitID, results[i].UnitName);
                 console.log("req body", req.body.UnitID, req.body.UnitName);
 
@@ -179,7 +179,7 @@ unitlist.put("/updateData/:UnitID", (req, res) => {
 let StateId=0;
     const id = req.params.UnitID;
     console.log("update id", id);
-    const up = 'SELECT UnitID  FROM magod_setup.magodlaser_units';
+    const up = 'SELECT UnitID , UnitIntial FROM magod_setup.magodlaser_units';
 
 
     const q = `SELECT StateCode ,State FROM magod_setup.state_codelist WHERE State='${req.body.State}'`
@@ -207,7 +207,7 @@ let StateId=0;
 
         let x = 0;
         for (let i = 0; i < r.length; i++) {
-            if (r[i].UnitID === id) {
+            if (r[i].UnitID === id || req.body.UnitIntial===r[i].UnitIntial) {
 
                 x++;
                 console.log("req id and ", req.body.UnitID, r[i].UnitID);

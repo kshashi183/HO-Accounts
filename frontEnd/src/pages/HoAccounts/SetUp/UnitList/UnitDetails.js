@@ -98,15 +98,15 @@ export default function UnitDetails() {
         else if (res.data.status === 'query') {
           console.log("22");
 
-          toast.error("Data is not posted")
+          toast.error("Unit Initial Should be Unique")
         }
         else if (res.data.status === 'success') {
 
-          if (t > 0) {
+         
             console.log("qwertyuio");
             toast.success(" Jigani Unit added Successfully")
 
-          }
+          
 
 
           setTimeout(() => {
@@ -142,17 +142,17 @@ export default function UnitDetails() {
         }
 
       }
-      else if (postData.UnitIntial.length > 3) {
+      else if (postData.UnitIntial.length > 3  ) {
         console.log(postData.UnitIntial.length, 'pos');
 
         if (test > 0) {
-          toast.error('Unit_Intial Length must be less than 3');
+          toast.error('Unit_Intial should be unique and  Length must be less than 3  ');
         }
       }
 
       else if (postData.PIN === '' && postData.Unit_GSTNo === '' && postData.Mail_Id == '') {
 
-        console.log("jjjjj");
+       
         insertData(e, test);
       }
 
@@ -340,8 +340,10 @@ export default function UnitDetails() {
   }
 
   const unitFormChange = (e) => {
+   
 
     const { name, value, type, checked } = e.target;
+    console.log("unit form cahnfe", value);
     if (!state) {
       if (type === 'checkbox') {
 
@@ -743,6 +745,7 @@ export default function UnitDetails() {
               <input className="mt-3 col-md-3 ms-5  custom-checkbox" type="checkbox" name='Current'
                 id="flexCheckDefault"
                 checked={selectRow.Current === 1 ? true : false || postData.Current === 1 ? true : false}
+                onChange={unitFormChange}
 
               />
             </div>

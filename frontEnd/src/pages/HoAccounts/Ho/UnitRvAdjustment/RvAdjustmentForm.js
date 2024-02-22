@@ -133,7 +133,8 @@ export default function RvAdjustmentForm() {
     select: select,
     CustCode: selectedCustCode,
     id:id,
-     adjustmentRows:selectRow
+     adjustmentRows:selectRow,
+    adj_unit: selectedUnitName.UnitName
 };
         console.log("select rowwwww",select);
         navigate("/HOAccounts/HO/HOPRV/Adjustment", {state: state });
@@ -169,7 +170,7 @@ export default function RvAdjustmentForm() {
       }, []);
     
 
-      console.log("currrrrent", currentPageData);
+      console.log("currrrrent", selectedUnitName.UnitName);
     return (
         <div>
             

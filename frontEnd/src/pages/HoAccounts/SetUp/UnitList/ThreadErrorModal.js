@@ -16,7 +16,8 @@ export default function ThreadErrorModal({threadModal, setThreadModal,unitDetail
           <Modal.Title>magod_machine</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>  Column 'UnitName'  And 'UnitID' is constrained to be unique. 
+        <Modal.Body>  Column 'UnitName'  And 'UnitID' is constrained to be unique  and
+           Unit_Intial should be unique. 
            
 
          </Modal.Body> 
