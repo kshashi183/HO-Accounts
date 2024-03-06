@@ -128,6 +128,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
                             }
                         },
                         TALLYMESSAGE: invoiceListData.map((voucher) => {
+                           
                             const creditPeriod = Math.round(
                                 Math.abs(new Date(voucher.PaymentDate) - new Date(voucher.Inv_Date)) / (1000 * 60 * 60 * 24)
                             );
@@ -211,9 +212,10 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
                                     VCHTYPE: voucher.DC_InvType,
                                     ACTION: 'Create'
                                 },
-                                DATE: voucher.Inv_Date,
+                                DATE:  voucher.Inv_Date.replace(/-/g, ''),
+                               
                                 GUID: voucher.DC_Inv_No,
-                                NARRATION: `Our WO No: ${voucher.OrderNo} Packing Note No: ${voucher.DC_no}/ ${voucher.DC_Fin_Year}`,
+                                NARRATION: `Our WO No: ${voucher.OrderNo} Packing Note No: ${voucher.DC_No}/ ${voucher.DC_Fin_Year}`,
                                 VOUCHERTYPENAME: voucher.DC_InvType,
                                 VOUCHERNUMBER: `${voucher.PreFix} /${voucher.Inv_No} / ${voucher.Inv_Fin_Year}`,
                                 REFERENCE: voucher.PO_No,
@@ -247,6 +249,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
                             };
     
                             return {
+                                
                                 VOUCHER: baseVoucher
                             };
                         }),
@@ -254,9 +257,17 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
                 },
             },
         };
+
+       
     
         const xml = xmljs.js2xml(xmlData, { compact: true, spaces: 2 });
-        return xml;
+        
+ // Adding attribute to every TALLYMESSAGE element
+ const modifiedXml = xml.replace(/<TALLYMESSAGE>/g, '<TALLYMESSAGE xmlns:UDF="TallyUDF">');
+
+ return modifiedXml;
+        
+       // return xml;
     };
     
 

@@ -15,7 +15,8 @@ export default function CreateNewForm() {
 
   const { adjustmentRows, adj_unit } = location.state ? location.state : "";
   let onAccountValue1 = adjustmentRows ? parseInt(adjustmentRows.On_account) : 0
-  console.log("adj unit", adj_unit);
+  console.log("adj unit", adjustmentRows);
+  const adj_unitname=adj_unit;
 
   let sum = 0;
 
@@ -39,7 +40,7 @@ export default function CreateNewForm() {
 
   const [pdfVoucher, setPdfVoucher] = useState(false);
 
-
+const [alertCancel, setAlertCancel]=useState(false)
 
 
   const [rvData, setRvData] = useState({
@@ -222,6 +223,7 @@ export default function CreateNewForm() {
 
   const handlePostModalClose = () => {
     setShowPostModal(false);
+    setAlertCancel(false);
   };
 
   const handleUnitNames = () => {
@@ -315,8 +317,7 @@ export default function CreateNewForm() {
 
 
 
-      console.log("save error recpt detais", rvData.data.receipt_details);
-      console.log("save error firsttable arry", rvData.firstTableArray,);
+    
 
 
       if (rvData.data.receipt_details) {
@@ -411,13 +412,13 @@ export default function CreateNewForm() {
 
         console.log("Amount  else:", rvData.postData.Cust_code);
 
-        const unitToStore = getUnit === ' ' ? rvData.postData.UnitName : getUnit;
+      //  const unitToStore = getUnit === ' ' ? rvData.postData.UnitName : getUnit;
         const custCodetostore = getCustCode === '' ? rvData.postData.Cust_code : getCustCode
         const custnametostore = getCustomer === '' ? rvData.postData.CustName : getCustCode
         const updateResponse = await axios.post(
           baseURL + "/hoCreateNew/updateData",
           {
-            unit: getUnit,
+            unit: adj_unitname,
             HO_PrvId: rvData.postData.HO_PrvId,
             custCode: custCodetostore,
             custName: custnametostore,
@@ -983,6 +984,17 @@ export default function CreateNewForm() {
     }
   };
 
+
+
+  const alertformClose=()=>{
+    setAlertCancel(false)
+  }
+
+  const forCancelFormOpen=()=>{
+    setAlertCancel(false)
+    setCancelPopup(true);
+  }
+
   const [cancelPopup, setCancelPopup] = useState(false)
 
   const canacleButton = () => {
@@ -1026,10 +1038,13 @@ export default function CreateNewForm() {
     if (stopExecution) return;
 
     else {
-      setCancelPopup(true)
+     
+     setAlertCancel(true);
     }
   }
 
+
+  
 
   const handleCancelClose = () => {
     setCancelPopup(false)
@@ -1344,6 +1359,7 @@ export default function CreateNewForm() {
 
 
   console.log("rectttttttttt", rvData.data.receipt_details);
+  
 
   const handlePostYes = async () => {
 
@@ -1538,52 +1554,17 @@ export default function CreateNewForm() {
           <input className="" value={inputValue} />
         </div>
 
-        <div className="col-md-3">
-          <label className="form-label">Select Unit </label>
-          <Typeahead
-            id="basic-example"
-            labelKey={(option) =>
-              option && option.UnitName ? option.UnitName.toString() : ""
-            }
-            options={getUnitNames}
-            placeholder="Select Unit"
-            onChange={handleSelectUnit}
-            selected={selectedOption}
-            disabled
+       
 
-          />
-        </div>
-
-        <div className=" col-md-4  ">
-          <label className="form-label">Customer</label>
-          <Typeahead
-            id="basic-example"
-            labelKey={(option) =>
-              option && option.Cust_Name ? option.Cust_Name.toString() : ""
-            }
-            options={getCustNames}
-            placeholder="Select Customer"
-            onChange={handleSelectCustomer}
-            selected={selectedCustOption}
-            disabled
-          />
-        </div>
-      </div>
-
-      <div className="row col-md-12 " style={{}}>
-        <div className="col-md-2">
-          <label className="form-label">Transaction Type</label>
+<div className="col-md-3">
+          <label className="form-label ">Transaction Type</label>
           <select
-            className="ip-select"
+            className="ip-select mt-1"
             name="TxnType"
             id="TxnType"
             onChange={PaymentReceipts}
             value={rvData.postData.TxnType}
-          // disabled={
-          //   rvData.postData.Status != "Draft"
-          //     ? rvData.postData.Status
-          //     : ""
-          // }
+          
           >
             <option value="">Select</option>
             <option value="Bank">Bank</option>
@@ -1602,7 +1583,7 @@ export default function CreateNewForm() {
           </select>
         </div>
 
-        <div className="col-md-3 ">
+        <div className="col-md-4 ">
           <label className="form-label">Receive Form</label>
           <input className="" value={rvData.postData.CustName}
             disabled={
@@ -1612,8 +1593,12 @@ export default function CreateNewForm() {
             }
           />
         </div>
+      </div>
 
-        <div className="col-md-3">
+      <div className="row col-md-12 " >
+       
+
+        <div className="col-md-2">
           <label className="form-label">Amount</label>
           <input
             name="Amount"
@@ -1634,9 +1619,7 @@ export default function CreateNewForm() {
           />
 
         </div>
-      </div>
 
-      <div className=" row ">
         <div className="col-md-2">
           <label className="form-label">Status</label>
           <input
@@ -1651,12 +1634,18 @@ export default function CreateNewForm() {
           />
         </div>
 
-        <div className="col-md-2">
+        <div className="col-md-5">
           <label className="form-label">Reason</label>
           <input name="reason" disabled value={reason} />
         </div>
+      </div>
 
-        <div className="col-md-2">
+      <div className=" row ">
+        
+
+        
+
+        <div className="col-md-5">
           <label className="form-label">Description</label>
           <textarea
             className="form-control"
@@ -1666,11 +1655,7 @@ export default function CreateNewForm() {
             onChange={PaymentReceipts}
             value={rvData.postData.Description}
 
-            // disabled={
-            //   rvData && rvData.postData.Status !== "Draft"
-            //     ? rvData.postData.Status
-            //     : "" 
-            // }
+          
 
             style={{ height: "70px", resize: "none" }}
           ></textarea>
@@ -1801,7 +1786,7 @@ export default function CreateNewForm() {
             </div>
 
             <div className="col-md-4 ">
-              <label className="form-label">Adjusted</label>
+              <label className="form-label">Amount Adjusted</label>
               <input name="reason" disabled value={adjustmentRows ? adjustmentRows.On_account : ''} />
             </div>
           </div>
@@ -1827,22 +1812,7 @@ export default function CreateNewForm() {
                   <th>Received</th>
                   <th>Receive Now</th>
                   <th>Id</th>
-                  {/* <th>Unitname</th>
-                  <th>PVSrlID</th>
-                  <th>Unit_UId</th>
-                  <th>HOPrvId</th>
-                  <th>RecdPvSrl</th>
-                  <th>HO_Uid</th>
-                  <th>Dc_inv_no</th>
-                  <th>Inv_No</th>
-                  <th>Inv_Type</th>
-                  <th>Inv_Amount</th>
-                  <th>Amt_received</th>
-                  <th>Receive_Now</th>
-                  <th>InvUpdated</th>
-                  <th>Inv_date</th>
-                  <th>RefNo</th>
-                  <th>UnitID</th> */}
+                  
                 </tr>
               </thead>
 
@@ -1896,28 +1866,7 @@ export default function CreateNewForm() {
                           />
                         </td>
                         <td>{data.Id}</td>
-                        {/* <td>{data.Unitname}</td>
-                          <td>{data.Unitname}</td>
-                          <td>{data.Unitname}</td>
-                          <td>{data.HOPrvId}</td>
-                          <td>{data.RecdPvSrl}</td>
-                          <td>{data.Unitname}</td>
-                          <td>{data.Dc_inv_no}</td>
-                          <td>{data.Inv_No}</td>
-                          <td>{data.Inv_Type}</td>
-                          <td>{data.Inv_Amount}</td>
-                          <td>{data.Amt_received}</td>
-                          <td>{data.Receive_Now}</td>
-                          <td>{data.Unitname}</td>
-                          <td>
-                            {new Date(data.Inv_date).toLocaleDateString(
-                              "en-GB"
-                            )}
-                          </td>
-
-                          <td>{data.RefNo}</td>
                         
-                          <td>{formatAmount(data.Amt_received)}</td> */}
                       </tr>
                     </>
                   ))
@@ -1939,11 +1888,7 @@ export default function CreateNewForm() {
               </label>
             </div>
 
-            {/* <div className="col-md-5 mt-3">
-              <select className="ip-select" disabled>
-                <option value="option 1">{getCustomer}</option>
-              </select>
-            </div> */}
+            
 
             <div className=" col-md-5 mb-1">
               <button
@@ -1953,10 +1898,7 @@ export default function CreateNewForm() {
                     ? "disabled-button"
                     : "button-style  group-button"
                 }
-                // className={
-                //   !rvData.postData.HO_PrvId ? "disabled-button" : "button-style"
-                // }
-                // disabled={!rvData.postData.HO_PrvId}
+                
                 disabled={
                   rvData && rvData.postData.Status !== "Draft"
                     ? rvData.postData.Status
@@ -2056,6 +1998,34 @@ export default function CreateNewForm() {
       </Modal>
 
 
+      <Modal show={alertCancel} onHide={handlePostModalClose} size="md">
+        <Modal.Header closeButton>
+          <Modal.Title>HO Accounts</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          Do You wish to open cancel form
+          
+        </Modal.Body>
+
+        <Modal.Footer>
+          <button
+            className="button-style"
+            style={{ width: "50px" }}
+            onClick={forCancelFormOpen}
+          >
+            Yes
+          </button>
+
+          <button
+            className="button-style"
+            style={{ width: "50px", backgroundColor: "rgb(173, 173, 173)" }}
+            onClick={alertformClose}
+          >
+            No
+          </button>
+        </Modal.Footer>
+      </Modal>
 
 
       <Modal size="lg" show={cancelPopup} onHide={handleCancelClose}>

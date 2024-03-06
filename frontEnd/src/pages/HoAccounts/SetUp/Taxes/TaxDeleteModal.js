@@ -18,7 +18,7 @@ export default function TaxDeleteModal({deleteID, setDeleteID, selectRow}) {
           //  alert("deleted successful")
          // toast.warn("deleted successful");
            // window.location.reload();
-           toast.warn("Deleted successfully");
+           toast.success("Deleted successfully");
           // 3000 milliseconds = 3 seconds
           setTimeout(() => {
 
@@ -39,7 +39,8 @@ export default function TaxDeleteModal({deleteID, setDeleteID, selectRow}) {
           <Modal.Title>WARNING</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body> WARNING-You are about Delete {selectRow.TaxName} .Are you sure?
+        <Modal.Body> 
+        WARNING - You are about to Delete {selectRow.TaxName} FROM Database, Are You Sure?
 
         </Modal.Body>
 

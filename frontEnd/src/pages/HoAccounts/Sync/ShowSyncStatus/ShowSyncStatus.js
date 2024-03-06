@@ -31,9 +31,14 @@ export default function ShowSyncStatus() {
   const [selectRowHO, setSelectRowHO] = useState([]);
 
   const handleButtonClick = (e) => {
+    if(getName){
     fileInputRef.current.click();
     console.log("Xml File", fileInputRef);
     handleApi();
+    }
+    else{
+      toast.warn("Select Unit")
+    }
   };
 
 
@@ -180,32 +185,8 @@ export default function ShowSyncStatus() {
       URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      // const handle = await window.showSaveFilePicker({
-      //   suggestedName: fileXml,
-      //   types: [
-      //     {
-      //       description: "XML Files",
-      //       accept: {
-      //         "text/xml": [".xml"],
-      //       },
-      //     },
-      //   ],
-      // });
-
-      // const writable = await handle.createWritable();
-      // await writable.write(blob);
-      // await writable.close();
-
-      // if (
-      //   getCustInvoice === 0 &&
-      //   getInvoiceList === 0 &&
-      //   getPaymentReceipts === 0 &&
-      //   getCancelledUnit === 0
-      // ) {
-      //   toast.success("Unit Vouchers In Sync");
-      // } else {
-      //   // <SendMail/>
-      // }
+     
+     
     } catch (error) {
       console.error("Error saving file:", error);
     }
@@ -264,8 +245,9 @@ export default function ShowSyncStatus() {
     axios
       .get(baseURL + `/showSyncStatus/hoUnitNames`)
       .then((res) => {
-        // console.log("firstTable", res.data)
+         console.log("firstTable", res.data[0].UnitName)
         setunitData(res.data);
+        setGetName(res.data[0].UnitName)
       })
       .catch((err) => {
         console.log("err in table", err);
@@ -281,13 +263,13 @@ export default function ShowSyncStatus() {
   };
 
 
-
+  //console.log("unit namee1111", getName);
 
   const handleApi = async () => {
-
+console.log("unit namee", getName);
 
     await axios
-      .put(baseURL + `/showSyncStatus/updateUnitInvoicePaymentStatus`)
+      .put(baseURL + `/showSyncStatus/updateUnitInvoicePaymentStatus/`+getName)
       .then((res) => {
         console.log("Data updated sucessfully", res.data);
       })
@@ -365,6 +347,7 @@ export default function ShowSyncStatus() {
   const [unmatchedInvoices, setunmatchedInvoices] = useState([]);
 
   const compare = (report) => {
+   
     if (getUnitInvoice.length === 1) {
       const unitInvoices = getUnitInvoice[0].cmdInvList;
       setInvPaymentVrList(getUnitInvoice[0].cmdInvPaymentVrList);
@@ -377,9 +360,11 @@ export default function ShowSyncStatus() {
         );
 
         if (matchedInv) {
+         
           // Invoice is matched, add to matchedInvoices array
           matchedInvoices.push({ ...unitInv, matchedInv });
         } else {
+          
           // Invoice is unmatched, add to unmatchedInvoices array
           unmatchedInvoices.push(unitInv);
         }
@@ -391,6 +376,7 @@ export default function ShowSyncStatus() {
       // Now unmatchedInvoices contains the invoices present in unitInvoices but not in report.open_inv
       console.log("unmatchedInvoices", unmatchedInvoices);
     } else {
+     
       console.log("there is no length");
     }
   };
@@ -466,15 +452,17 @@ export default function ShowSyncStatus() {
 
       console.log("unit dc no", paymentVr.dc_inv_no, selectRow.DC_Inv_No);
       selectedPaymentVr.push(paymentVr);
+      console.log("unit second table",selectedPaymentVr);
     }
   }
 
-  console.log("vvvvvv", invPaymentVrList);
+ // console.log("vvvvvv", invPaymentVrList);
   //HO paymentVr
   const selectedPaymentVrHO = [];
   for (const paymentVrHO of invPaymentVrListHO) {
     if (paymentVrHO.dc_inv_no == selectRowHO.DC_Inv_No) {
       selectedPaymentVrHO.push(paymentVrHO);
+     // console.log("ho second table",selectedPaymentVrHO);
     }
   }
 
@@ -527,7 +515,7 @@ export default function ShowSyncStatus() {
     }
   };
 
-  let countUnmatched = unmatchedInvoices.length;
+  let countUnmatched = unmatchedInvoicesHO.length;
   const formatDate = (dateString) => {
     const dateObject = new Date(dateString);
     return dateObject.toLocaleDateString("en-GB", {
@@ -847,7 +835,7 @@ export default function ShowSyncStatus() {
                   <Table striped className="table-data border mt-1">
                     <thead className="tableHeaderBGColor">
                       <tr>
-                        <th style={{ whiteSpace: "nowrap" }}>Inv Type</th>
+                        <th style={{ whiteSpace: "nowrap" }}>Inv TType</th>
                         <th style={{ whiteSpace: "nowrap" }}>Inv No</th>
                         <th>Date</th>
                         <th style={{ whiteSpace: "nowrap" }}>Inv Total</th>
@@ -978,12 +966,17 @@ export default function ShowSyncStatus() {
                     </thead>
 
                     <tbody className="tablebody">
-                      <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                      </tr>
+                    {selectedPaymentVrHO &&
+                        selectedPaymentVrHO.map((item, key) => {
+                          return (
+                            <tr style={{ whiteSpace: "nowrap" }} key={key}>
+                              <td>{item.VoucherNo}</td>
+                              <td>{item.TxnType}</td>
+                              <td>{item.Receive_Now}</td>
+                              <td>{item.VoucherStatus}</td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </Table>
                 </div>

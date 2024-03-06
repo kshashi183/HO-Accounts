@@ -248,183 +248,6 @@ createnew.put('/updateReceiveNowAmount', (req, res) => {
 
 
 
-// createnew.post("/cancelUpdate", async (req, res, next) => {
-//   try {
-//     const { HO_PrvId, } = req.body;
-//     console.log("REQ_BODY", req.body);
-
-
-//     //fetch receipt details
-//     const sqlquery = ` SELECT * FROM magod_hq_mis.ho_paymentrv_details  WHERE HOPrvId='${HO_PrvId}'`
-//     setupQueryMod(sqlquery, (err, resu) => {
-//       if (err) {
-
-//       }
-//       else {
-//         console.log("cncel res", resu);
-
-
-//         if (resu.length > 0) {
-
-//           resu.forEach((item) => {
-//             const { UnitName, Dc_inv_no } = item
-
-//             const sql = `UPDATE magod_hq_mis.unit_invoices_list d
-//           JOIN (
-//               SELECT 
-//                   CASE WHEN SUM(a.Receive_Now) IS NULL THEN 0 ELSE SUM(a.Receive_Now) END AS Receive_now 
-//               FROM (
-//                   SELECT 
-//                       p.Receive_Now,
-//                       p1.Recd_PvNo AS VrNo
-//                   FROM 
-//                       magod_hq_mis.unit_payment_recd_voucher_details p
-//                       JOIN magod_hq_mis.unit_payment_recd_voucher_register p1 
-//                           ON p1.RecdPVID = p.RecdPVID
-//                   WHERE  
-//                       p1.Unitname = '${UnitName}' 
-//                       AND p.Dc_inv_no = '${Dc_inv_no}'
-//                       AND NOT (p1.PRV_Status LIKE 'Cancelled' OR p1.PRV_Status LIKE 'Draft')
-//                   UNION
-//                   SELECT 
-//                       p.Receive_Now,
-//                       p1.HORef AS VrNo
-//                   FROM 
-//                       magod_hq_mis.ho_paymentrv_details p
-//                       JOIN magod_hq_mis.ho_paymentrv_register p1 
-//                           ON p1.HOPrvId = p.HOPrvId
-//                   WHERE  
-//                       p1.Unitname = '${UnitName}'
-//                       AND p.Dc_inv_no = '${Dc_inv_no}'
-//                       AND NOT (p1.Status LIKE 'Cancelled' OR p1.Status LIKE 'Draft')
-//               ) AS a
-//           ) AS b ON 1=1
-//           SET 
-//               d.PymtAmtRecd = b.Receive_now,
-//               d.DCStatus = CASE 
-//                   WHEN d.grandTotal - b.receive_now = 0 THEN 'Closed'
-//                   WHEN d.grandTotal - b.receive_now > 0 THEN 'Despatched'
-//                   ELSE 'OverPaid' 
-//               END
-//           WHERE 
-//               d.Unitname = '${UnitName}' 
-//               AND d.Dc_inv_no = '${Dc_inv_no}';`;
-
-//             setupQueryMod(sql, (e, r) => {
-//               if (e) {
-//                 console.log("update error cancel ", e);
-//               }
-//               else {
-//                 console.log("update sucess cancel");
-//               }
-
-//             })
-//           })
-
-
-
-//         }
-
-//       }
-//     })
-
-//   }
-//   catch (err) {
-//     console.log("err in canmcel catch block", err);
-//   }
-// });
-
-
-
-// createnew.post("/cancelUpdate", async (req, res, next) => {
-//   try {
-//     const {HO_PrvId,r} = req.body; // Assuming rvData contains your receipt details
-
-//     console.log("cancel result111111111", r);
-// //     const receptFetch = `SELECT * FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId='${HO_PrvId}'`;
-// //     const receiptDetails = await setupQueryMod(receptFetch);
-
-// // console.log("cancel result", receiptDetails);
-// //     if (!Array.isArray(receiptDetails)) {
-// //       console.log("    rvData.data.receipt_details is not iterable");
-// //       throw new Error('Receipt details fetched are not in the expected format.');
-// //     }
-
-// //     // Assuming rvData is extracted from the fetched receipt details
-// //     const rvData = { data: { receipt_details: receiptDetails } };
-
-
-
-
-
-//     for (const receiptDetail of r) {
-//       const Unitname = receiptDetail.Unitname;
-//       const Dc_inv_no = receiptDetail.Dc_inv_no;
-// console.log("unt and dc no ",  Unitname, Dc_inv_no);
-//       // First query
-//       const firstQuery = `
-//         SELECT 
-//             CASE WHEN SUM(a.Receive_Now) IS NULL THEN 0 ELSE SUM(a.Receive_Now) END AS Receive_now 
-//         FROM (
-//             SELECT 
-//                 p.Receive_Now,
-//                 p1.Recd_PvNo AS VrNo
-//             FROM 
-//                 magod_hq_mis.unit_payment_recd_voucher_details p
-//                 JOIN magod_hq_mis.unit_payment_recd_voucher_register p1 
-//                     ON p1.RecdPVID = p.RecdPVID
-//             WHERE  
-//                 p1.Unitname = '${Unitname}' 
-//                 AND p.Dc_inv_no = '${Dc_inv_no}'
-//                 AND NOT (p1.PRV_Status LIKE 'Cancelled' OR p1.PRV_Status LIKE 'Draft')
-//             UNION
-//             SELECT 
-//                 p.Receive_Now,
-//                 p1.HORef AS VrNo
-//             FROM 
-//                 magod_hq_mis.ho_paymentrv_details p
-//                 JOIN magod_hq_mis.ho_paymentrv_register p1 
-//                     ON p1.HOPrvId = p.HOPrvId
-//             WHERE  
-//                 p1.Unitname = '${Unitname}'
-//                 AND p.Dc_inv_no = '${Dc_inv_no}'
-//                 AND NOT (p1.Status LIKE 'Cancelled' OR p1.Status LIKE 'Draft')
-//         ) AS a
-//       `;
-//       const firstResults = await setupQueryMod(firstQuery);
-//       console.log("first result ",firstResults );
-
-//       if (firstResults.length > 0) {
-//         const receiveNow = firstResults[0].Receive_now;
-
-//         // Second query dependent on the result of the first query
-//         const secondQuery = `
-//           UPDATE magod_hq_mis.unit_invoices_list d
-//           SET 
-//               d.PymtAmtRecd = ${receiveNow},
-//               d.DCStatus = CASE 
-//                   WHEN d.grandTotal - ${receiveNow} = 0 THEN 'Closed'
-//                   WHEN d.grandTotal - ${receiveNow} > 0 THEN 'Despatched'
-//                   ELSE 'OverPaid' 
-//               END
-//           WHERE 
-//               d.Unitname = '${Unitname}' 
-//               AND d.Dc_inv_no = '${Dc_inv_no}';
-//         `;
-//         const secondResults = await setupQueryMod(secondQuery);
-
-//         console.log('Second query executed successfully:', secondResults);
-//       } else {
-//         console.log('No results found for the first query.');
-//       }
-//     }
-
-//     res.status(200).send('Cancel update completed');
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).send('Error executing cancel update');
-//   }
-// });
 
 createnew.post('/cancelUpdate', async (req, res) => {
   const { HO_PrvId, custName, totalReceiveNow, id } = req.body;
@@ -477,9 +300,6 @@ createnew.post('/cancelUpdate', async (req, res) => {
                 } else {
                   // Update successful
                   console.log("update right table after cancel");
-
-
-
                 }
               });
 
@@ -496,7 +316,7 @@ createnew.post('/cancelUpdate', async (req, res) => {
 
       //update the form data and adjustmemt voucher form data 
 
-      console.log("adj totalReceiveNow", totalReceiveNow);
+      
       const cancelForm = `UPDATE magod_hq_mis.ho_paymentrv_register  
       SET Status='Cancelled' where HOPrvId='${HO_PrvId}'`
 
@@ -642,7 +462,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
 
 
 
-//--------------------------------------------------------------------
+//----------------------------------------------------------------------
 
 //new form for cretae screen 
 
@@ -1010,4 +830,100 @@ createnew.get('/getFormByRowData', (req, res) => {
     }
   })
 })
+
+
+createnew.post('/cancelCreateNewScreen', (req, res) => {
+  const { HO_PrvId, custName, totalReceiveNow,  } = req.body;
+  console.log("req body cancel in crete new screen", HO_PrvId, custName, totalReceiveNow);
+  
+ 
+ 
+  const fetchLeft = `SELECT * FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId='${HO_PrvId}'`;
+
+  const rightTable = `SELECT u.*
+                      FROM magod_hq_mis.unit_invoices_list u
+                      WHERE u.UnitName = 'Jigani'
+                        AND u.Cust_Name = '${custName}'`;
+
+  setupQueryMod(rightTable, (rightErr, rightRes) => {
+    if (rightErr) {
+      // Handle error if needed
+      console.log("right table error after cancel", rightErr);
+    } else {
+
+
+      // console.log("right table result cancel after",rightRes);
+      setupQueryMod(fetchLeft, (leftErr, leftResult) => {
+        if (leftErr) {
+          console.log("left table error after cancel", leftErr);
+        } else {
+          // console.log("left table res after cancel",leftResult);
+
+          leftResult.forEach((item, index) => {
+            const receiveNowNumeric = parseFloat(item.Receive_Now);
+            const matchingEntry = rightRes.find(entry => entry.DC_Inv_No === item.Dc_inv_no);
+            if (matchingEntry) {
+
+
+              console.log("matched inv", item.Receive_Now, totalReceiveNow);
+              // Execute an update query to update the entry in the unit_invoices_list table
+
+              const updateQuery = `UPDATE magod_hq_mis.unit_invoices_list 
+                                   SET PymtAmtRecd=PymtAmtRecd-${receiveNowNumeric} ,
+                                   DCStatus = CASE 
+                                                    WHEN GrandTotal - ${receiveNowNumeric} = 0 THEN 'Closed'
+                                                    WHEN GrandTotal - ${receiveNowNumeric} > 0 THEN 'Despatched'
+                                                    ELSE 'OverPaid'
+                                                 END 
+                                   WHERE DC_Inv_No = ${item.Dc_inv_no}`;
+
+
+              // const updateQuery = `UPDATE magod_hq_mis.unit_invoices_list 
+              // SET PymtAmtRecd=PymtAmtRecd -${receiveNowNumeric},
+              // DCStatus ='Despatched'
+              // WHERE DC_Inv_No = ${item.Dc_inv_no}`;
+              // console.log("update right table query", updateQuery);
+
+              setupQueryMod(updateQuery, (updateErr, updateRes) => {
+                if (updateErr) {
+                  // Handle error if needed
+                } else {
+                  // Update successful
+                  console.log("update right table after cancel");
+                }
+              });
+
+            }
+
+            else {
+              console.log("there is no matched data");
+            }
+          });
+        }
+      });
+
+
+
+      //update the form data and adjustmemt voucher form data 
+
+      
+      const cancelForm = `UPDATE magod_hq_mis.ho_paymentrv_register  
+      SET Status='Cancelled' where HOPrvId='${HO_PrvId}'`
+
+      setupQueryMod(cancelForm, (formErr, formRes) => {
+        if (formErr) {
+
+        }
+        else {
+          console.log("update form after cancell");
+        }
+
+      })
+
+
+    
+    }
+  });
+})
+
 module.exports = createnew;
