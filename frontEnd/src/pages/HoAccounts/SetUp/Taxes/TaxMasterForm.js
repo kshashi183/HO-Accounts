@@ -167,7 +167,7 @@ console.log("stateeee", state);
                         }
                         else if (res.data.status === 'success') {
 
-                            toast.success("Posted Successfully");
+                            toast.success("Tax Data saved Successfully");
 
                             setTimeout(() => {
 

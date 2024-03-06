@@ -178,7 +178,7 @@ unitlist.delete("/deleteUnit/:UnitID", (req, res) => {
 unitlist.put("/updateData/:UnitID", (req, res) => {
 let StateId=0;
     const id = req.params.UnitID;
-    console.log("update id", id);
+ //   console.log("update id", id);
     const up = 'SELECT UnitID , UnitIntial FROM magod_setup.magodlaser_units';
 
 
@@ -189,7 +189,7 @@ let StateId=0;
         }
         
         for (let i = 0; i < re.length; i++) {
-            console.log("hi");
+          //  console.log("hi");
 
             if (re[i].State === req.body.State) {
 
@@ -234,7 +234,7 @@ let StateId=0;
                 req.body.Mail_Id,
                 req.body.UnitIntial,
             ];
-            console.log("updt values", values);
+          //  console.log("updt values", values);
 
             setupQueryMod(updatequery, values, (err, result) => {
                 if (err) console.log("err in update query", err);

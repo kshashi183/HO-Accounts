@@ -1,6 +1,6 @@
 import React from 'react'
-import Adjustment_Tables from './Adjustment_Tables'
-import AdjustmentVoucherForm from './AdjustmentVoucherForm'
+// import Adjustment_Tables from './Adjustment_Tables'
+// import AdjustmentVoucherForm from './AdjustmentVoucherForm'
 
 export default function AdjustmentCallFile() {
   return (
@@ -19,7 +19,7 @@ export default function AdjustmentCallFile() {
 </div> */}
       <div className='row '>
         <div className='col-md-12'>
-            <AdjustmentVoucherForm/>
+            {/* <AdjustmentVoucherForm/> */}
         </div>
 
         {/* <div className='col-md-6'>

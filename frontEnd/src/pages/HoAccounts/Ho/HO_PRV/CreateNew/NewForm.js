@@ -583,10 +583,10 @@ export default function NewForm() {
 
 
 
-      setRvData((prevRvData) => ({
-        ...prevRvData,
-        secondTableArray: [],
-      }));
+      // setRvData((prevRvData) => ({
+      //   ...prevRvData,
+      //   secondTableArray: [],
+      // }));
     }
 
 
@@ -693,11 +693,19 @@ export default function NewForm() {
     });
   };
 
+
+  console.log("secod table arrrrrrrrrrrrrrrrrrrryy ",rvData.secondTableArray);
   const addRowData = async () => {
 
+    if(!rvData.postData.HO_PrvId){
+      toast.error("Save the Details")
+      return ;
+    }
 
+   
     try {
       const selectedRows = rvData.secondTableArray;
+    
 
       if (selectedRows.length === 0) {
         toast.error("No rows selected for addition to voucher.");
@@ -909,13 +917,7 @@ export default function NewForm() {
           })
         }
 
-
-
-
       });
-
-
-
 
     }
 
@@ -979,14 +981,6 @@ export default function NewForm() {
           console.error("Error:", error);
         });
     }
-
-
-
-
-
-
-
-
   }
 
 
@@ -1248,26 +1242,6 @@ export default function NewForm() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   //remove for rowData
 
 
@@ -1496,8 +1470,34 @@ export default function NewForm() {
 
   }
 
-  const cancelllationSubmit = () => {
 
+
+  const cancelllationSubmit = async() => {
+
+    console.log("rece now sum cancel ()", sumofReceive);
+    const cancelData = await axios.post(
+      baseURL + "/createNew/cancelCreateNewScreen",
+      {
+
+        HO_PrvId: rvData.postData.HO_PrvId,
+
+        custName: rvData.postData.CustName,
+        totalReceiveNow: sumofReceive,
+    
+
+      }
+    );
+
+    console.log("data after cancel from cretea new screen ", cancelData.data.StatusCancel);
+
+    setRvData((prevRvData) => ({
+      ...prevRvData,
+
+      postData: {
+        ...prevRvData.postData,
+        Status: cancelData.data.StatusCancel,
+      },
+    }));
   }
   return (
     <>
@@ -1560,7 +1560,7 @@ export default function NewForm() {
             selected={selectedOption}
 
             disabled={
-              rvData.postData.Status != "Draft"
+            rowData ||  rvData.postData.Status != "Draft"
                 ? rvData.postData.Status
                 : ""
             }
@@ -1572,15 +1572,15 @@ export default function NewForm() {
           <Typeahead
             id="basic-example"
             labelKey={(option) =>
-              option && option.Cust_Name ? option.Cust_Name.toString() : ""
+              option && option.Cust_Name ? option.Cust_Name.toString() : rvData.postData.CustName
             }
             options={getCustNames}
             placeholder="Select Customer"
             onChange={handleSelectCustomer}
-            selected={selectedCustOption}
+            selected={selectedCustOption }
 
             disabled={
-              rvData.postData.Status != "Draft"
+              rowData|| rvData.postData.Status != "Draft"
                 ? rvData.postData.Status
                 : ""
             }

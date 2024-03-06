@@ -656,7 +656,7 @@ export default function UnitDetails() {
 
 
             <div className='d-flex col-md-6 '>
-              <label className=' col-md-6 form-label '
+              <label className=' col-md-7 form-label '
                 style={{ whiteSpace: 'nowrap' }}
               > Tally Account Name</label>
               <input class=" form-control " type="text" placeholder=" " name='Tally_account_Name'
@@ -708,10 +708,15 @@ export default function UnitDetails() {
                     onChange={unitFormChange}
                     name="State"
                   >
+                    <option>Select State</option>
                     {stateList.map((i) => (
+                      <>
+                     
                       <option key={i.State} value={i.State}   >
                         {i.State}
                       </option>
+                      
+                      </>
                     ))}
                   </select>
 

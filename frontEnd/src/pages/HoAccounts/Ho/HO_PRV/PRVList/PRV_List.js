@@ -108,6 +108,17 @@ useEffect(() => {
 
 
    // console.log("soretd data", sortedData());
+
+
+   function formatAmount(amount) {
+    // Assuming amount is a number
+    const formattedAmount = new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+
+    return formattedAmount;
+  }
     return (
         <>
             <div className="row col-md-12 "   >
@@ -151,8 +162,7 @@ useEffect(() => {
                               onClick={() => requestSort("CustName")}
                             >Customer</th>
                             <th
-                             onClick={() => requestSort("Amount")}
-                            >Amount</th>
+                             onClick={() => requestSort("Amount")} style={{textAlign:'right'}}  >Amount</th>
                             <th>Description</th>
                             <th>Status</th>
 
@@ -181,7 +191,7 @@ useEffect(() => {
                                     <td>{new Date(item.HoRefDate).toLocaleDateString("en-GB")  .replace(/\//g, "-")}</td>
                                     <td>{item.Unitname}</td>
                                     <td>{item.CustName}</td>
-                                    <td>{item.Amount}</td>
+                                    <td style={{textAlign:'right'}}>{formatAmount(item.Amount)}</td>
                                     <td>{item.Description}</td>
                                     <td>{item.Status}</td>
                                 </tr>

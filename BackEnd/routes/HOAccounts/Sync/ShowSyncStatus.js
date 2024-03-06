@@ -8,6 +8,7 @@ showSyncRouter.get("/hoUnitNames", async (req, res, next) => {
     setupQuery(
       `SELECT DISTINCT UnitName FROM magod_setup.magodlaser_units;`,
       (err, data) => {
+      //  console.log("unit name show sync status", data);
         res.send(data);
       }
     );
@@ -18,9 +19,11 @@ showSyncRouter.get("/hoUnitNames", async (req, res, next) => {
 
 
 // common updateUnitInvoicePaymentStatus
-showSyncRouter.put(
-  "/updateUnitInvoicePaymentStatus",
-  async (req, res, next) => {
+showSyncRouter.put("/updateUnitInvoicePaymentStatus/:getName",async (req, res, next) => {
+  const getName = req.params.getName;
+ // console.log("updateUnitInvoicePaymentStatus1111", getName);
+
+  const unit='Jigani';
     try {
       hqQuery(
         `
@@ -46,7 +49,7 @@ showSyncRouter.put(
                     AND NOT (h1.\`Status\` = 'Cancelled' OR h1.\`Status\` = 'Draft')
                     AND d.\`DC_Inv_No\` = h.\`Dc_inv_no\`
                     AND d.\`UnitName\` = h.\`UnitName\`
-                    AND d.UnitName = @UnitName
+                    AND d.UnitName = '${getName}'
                     AND (d.\`DCStatus\` LIKE 'Despatched' OR d.\`DCStatus\` LIKE 'OverPaid')
                 GROUP BY d.\`DC_Inv_No\`
     
@@ -67,7 +70,7 @@ showSyncRouter.put(
                     AND NOT (h1.\`PRV_Status\` = 'Cancelled' OR h1.\`PRV_Status\` = 'Draft')
                     AND d.\`DC_Inv_No\` = h.\`Dc_inv_no\`
                     AND d.\`UnitName\` = h.\`UnitName\`
-                    AND d.UnitName = @UnitName
+                    AND d.UnitName = '${getName}'
                     AND (d.\`DCStatus\` LIKE 'Despatched' OR d.\`DCStatus\` LIKE 'OverPaid')
                 GROUP BY d.\`DC_Inv_No\`
             ) AS b
@@ -96,8 +99,9 @@ showSyncRouter.put(
 showSyncRouter.get(
   "/getHoOpenInvAndReceipts/:getName",
   async (req, res, next) => {
-    // const getName = req.params.getName;
-    const getName = 'Jigani'
+     const getName = req.params.getName;
+    // console.log("getHoOpenInvAndReceipts2222", getName);
+   
 
     const responseData = [];
     try {
@@ -159,13 +163,11 @@ showSyncRouter.get(
 
 
 //getUnitOpenInvAndReceipts
-showSyncRouter.get(
+showSyncRouter.get( "/getUnitOpenInvAndReceipts/:getName", async (req, res, next) => {
+    const getName = req.params.getName;
+ //   console.log("getUnitOpenInvAndReceipts333", getName);
 
-  "/getUnitOpenInvAndReceipts/:getName",
-  async (req, res, next) => {
-    //const getName = req.params.getName;
-
-    const getName = 'Jigani'
+    
     const responseData = [];
     try {
       const cmdInvList = await hqQuery(
@@ -226,6 +228,8 @@ showSyncRouter.get(
 
       // }
 
+      //console.log("respond data show sync", responseData);
+
       res.send(responseData);
     } catch (error) {
       next(error);
@@ -236,13 +240,12 @@ showSyncRouter.get(
 
 
 showSyncRouter.put(
-  "/updateUnmatchedRowsOfUnit/",
+  "/updateUnmatchedRowsOfUnit",
   async (req, res, next) => {
-    // const getName = req.body.getName;
-    const getName = 'Jigani'
-    const dcInvNo = req.body.dcInvNo;
+    const { getName, dcInvNo } = req.body;
+   
 
-    // console.log(getName, 'and', dcInvNo);
+    // console.log("44444444444",getName, 'and', dcInvNo);
 
     try {
       hqQuery(
@@ -341,8 +344,9 @@ showSyncRouter.put(
 showSyncRouter.get(
   "/getUnitOpenInvAndReceiptsForExport/:getName",
   async (req, res, next) => {
-    // const getName = req.params.getName;
-    const getName = 'Jigani'
+   const getName = req.params.getName;
+    //const getName = 'Jigani'
+   // console.log("55555", getName);
     const responseData = [];
     try {
       const cmdInvList = await hqQuery(

@@ -19,7 +19,8 @@ export default function On_AccountList() {
   const navigate = useNavigate();
   const [onAccountList, setOnAccountList] = useState([])
 
-  const [selectedUnitName, setSelectedUnitName] = useState([])
+  // const [selectedUnitName, setSelectedUnitName] = useState([])
+  const [selectedUnitName, setSelectedUnitName] = useState([{ UnitName: 'Jigani' }])
   const [selectUnit, setSelectUnit] = useState([])
   const [getName, setGetName] = useState("");
 
@@ -32,6 +33,8 @@ export default function On_AccountList() {
     setSelectedUnitName(selected)
   };
 
+
+
   const [unitdata, setunitData] = useState([]);
   const handleUnitName = () => {
     axios
@@ -40,7 +43,7 @@ export default function On_AccountList() {
         console.log("firstTable", res.data)
         setunitData(res.data);
         if (res.data.length > 0) {
-          setSelectedUnitName([res.data[0]]);
+          setSelectedUnitName([res.data[4]]);
         }
       })
       .catch((err) => {
@@ -53,7 +56,7 @@ export default function On_AccountList() {
   }, []);
 
 
-
+console.log("sel unit",selectedUnitName[0]?.UnitName);
 
 
   const [expandedGroup, setExpandedGroup] = useState(null);
@@ -62,9 +65,15 @@ export default function On_AccountList() {
     setExpandedGroup(index === expandedGroup ? null : index);
   };
   console.log(expandedGroup, 'expandedGroup')
+
+
   const DraftReceipts = async () => {
     try {
-      const response = await axios.get(baseURL + '/prvListdata/getOnaccountList'); // Replace this URL with your API endpoint
+      const response = await axios.get(baseURL + '/prvListdata/getOnaccountList', {
+        params: {
+          unit: selectedUnitName[0]?.UnitName // Pass selectedUnitName[0].UnitName as a query parameter
+        }
+      }); // Replace this URL with your API endpoint
       setOnAccountList(response.data.Result);
       //console.log("onaccounst",response.data.Result)
     } catch (error) {
@@ -73,8 +82,14 @@ export default function On_AccountList() {
   };
   useEffect(() => {
     // Call the API function when the component mounts
-    DraftReceipts();
-  }, []); // Empty dependency array ensures it runs only once, equivalent to componentDidMount
+    if(selectedUnitName){
+      DraftReceipts();
+    }
+    else{
+      alert("select unit")
+    }
+  
+  }, [selectedUnitName]); // Empty dependency array ensures it runs only once, equivalent to componentDidMount
 
 
 
@@ -243,7 +258,7 @@ export default function On_AccountList() {
               <th></th>
               <th>Cust Code</th>
               <th>Customer</th>
-              <th>OnAccount Amount</th>
+              <th style={{textAlign:'right'}}>OnAccount Amount</th>
               <th></th>
 
             </tr>
@@ -256,7 +271,7 @@ export default function On_AccountList() {
                   <td style={{ cursor: "pointer" }} onClick={() => handleRowClick(index)}>+</td>
                   <td>{group.custCode}</td>
                   <td>{group.custName}</td>
-                  <td >{formatAmount(group.totalOnAccount)}</td>
+                  <td style={{textAlign:'right'}}>{formatAmount(group.totalOnAccount)}</td>
                   <td></td>
                 </tr>
                 {expandedGroup === index && (
@@ -265,8 +280,8 @@ export default function On_AccountList() {
                       <th></th>
                       <th></th>
                       <th>RV No</th>
-                      <th>Amount</th>
-                      <th>OnAccount</th>
+                      <th style={{textAlign:'right'}}>Amount</th>
+                      <th style={{textAlign:'right'}}>OnAccount</th>
                       {/* Add more header columns as needed */}
                     </tr>
                     {group.items.map((item, key) => (
@@ -280,8 +295,8 @@ export default function On_AccountList() {
                         <td></td>
                         <td></td>
                         <td>{item.Recd_PVNo}</td>
-                        <td >{formatAmount(item.Amount)}</td>
-                        <td >{formatAmount(item.On_account)}</td>
+                        <td style={{textAlign:'right'}}>{formatAmount(item.Amount)}</td>
+                        <td style={{textAlign:'right'}}>{formatAmount(item.On_account)}</td>
 
                       </tr>
                     ))}
