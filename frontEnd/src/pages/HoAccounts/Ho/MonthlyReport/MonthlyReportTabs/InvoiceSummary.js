@@ -9,6 +9,8 @@ export default function InvoiceSummary({ getInvoiceValues }) {
     setSelectRow(list);
   };
 
+  console.log("hello", getInvoiceValues);
+
   return (
     <div>
       <div

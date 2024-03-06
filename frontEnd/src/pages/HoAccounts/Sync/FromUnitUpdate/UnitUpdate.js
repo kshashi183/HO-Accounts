@@ -139,7 +139,7 @@ export default function UnitUpdate() {
     <>
       <div className="col-md-12">
         <div className="row">
-          <h4 className="title">From Unit Upadte</h4>
+          <h4 className="title">From Unit Update</h4>
         </div>
       </div>
       <div className="col-md-12">

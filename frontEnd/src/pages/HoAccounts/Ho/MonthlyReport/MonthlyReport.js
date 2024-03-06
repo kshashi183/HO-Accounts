@@ -116,6 +116,7 @@ export default function MonthlyReport() {
   }, []);
 
   const handleGetData = async () => {
+    toast.success("Data is populating please wait.");
     try {
       const response = await axios.post(
         baseURL + `/monthlyReportData/monthlyInvoiceSummary`,
