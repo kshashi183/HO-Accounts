@@ -20,7 +20,7 @@ unitlist.get('/getUnitData', (req, res, next) => {
                 console.log("err in query", err);
             }
             else {
-             console.log("data", data);
+           //  console.log("data", data);
                 return res.json({ Status: 'Success', Result: data });
             }
 
