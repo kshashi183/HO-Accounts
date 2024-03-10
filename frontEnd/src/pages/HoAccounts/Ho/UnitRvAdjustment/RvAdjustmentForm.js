@@ -5,6 +5,7 @@ import axios from "axios";
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { baseURL } from '../../../../api/baseUrl';
 import ReactPaginate from "react-paginate";
+import { toast } from 'react-toastify';
 
 const initial = {
     HoRefDate: '', TxnType: '', Amount: '', Description: '', HORef: '', Status: ''
@@ -39,7 +40,7 @@ export default function RvAdjustmentForm() {
         setCurrentPage(selected);
     };
     useEffect(() => {
-        if(selectedUnitName){
+        if(selectedUnitName && selectedCustCode  && showAll===false){
         AdjsutmentSubmit()
         }
         else{
@@ -52,24 +53,9 @@ export default function RvAdjustmentForm() {
     console.log("selectedUnitName1111", selectedUnitName);
 
     const AdjsutmentSubmit = () => {
-        if (showAll) {
-            axios.get(baseURL + '/unitRV_Adjustment/rvAdjustment',
-            {
-                params: {
-                    selectedCustCode: selectedCustCode,
-                    selectedUnitName: selectedUnitName
-                },
-            }
-            )
-                .then((res) => {
-                    setRvAdjustmentData(res.data.Result)
-                    console.log("111 all customers");
-                })
-                .catch((err) => {
-                    console.log("err");
-                })
-        }
-        else {
+       
+
+
             console.log("selectedUnitName", selectedUnitName);
             axios.get(baseURL + '/unitRV_Adjustment/rvAdjustment', 
             {
@@ -86,9 +72,36 @@ export default function RvAdjustmentForm() {
                 .catch((err) => {
                     console.log("err");
                 })
-        }
+        
 
     }
+
+    useEffect(()=>{
+        if(showAll===true && selectUnit){
+            acrossCustomer();
+        }
+
+    },[showAll, selectUnit])
+
+    const acrossCustomer=()=>{
+        axios.get(baseURL + '/unitRV_Adjustment/rvAdjustment',
+        {
+            params: {
+               
+                 selectedUnitName: selectedUnitName
+            },
+        }
+        )
+            .then((res) => {
+                setRvAdjustmentData(res.data.Result)
+                console.log("111 all customers");
+            })
+            .catch((err) => {
+                console.log("err");
+            })
+    }
+
+
 
     const getCustomersSubmit = () => {
         axios.get(baseURL + '/unitRV_Adjustment/getCustomers')
@@ -134,6 +147,8 @@ export default function RvAdjustmentForm() {
 
     function handleButtonClick(selectRow) {
 
+        if(selectRow.TxnType !==''){
+
         const select = selectRow.HOPrvId;
         const id = selectRow.Id
 
@@ -146,6 +161,11 @@ export default function RvAdjustmentForm() {
         };
         console.log("select rowwwww", select);
         navigate("/HOAccounts/HO/HOPRV/Adjustment", { state: state });
+    }
+
+    else{
+        toast.warn(' SelectRow ')
+    }
     }
 
 
@@ -332,56 +352,3 @@ export default function RvAdjustmentForm() {
 }
 
 
-// const getReceipts = async (cust_code, postdata) => {
-//     setRvData((prevRvData) => ({ ...prevRvData, postData: postdata }));
-
-//     try {
-//       const resp = await axios.get(
-//         baseURL + `/Payment_Receipts/getrvdata?receipt_id=${rowData}`
-//       );
-
-//       try {
-//         const response = await axios.get(
-//           baseURL + `/Payment_Receipts/getinvlist?customercode=${cust_code}`
-//         );
-
-//         setRvData((prevRvData) => ({
-//           ...prevRvData,
-//           data: {
-//             ...prevRvData.data,
-//             inv_data: response.data.Result,
-//             receipt_details: resp.data.Result,
-//             receipt_data: prevRvData.postData,
-//             receipt_id: rowData,
-//           },
-
-//         }));
-
-//       } catch (error) {
-//         console.error("Error fetching data:", error);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     }
-//   };
-
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       if (rowData !== "") {
-//         try {
-//           const response = await axios.get(
-//             baseURL + `/Payment_Receipts/getreceipt?receipt_id=${rowData}`
-//           );
-//           getReceipts(
-//             response.data.Result[0].Cust_code,
-//             response.data.Result[0]
-//           );
-//         } catch (error) {
-//           console.error("Error making API call:", error);
-//         }
-//       }
-//     };
-
-//     fetchData();
-//   }, [rowData]);

@@ -1522,7 +1522,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
       <div className="row col-md-12">
         <div className="col-md-10">
-          <label className="form-label ">Adjustment Voucher</label>
+          <label className="form-label ">Create Adjustment Voucher for Receipt Voucher {adjustmentRows?.Recd_PVNo} </label>
         </div>
         <div className="col-md-2">
           <button

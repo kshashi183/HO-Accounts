@@ -261,6 +261,21 @@ const { parseString } = require('xml2js');
 
 
 tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
+
+    const tallyUrl = 'http://localhost:9000';
+
+    // Fetch company Names
+  
+        try {
+            const response = await axios.post(tallyUrl, {
+                xmlRequest: '<ENVELOPE><HEADER><TALLYREQUEST>Export Data</TALLYREQUEST></HEADER><BODY><EXPORTDATA><REQUESTDESC><REPORTNAME>Current Company</REPORTNAME></REQUESTDESC></EXPORTDATA></BODY></ENVELOPE>'
+            });
+            // Process response XML here
+            console.log("tally company list",response.data);
+        } catch (error) {
+            console.error('Error fetching ledger names:', error);
+        }
+    
     try {
         const xmlFile=`<ENVELOPE>
         <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
@@ -384,7 +399,7 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
                     res.status(500).send('Error parsing XML from Tally server');
                     return;
                 }
-                console.log("resulttttttttt", result);
+               // console.log("resulttttttttt", result);
                 // Extract the ledger names from the parsed XML response
                 const ledgerEntries = result.ENVELOPE.BODY[0].IMPORTDATA[0].TALLYMESSAGE[0].VOUCHER[0]['ALLLEDGERENTRIES.LIST'];
                 for (let i = 0; i < ledgerEntries.length; i++) {
@@ -393,7 +408,7 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
                 }
             });
         } else {
-            console.error('Error from Tally server:', tallyResponse.statusText);
+           // console.error('Error from Tally server:', tallyResponse.statusText);
             res.status(tallyResponse.status).send('Error communicating with Tally server: ' + tallyResponse.statusText);
             return; // Return early to avoid further processing in case of an error
         }
@@ -406,7 +421,7 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         notExportedLedgers = xmlLedgerNames.filter(name => !exportedLedgers.includes(name));
 
         // Send response with exported and not exported ledger names
-        console.log("ledger namessss",notExportedLedgers);
+     //   console.log("ledger namessss",notExportedLedgers);
         res.status(200).json({ exported: exportedLedgers, notExported: notExportedLedgers });
 
     } catch (error) {

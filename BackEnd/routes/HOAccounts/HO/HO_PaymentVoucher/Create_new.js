@@ -22,7 +22,7 @@ createnew.get('/ho_openInvoices', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      //  console.log("HO open invoice", result);
+        console.log("HO open invoice", result);
       return res.json({ Result: result });
     }
   })
