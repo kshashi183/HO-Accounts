@@ -22,16 +22,17 @@ export default function TallyExportForm() {
   }, [])
 
   const onLoadDataClick = () => {
-    
-    setFlag(true);
-  
-    
+
+    if (selectedUnitName) {
+      setFlag(true);
+    }
+
   }
 
   const tallyExportSubmit = () => {
     setExportTally(true);
   }
- 
+
 
   const navigate = useNavigate();
 
@@ -126,8 +127,8 @@ export default function TallyExportForm() {
       </div>
       <hr className="horizontal-line" />
       <TallyExportTabs selectedDate={selectedDate} flag={flag} setFlag={setFlag}
-        exportTally={exportTally} setExportTally={setExportTally}  
-        selectedUnitName={  selectedUnitName[0]}/>
+        exportTally={exportTally} setExportTally={setExportTally}
+        selectedUnitName={selectedUnitName[0]} />
     </div>
   );
 }

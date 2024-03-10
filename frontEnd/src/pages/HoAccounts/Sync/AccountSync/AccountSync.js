@@ -3,6 +3,7 @@ import { baseURL } from "../../../../api/baseUrl";
 import { toast } from "react-toastify";
 import { xml2js, js2xml } from "xml-js";
 import axios from "axios";
+import SendMail from "../../../SendMail/SendMail";
 
 export default function AccountSync() {
   const [getPaymentRvRegister, setGetPaymentRvRegister] = useState([]);
@@ -165,7 +166,7 @@ export default function AccountSync() {
     const xmlData = {
       AccountsDS: {
         MagodUnits: {
-          UnitName: {selectedValue},
+          UnitName: { selectedValue },
           CashInHand: 0,
         },
         Unit_Vendor_Data: unitVendorData.map((item, index) => ({
@@ -391,28 +392,28 @@ export default function AccountSync() {
         const strUnitName = "Jigani";
         // const strUnitName = data[0]?.UnitName || "DefaultUnit"; // Replace "DefaultUnit" with a default value if UnitName is not available
         // a.download = "unit_hosync.xml";
-        const fileXml = `HO_to_${selectedValue}_Sync_${formattedDate}.xml`;
-        // a.download = `${strUnitName}_to_HO_AcctsSync_${formattedDate}.xml`;
-        // document.body.appendChild(a);
-        // a.click();
-        // URL.revokeObjectURL(url);
-        // document.body.removeChild(a);
+        // const fileXml = `HO_to_${selectedValue}_Sync_${formattedDate}.xml`;
+        a.download = `HO_to_${selectedValue}_Sync_${formattedDate}.xml`;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
 
-        const handle = await window.showSaveFilePicker({
-          suggestedName: fileXml,
-          types: [
-            {
-              description: "XML Files",
-              accept: {
-                "text/xml": [".xml"],
-              },
-            },
-          ],
-        });
+        // const handle = await window.showSaveFilePicker({
+        //   suggestedName: fileXml,
+        //   types: [
+        //     {
+        //       description: "XML Files",
+        //       accept: {
+        //         "text/xml": [".xml"],
+        //       },
+        //     },
+        //   ],
+        // });
 
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
+        // const writable = await handle.createWritable();
+        // await writable.write(blob);
+        // await writable.close();
 
         // if (
         //   getCustInvoice === 0 &&
@@ -471,6 +472,7 @@ export default function AccountSync() {
             Create Sync
           </button>
         </div>
+        {/* <SendMail/> */}
       </div>
     </>
   );

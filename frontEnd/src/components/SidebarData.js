@@ -107,11 +107,11 @@ export const customerSidebar = [
         icon: <BsCreditCard2BackFill />,
         path: "/HOAccounts/HO/UnitReciptList",
       },
-      {
-        title: "Unit Sync",
-        icon: <BsCloudPlus />,
-        path: "/HOAccounts/HO/UnitSync",
-      },
+      // {
+      //   title: "Unit Sync",
+      //   icon: <BsCloudPlus />,
+      //   path: "/HOAccounts/HO/UnitSync",
+      // },
       {
         title: "HO PRV",
         icon: <ImLink />,

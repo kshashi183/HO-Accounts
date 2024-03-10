@@ -47,7 +47,7 @@ export default function SaveChangesModal(
         }
         else if (res.data.status === 'query') {
           if(t>0){
-          toast.error('Unit_Name must be Unique');
+          toast.error('Unit_Name  and UnitIntial must be Unique');
           }
         }
         else if (res.data.status === 'success') {
@@ -71,7 +71,8 @@ export default function SaveChangesModal(
       })
   }
 
-  console.log("sel1111", selectRow);
+  console.log("sel1111", selectRow.PIN, selectRow.Unit_GSTNo, selectRow.Mail_Id);
+  console.log("selctrowwwww", selectRow);
 
   const unitlistSubmit = () => {
     const now = Date.now();
@@ -87,13 +88,18 @@ export default function SaveChangesModal(
       toast.error("Add UnitName")
       }
     }
-    else if (selectRow.UnitIntial.length > 3) {
+    else if (selectRow.UnitIntial.length > 3 ) {
       if(test>0){
       toast.error('Unit_Intial Length must be less than 3');
       }
     }
 
     else if (selectRow.PIN === null && selectRow.Unit_GSTNo === null && selectRow.Mail_Id===null) {
+
+      insertData();
+    }
+
+    else if (selectRow.PIN === '' && selectRow.Unit_GSTNo === '' && selectRow.Mail_Id==='') {
 
       insertData();
     }

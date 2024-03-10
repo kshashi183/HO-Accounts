@@ -6,8 +6,8 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { baseURL } from '../../../../api/baseUrl';
 import ReactPaginate from "react-paginate";
 
-const initial={
-    HoRefDate:'', TxnType:'', Amount:'', Description:'',HORef:'', Status:''
+const initial = {
+    HoRefDate: '', TxnType: '', Amount: '', Description: '', HORef: '', Status: ''
 }
 
 export default function RvAdjustmentForm() {
@@ -15,40 +15,52 @@ export default function RvAdjustmentForm() {
     const [rvAdjustmentData, setRvAdjustmentData] = useState([]);
     const [getCustomer, setGetCustomer] = useState([])
     //const [searchQuery, setSearchQuery] = useState('')
-    const [selectedCustCode, setSelectedCustCode] = useState("0000");
+    const [selectedCustCode, setSelectedCustCode] = useState("");
     const [showAll, setShowAll] = useState(false);
 
 
-    const [selectedUnitName, setSelectedUnitName]=useState("Jigani")
-      const [selectUnit, setSelectUnit] = useState([])
-      const [getName, setGetName] = useState("");
+    const [selectedUnitName, setSelectedUnitName] = useState("")
+    const [selectUnit, setSelectUnit] = useState([])
+    const [getName, setGetName] = useState("");
 
 
-      const itemsPerPage = 100;
-      const [currentPage, setCurrentPage] = useState(0);
+    const itemsPerPage = 100;
+    const [currentPage, setCurrentPage] = useState(0);
 
-  // Calculate the start and end indices for the current page
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+    // Calculate the start and end indices for the current page
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
 
-  // Get the data for the current page
-  const currentPageData = rvAdjustmentData.slice(startIndex, endIndex);
-  console.log(currentPageData, "currentPageData");
+    // Get the data for the current page
+    const currentPageData = rvAdjustmentData.slice(startIndex, endIndex);
+    console.log(currentPageData, "currentPageData");
 
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
-  };
+    const handlePageChange = ({ selected }) => {
+        setCurrentPage(selected);
+    };
     useEffect(() => {
+        if(selectedUnitName){
         AdjsutmentSubmit()
+        }
+        else{
+            
+        }
         getCustomersSubmit()
-    }, [selectedCustCode, showAll, selectedUnitName ])
+    }, [selectedCustCode, showAll, selectedUnitName])
 
 
     console.log("selectedUnitName1111", selectedUnitName);
 
     const AdjsutmentSubmit = () => {
         if (showAll) {
-            axios.get(baseURL+'/unitRV_Adjustment/rvAdjustment',)
+            axios.get(baseURL + '/unitRV_Adjustment/rvAdjustment',
+            {
+                params: {
+                    selectedCustCode: selectedCustCode,
+                    selectedUnitName: selectedUnitName
+                },
+            }
+            )
                 .then((res) => {
                     setRvAdjustmentData(res.data.Result)
                     console.log("111 all customers");
@@ -58,13 +70,15 @@ export default function RvAdjustmentForm() {
                 })
         }
         else {
-          console.log("selectedUnitName", selectedUnitName);
-            axios.get(baseURL+'/unitRV_Adjustment/rvAdjustment', {
+            console.log("selectedUnitName", selectedUnitName);
+            axios.get(baseURL + '/unitRV_Adjustment/rvAdjustment', 
+            {
                 params: {
                     selectedCustCode: selectedCustCode,
-                    selectedUnitName:selectedUnitName
+                    selectedUnitName: selectedUnitName
                 },
-            })
+            }
+            )
                 .then((res) => {
                     setRvAdjustmentData(res.data.Result)
                     console.log("based on customers");
@@ -77,7 +91,7 @@ export default function RvAdjustmentForm() {
     }
 
     const getCustomersSubmit = () => {
-        axios.get(baseURL+'/unitRV_Adjustment/getCustomers')
+        axios.get(baseURL + '/unitRV_Adjustment/getCustomers')
             .then((res) => {
                 setGetCustomer(res.data.Result)
                 //console.log("cust", res.data.Result);
@@ -87,7 +101,7 @@ export default function RvAdjustmentForm() {
             })
     }
 
-    const [selectedOption, setSelectedOption] = useState([{ Cust_name: 'MAGOD LASER MACHINING PVT LTD' }]);
+    const [selectedOption, setSelectedOption] = useState([{}]);
     const handleTypeaheadChange = (selectedOptions) => {
         if (selectedOptions && selectedOptions.length > 0) {
             const selectedCustomer = selectedOptions[0];
@@ -119,60 +133,55 @@ export default function RvAdjustmentForm() {
 
 
     function handleButtonClick(selectRow) {
-    // const select=selectRow.Unit_UId ;
-    
-   
-    //const select=selectRow.Id ;
-  // const select=selectedCustCode
-   
-  //  const select=selectRow.RecdPVID
-  const select = selectRow.HOPrvId;
-    const id=selectRow.Id
 
-  const state = {
-    select: select,
-    CustCode: selectedCustCode,
-    id:id,
-     adjustmentRows:selectRow
-};
-        console.log("select rowwwww",select);
-        navigate("/HOAccounts/HO/HOPRV/CreateNew", {state: state });
-      }
-      
+        const select = selectRow.HOPrvId;
+        const id = selectRow.Id
 
-  
-      const handleUnitSelect = (selected) => {
-          const selectedCustomer = selected[0];
-          setSelectUnit(selected); // Update selected option state
-          setGetName(selectedCustomer ? selectedCustomer.UnitName : "");
-          setSelectedUnitName(selected)
-      };
-  
-      const [unitdata, setunitData] = useState([]);
-      const handleUnitName = () => {
-          axios
-              .get(baseURL + '/unitReceiptList/getunitName')
-              .then((res) => {
-                  console.log("firstTable", res.data)
-                  setunitData(res.data);
-                  if (res.data.length > 0) {
-                    setSelectedUnitName(res.data[4]);
-                  }
-              })
-              .catch((err) => {
-                  console.log("err in table", err);
-              });
-      };
-  
-      useEffect(() => {
-          handleUnitName();
-      }, []);
-    
+        const state = {
+            select: select,
+            CustCode: selectedCustCode,
+            id: id,
+            adjustmentRows: selectRow,
+            adj_unit: selectedUnitName.UnitName
+        };
+        console.log("select rowwwww", select);
+        navigate("/HOAccounts/HO/HOPRV/Adjustment", { state: state });
+    }
 
-      console.log("currrrrent", currentPageData);
+
+
+    const handleUnitSelect = (selected) => {
+        const selectedCustomer = selected[0];
+        setSelectUnit(selected); // Update selected option state
+        setGetName(selectedCustomer ? selectedCustomer.UnitName : "");
+        setSelectedUnitName(selected)
+    };
+
+    const [unitdata, setunitData] = useState([]);
+    const handleUnitName = () => {
+        axios
+            .get(baseURL + '/unitReceiptList/getunitName')
+            .then((res) => {
+                console.log("firstTable", res.data)
+                setunitData(res.data);
+                //   if (res.data.length > 0) {
+                //     setSelectedUnitName(res.data[4]);
+                //   }
+            })
+            .catch((err) => {
+                console.log("err in table", err);
+            });
+    };
+
+    useEffect(() => {
+        handleUnitName();
+    }, []);
+
+
+    console.log("currrrrent", selectedUnitName.UnitName);
     return (
         <div>
-            
+
             <div className='col-md-12'>
                 <div className='row'>
                     <h4 className='title '>HO Receipt Adjuster</h4>
@@ -192,13 +201,13 @@ export default function RvAdjustmentForm() {
                         options={unitdata}
                         placeholder="Select Unit"
                         onChange={handleUnitSelect}
-                      //  selected={selectedUnitName}
-                      selected={selectedUnitName ? [selectedUnitName] : []}
-                        
+                        selected={selectedUnitName}
+                    //   selected={selectedUnitName ? [selectedUnitName] : []}
+
                     />
                 </div>
 
-                <div className="col-md-2">
+                <div className="col-md-4">
                     <label className="form-label" >Select Customer</label>
                     <Typeahead
 
@@ -214,20 +223,20 @@ export default function RvAdjustmentForm() {
                 </div>
 
 
-                <div className="col-md-3 mt-2">
+                <div className="col-md-2 mt-2">
                     <button className="button-style mt-2 group-button"
-                        style={{ width: "180px", marginLeft: "20px" }}
-                        onClick={() => 
-                            
-                            {
-                            handleButtonClick(selectRow);}
+                        style={{ width: "180px", }}
+                        onClick={() => {
+                            handleButtonClick(selectRow);
                         }
-                        >
+                        }
+                    >
                         Adjustment Voucher
                     </button>
                 </div>
-                <div className="col-md-2 mt-2">
+                <div className="col-md-1 mt-2">
                     <button className="button-style mt-2 group-button"
+                    style={{width:'80px'}}
                         onClick={e => navigate("/HOAccounts")}  >
                         Close
                     </button>
@@ -242,8 +251,8 @@ export default function RvAdjustmentForm() {
                     </div>
 
 
-                    <div className=' col-md-3 ' >
-                        <label className="form-label" style={{whiteSpace:'nowrap'}}>Show All</label>
+                    <div className=' col-md-2' >
+                        <label className="form-label" style={{ whiteSpace: 'nowrap' }}>Show All</label>
                     </div>
 
 
@@ -269,19 +278,19 @@ export default function RvAdjustmentForm() {
                                     <th style={{ whiteSpace: 'nowrap' }}>Rv Date</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Description</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Txn Type</th>
-                                    <th>HO_PrvId</th>
+                                    {/* <th>HO_PrvId</th> */}
 
                                 </tr>
                             </thead>
 
 
                             <tbody className='tablebody'>
-                                { currentPageData ? 
+                                {currentPageData ?
                                     currentPageData.map((item, key) => {
                                         return (
-                                            <tr  onClick={() => selectedRowFun(item, key)}
+                                            <tr onClick={() => selectedRowFun(item, key)}
 
-                                            className={key === selectRow?.index ? 'selcted-row-clr' : ''}>
+                                                className={key === selectRow?.index ? 'selcted-row-clr' : ''}>
                                                 <td style={{ whiteSpace: 'nowrap' }}>{item.Recd_PVNo}  </td>
                                                 {
                                                     showAll && <td>{item.Cust_code}</td>
@@ -295,10 +304,10 @@ export default function RvAdjustmentForm() {
                                                 <td style={{ whiteSpace: 'nowrap' }}>{item.Formatted_Recd_PV_Date}</td>
                                                 <td>{item.Description}</td>
                                                 <td>{item.TxnType}</td>
-                                                <td>{item.HO_PrvId}</td>
+                                                {/* <td>{item.HO_PrvId}</td> */}
                                             </tr>
                                         )
-                                    }) :''
+                                    }) : ''
                                 }
                             </tbody>
                         </Table>
@@ -307,17 +316,17 @@ export default function RvAdjustmentForm() {
             </div>
 
             <ReactPaginate
-        previousLabel={"previous"}
-        nextLabel={"next"}
-        breakLabel={"..."}
-        pageCount={Math.ceil(rvAdjustmentData.length / itemsPerPage)}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={5}
-        onPageChange={handlePageChange}
-        containerClassName={"pagination"}
-        subContainerClassName={"pages pagination"}
-        activeClassName={"active"}
-      />
+                previousLabel={"previous"}
+                nextLabel={"next"}
+                breakLabel={"..."}
+                pageCount={Math.ceil(rvAdjustmentData.length / itemsPerPage)}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={handlePageChange}
+                containerClassName={"pagination"}
+                subContainerClassName={"pages pagination"}
+                activeClassName={"active"}
+            />
         </div>
     );
 }

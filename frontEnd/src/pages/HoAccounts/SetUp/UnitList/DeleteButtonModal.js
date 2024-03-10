@@ -67,7 +67,7 @@ export default function DeleteButtonModal({ setDeleteModal, deleteModal, selectR
           <Modal.Title>magod_machine</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body> Do you wish to delete {selectRow.UnitName} ?
+        <Modal.Body> Do you wish to delete {selectRow.UnitID} ?
 
         </Modal.Body>
 

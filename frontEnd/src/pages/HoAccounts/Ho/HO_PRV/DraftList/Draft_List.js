@@ -140,6 +140,16 @@ useEffect(() => {
         return dataCopy;
       };
   
+
+      function formatAmount(amount) {
+        // Assuming amount is a number
+        const formattedAmount = new Intl.NumberFormat('en-IN', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount);
+    
+        return formattedAmount;
+      }
     return (
         <>
      
@@ -210,7 +220,7 @@ useEffect(() => {
                                     <td>{new Date(item.HoRefDate).toLocaleDateString("en-GB")  .replace(/\//g, "-")}</td>
                                     <td>{item.Unitname}</td>
                                     <td>{item.CustName}</td>
-                                    <td>{item.Amount}</td>
+                                    <td>{formatAmount(item.Amount)}</td>
                                     <td>{item.Description}</td>
                                     <td>{item.Status}</td>
                                 </tr>

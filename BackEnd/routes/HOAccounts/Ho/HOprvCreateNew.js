@@ -36,7 +36,7 @@ createNewRouter.get("/customerNames", async (req, res, next) => {
 
 createNewRouter.post("/getInvoices", async (req, res, next) => {
   const { unit, custCode } = req.body;
-  // console.log("unit", req.body);
+  console.log("unit open inv", req.body);
   try {
     hqQuery(
       `SELECT u.*
@@ -46,7 +46,14 @@ createNewRouter.post("/getInvoices", async (req, res, next) => {
       AND ABS(u.GrandTotal - u.PymtAmtRecd) > 0
       AND u.DCStatus != 'Closed'`,
       (err, data) => {
+        if(err){
+
+        }
+        else{
+//console.log("open inv ", data);
+        
         res.send(data);
+        }
       }
     );
   } catch (error) {
@@ -55,14 +62,24 @@ createNewRouter.post("/getInvoices", async (req, res, next) => {
 });
 
 createNewRouter.post("/getHOPrvId", async (req, res, next) => {
-  const { unit, custCode } = req.body;
-  console.log("unit", req.body);
+  const {  custCode } = req.body;
+  
+  console.log("unit get horvid", custCode);
   try {
     hqQuery(
-      `SELECT h.HOPrvId, Amount FROM magod_hq_mis.ho_paymentrv_register h WHERE h.UnitName='${unit}' AND h.Cust_Code=${custCode} AND h.HORef='Draft';
+      `SELECT HOPrvId FROM magod_hq_mis.ho_paymentrv_register h WHERE   h.Cust_code='${custCode}' AND h.HORef='Draft';
       `,
       (err, data) => {
-        res.send(data);
+        if (err) {
+          console.log("err", err);
+        }
+        else {
+          console.log("dattttttttttt", data);
+          res.send(data)
+          
+
+          
+        }
       }
     );
   } catch (error) {
@@ -82,6 +99,7 @@ createNewRouter.post("/saveData", async (req, res, next) => {
           console.error(err);
           res.status(500).send({ success: false, error: err.message });
         } else {
+          console.log("insert", data);
           res.send({ success: true, data });
         }
       }
@@ -131,11 +149,11 @@ createNewRouter.post("/updateData", async (req, res, next) => {
 createNewRouter.post("/addInvoice", async (req, res, next) => {
   try {
     const { selectedRows, HO_PrvId, unit } = req.body;
-    console.log("hoid", selectedRows);
+    console.log("hoid",HO_PrvId);
     const insertResults = [];
     let existingDraftIds = [];
 
-    const checkRecdPvSrlQuery = `SELECT MAX(RecdPvSrl) AS maxRecdPvSrl FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId=${HO_PrvId};`;
+    const checkRecdPvSrlQuery = `SELECT MAX(RecdPvSrl) AS maxRecdPvSrl FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId='${HO_PrvId}';`;
 
     const checkRecdPvSrlData = await new Promise((resolve, reject) => {
       hqQuery(checkRecdPvSrlQuery, (err, data) => {
@@ -527,7 +545,7 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
 
 createNewRouter.post("/postInvoice", async (req, res, next) => {
   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
-
+console.log("req body after post", req.body);
   const date = new Date();
   // const date = new Date("2024-04-01");
   const year = date.getFullYear();
@@ -554,6 +572,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
       let newHrefNo = "";
 
+      console.log("select result",selectResult);
       if (selectResult && selectResult.length > 0) {
         const lastRunNo = selectResult[0].Running_No;
         const numericPart = parseInt(lastRunNo) + 1;
@@ -590,7 +609,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
 
           const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
-          SET u.PymtAmtRecd = ${item.Receive_Now},
+          SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
               u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
           WHERE u.UnitName = 'Jigani' AND u.DC_Inv_No = ${item.Dc_inv_no};
           `
@@ -639,7 +658,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
       // Your existing update query
       hqQuery(
         `UPDATE magod_Hq_Mis.ho_paymentrv_register
-        SET HoRefDate = curdate(),
+        SET HoRefDate = curdate(), Unitname='${unit}',
         HORef = '${newHrefNo}',
         
         Status = 'Pending'

@@ -24,6 +24,7 @@
     "node-fetch": "^3.3.2",
     "nodemon": "^2.0.22",
     "winston": "^3.11.0",
-    "winston-daily-rotate-file": "^4.7.1"
+    "winston-daily-rotate-file": "^4.7.1",
+    "xml2js": "^0.6.2"
   }
 }

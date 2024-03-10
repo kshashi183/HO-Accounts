@@ -62,12 +62,7 @@ tally_Export.get('/getInvoiceTaxDetails', (req, res) => {
 tally_Export.get('/getPaymentReceipntData', (req, res) => {
     const date = req.query.date
     const unit = req.query.selectedUnitName
-    //   console.log("dateeeeeeeeeeee", date);
-    // const sql=` SELECT p1.*, t.voucher_type, t.PreFix, t.LedgerName
-    // FROM magod_hq_mis.unit_payment_recd_voucher_register p
-    // JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID
-    // JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
-    // WHERE p.Unitname = 'Jigani' AND p.Recd_PV_Date =  '${date}'`
+    
 
     const sql1 = `SELECT  DISTINCT p.*, t.voucher_type, t.PreFix, t.LedgerName
       FROM magod_hq_mis.unit_payment_recd_voucher_register p
@@ -123,43 +118,250 @@ tally_Export.get('/getPayment', (req, res) => {
 
 
 
-//EXPORT TO TALLY SOFTWARE
 
 
-// const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
 
-// tally_Export.post('/exporttally', async (req, res) => {
-//     console.log("xml", req.body);
-
+// tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
+   
 //     try {
-//         // Assuming 'req.body' contains the data you want to send to Tally
-//         const tallyResponse = await axios.post(`${tallyServerUrl}`, req.body, {
-//             // Add any headers or authentication needed for Tally
+//        // const xmlFile = req.file.buffer.toString(); // Assuming the file is XML 
+//         // console.log("xml file", xmlFile);
+//     const xmlFile=`<ENVELOPE>
+//     <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
+//     <BODY>
+//     <IMPORTDATA>
+//     <REQUESTDESC>
+//     <REPORTNAME>Vouchers</REPORTNAME>
+//     <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY></STATICVARIABLES>
+//     </REQUESTDESC>
+//     <TALLYMESSAGE xmlns:UDF='TallyUDF'>
+//     <VOUCHER REMOTEID='SL2147387070' VCHTYPE='Sales' ACTION='Create'>
+//     <DATE>20240222</DATE>
+//     <GUID>2147387070</GUID>
+//     <NARRATION>Our WO No :240492 Packing Note No :09014/ 23/24</NARRATION>
+//     <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
+//     <VOUCHERNUMBER>SL / JG1133/ 23/24</VOUCHERNUMBER>
+//     <REFERENCE>KE034 DTD/31.01.2024</REFERENCE>
+//     <PARTYLEDGERNAME>KALPA ENGINEERING</PARTYLEDGERNAME>
+//     <CSTFORMISSUETYPE />
+//     <CSTFORMRECVTYPE />
+//     <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+//     <VCHGSTCLASS />
+//     <DIFFACTUALQTY>No</DIFFACTUALQTY>
+//     <AUDITED>No</AUDITED>
+//     <FORJOBCOSTING>No</FORJOBCOSTING>
+//     <ISOPTIONAL>No</ISOPTIONAL>
+//     <EFFECTIVEDATE>20240222</EFFECTIVEDATE>
+//     <USEFORINTEREST>No</USEFORINTEREST>
+//     <USEFORGAINLOSS>No</USEFORGAINLOSS>
+//     <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
+//     <USEFORCOMPOUND>No</USEFORCOMPOUND>
+//     <ALTERID>2</ALTERID>
+//     <EXCISEOPENING>No</EXCISEOPENING>
+//     <ISCANCELLED>No</ISCANCELLED>
+//     <HASCASHFLOW>No</HASCASHFLOW>
+//     <ISPOSTDATED>No</ISPOSTDATED>
+//     <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
+//     <ISINVOICE>No</ISINVOICE>
+//     <MFGJOURNAL>No</MFGJOURNAL>
+//     <HASDISCOUNTS>No</HASDISCOUNTS>
+//     <ASPAYSLIP>No</ASPAYSLIP>
+//     <ISDELETED>No</ISDELETED>
+//     <ASORIGINAL>No</ASORIGINAL>
+//     <ALLLEDGERENTRIES.LIST>
+//     <LEDGERNAME>KALPA ENGINEERING</LEDGERNAME>
+//     <GSTCLASS />
+//     <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
+//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//     <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+//     <AMOUNT>-26143.00</AMOUNT>
+//     <BILLALLOCATIONS.LIST>
+//     <NAME>SL / JG1133/ 23/24</NAME>
+//     <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
+//     <BILLTYPE>New Ref</BILLTYPE>
+//     <AMOUNT>-26143.00</AMOUNT>
+//     </BILLALLOCATIONS.LIST>
+//     </ALLLEDGERENTRIES.LIST>
+//     <ALLLEDGERENTRIES.LIST>
+//     <LEDGERNAME>SALES</LEDGERNAME>
+//     <GSTCLASS />
+//     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//     <ISPARTYLEDGER>No</ISPARTYLEDGER>
+//     <AMOUNT>22155.00</AMOUNT>
+//     </ALLLEDGERENTRIES.LIST>
+//     <ALLLEDGERENTRIES.LIST>
+//     <LEDGERNAME>CGST @ 9%</LEDGERNAME>
+//     <GSTCLASS />
+//     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//     <ISPARTYLEDGER>No</ISPARTYLEDGER>
+//     <AMOUNT>1993.95</AMOUNT>
+//     </ALLLEDGERENTRIES.LIST>
+//     <ALLLEDGERENTRIES.LIST>
+//     <LEDGERNAME>SGST @ 9%</LEDGERNAME>
+//     <GSTCLASS />
+//     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//     <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+//     <AMOUNT>1993.95</AMOUNT>
+//     </ALLLEDGERENTRIES.LIST>
+//     <ALLLEDGERENTRIES.LIST>
+//     <LEDGERNAME>Round Off</LEDGERNAME>
+//     <GSTCLASS />
+//     <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//     <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+//     <AMOUNT>0.10</AMOUNT>
+//     </ALLLEDGERENTRIES.LIST>
+//     </VOUCHER>
+//     </TALLYMESSAGE>
+//     </IMPORTDATA>
+//     </BODY>
+//     </ENVELOPE>
+    
+//     `
+//         const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
+//         const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
 //             headers: {
 //                 'Content-Type': 'application/xml',
 //             },
 //         });
 
-//         // Handle the Tally response as needed
-//         res.status(200).json({ success: true, tallyResponse: tallyResponse.data });
-//     } catch (error) {
-//         console.error('Error communicating with Tally:', error.message);
-//         res.status(500).json({ success: false, error: error.message });
+//         // Check the response from the Tally server
+//         const tallyXmlResponse = parseXml(tallyResponse.data);
+//        console.log("tally response", tallyXmlResponse);
+//       if (tallyResponse.status === 200 ) {
+//         // Tally server responded with a success status
+//         console.log('File uploaded and sent to Tally successfully');
+//         res.status(200).send('File uploaded and sent to Tally successfully');
 //     }
+//         else {
+//             // Tally server responded with an error status
+//             console.error('Error from Tally server:', tallyResponse.statusText);
+//             res.status(500).send('Error communicating with Tally server');
+//         }
+//     } catch (error) {
+//         console.error('Error handling file upload:', error);
+//         res.status(500).send('Internal Server Error');
+//     }
+
 // });
 
 
+
+
+const { parseString } = require('xml2js');
+//tally after exporting i need to compre which ledger is not export
+
+
 tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
-   
-
     try {
-        // Access the file data
-        const xmlFile = req.file.buffer.toString(); // Assuming the file is XML
+        const xmlFile=`<ENVELOPE>
+        <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
+        <BODY>
+        <IMPORTDATA>
+        <REQUESTDESC>
+        <REPORTNAME>Vouchers</REPORTNAME>
+        <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY></STATICVARIABLES>
+        </REQUESTDESC>
+        <TALLYMESSAGE xmlns:UDF='TallyUDF'>
+        <VOUCHER REMOTEID='SL2147387070' VCHTYPE='Sales' ACTION='Create'>
+        <DATE>20240222</DATE>
+        <GUID>2147387070</GUID>
+        <NARRATION>Our WO No :240492 Packing Note No :09014/ 23/24</NARRATION>
+        <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
+        <VOUCHERNUMBER>SL / JG1133/ 23/24</VOUCHERNUMBER>
+        <REFERENCE>KE034 DTD/31.01.2024</REFERENCE>
+        <PARTYLEDGERNAME>KALPA ENGINEERING</PARTYLEDGERNAME>
+        <CSTFORMISSUETYPE />
+        <CSTFORMRECVTYPE />
+        <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+        <VCHGSTCLASS />
+        <DIFFACTUALQTY>No</DIFFACTUALQTY>
+        <AUDITED>No</AUDITED>
+        <FORJOBCOSTING>No</FORJOBCOSTING>
+        <ISOPTIONAL>No</ISOPTIONAL>
+        <EFFECTIVEDATE>20240222</EFFECTIVEDATE>
+        <USEFORINTEREST>No</USEFORINTEREST>
+        <USEFORGAINLOSS>No</USEFORGAINLOSS>
+        <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
+        <USEFORCOMPOUND>No</USEFORCOMPOUND>
+        <ALTERID>2</ALTERID>
+        <EXCISEOPENING>No</EXCISEOPENING>
+        <ISCANCELLED>No</ISCANCELLED>
+        <HASCASHFLOW>No</HASCASHFLOW>
+        <ISPOSTDATED>No</ISPOSTDATED>
+        <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
+        <ISINVOICE>No</ISINVOICE>
+        <MFGJOURNAL>No</MFGJOURNAL>
+        <HASDISCOUNTS>No</HASDISCOUNTS>
+        <ASPAYSLIP>No</ASPAYSLIP>
+        <ISDELETED>No</ISDELETED>
+        <ASORIGINAL>No</ASORIGINAL>
+        <ALLLEDGERENTRIES.LIST>
+        <LEDGERNAME>KALPA ENGINEERING</LEDGERNAME>
+        <GSTCLASS />
+        <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
+        <LEDGERFROMITEM>No</LEDGERFROMITEM>
+        <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+        <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+        <AMOUNT>-26143.00</AMOUNT>
+        <BILLALLOCATIONS.LIST>
+        <NAME>SL / JG1133/ 23/24</NAME>
+        <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
+        <BILLTYPE>New Ref</BILLTYPE>
+        <AMOUNT>-26143.00</AMOUNT>
+        </BILLALLOCATIONS.LIST>
+        </ALLLEDGERENTRIES.LIST>
+        <ALLLEDGERENTRIES.LIST>
+        <LEDGERNAME>SALES</LEDGERNAME>
+        <GSTCLASS />
+        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        <LEDGERFROMITEM>No</LEDGERFROMITEM>
+        <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+        <ISPARTYLEDGER>No</ISPARTYLEDGER>
+        <AMOUNT>22155.00</AMOUNT>
+        </ALLLEDGERENTRIES.LIST>
+        <ALLLEDGERENTRIES.LIST>
+        <LEDGERNAME>CGST @ 9%</LEDGERNAME>
+        <GSTCLASS />
+        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        <LEDGERFROMITEM>No</LEDGERFROMITEM>
+        <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+        <ISPARTYLEDGER>No</ISPARTYLEDGER>
+        <AMOUNT>1993.95</AMOUNT>
+        </ALLLEDGERENTRIES.LIST>
+        <ALLLEDGERENTRIES.LIST>
+        <LEDGERNAME>SGST @ 9%</LEDGERNAME>
+        <GSTCLASS />
+        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+        <LEDGERFROMITEM>No</LEDGERFROMITEM>
+        <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+        <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+        <AMOUNT>1993.95</AMOUNT>
+        </ALLLEDGERENTRIES.LIST>
+        <ALLLEDGERENTRIES.LIST>
+        <LEDGERNAME>Round Off</LEDGERNAME>
+        <GSTCLASS />
+        <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+        <LEDGERFROMITEM>No</LEDGERFROMITEM>
+        <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+        <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+        <AMOUNT>0.10</AMOUNT>
+        </ALLLEDGERENTRIES.LIST>
+        </VOUCHER>
+        </TALLYMESSAGE>
+        </IMPORTDATA>
+        </BODY>
+        </ENVELOPE>
+        `// Your XML data
 
-        // Process the XML data as needed
-        // console.log("xml file", xmlFile);
-
-        // Send the XML data to the Tally server URL
         const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
         const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
             headers: {
@@ -167,21 +369,51 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
             },
         });
 
-        // Check the response from the Tally server
-        if (tallyResponse.ok) {
-            // Tally server responded with a success status
-            res.status(200).send('File uploaded and sent to Tally successfully');
-        }
-        else {
-            // Tally server responded with an error status
+       // console.log("Tally Response:", tallyResponse);
+
+        // Define arrays to store exported and not exported ledger names
+        let exportedLedgers = [];
+        let notExportedLedgers = [];
+
+        // Check if the response status is successful
+        if (tallyResponse.status === 200) {
+            // Parse the XML response to extract the ledger names
+            parseString(tallyResponse.data, (err, result) => {
+                if (err) {
+                    console.error('Error parsing XML:', err);
+                    res.status(500).send('Error parsing XML from Tally server');
+                    return;
+                }
+                console.log("resulttttttttt", result);
+                // Extract the ledger names from the parsed XML response
+                const ledgerEntries = result.ENVELOPE.BODY[0].IMPORTDATA[0].TALLYMESSAGE[0].VOUCHER[0]['ALLLEDGERENTRIES.LIST'];
+                for (let i = 0; i < ledgerEntries.length; i++) {
+                    const ledgerName = ledgerEntries[i].LEDGERNAME[0];
+                    exportedLedgers.push(ledgerName);
+                }
+            });
+        } else {
             console.error('Error from Tally server:', tallyResponse.statusText);
-            res.status(500).send('Error communicating with Tally server');
+            res.status(tallyResponse.status).send('Error communicating with Tally server: ' + tallyResponse.statusText);
+            return; // Return early to avoid further processing in case of an error
         }
+
+        // Logic to compare exported and not exported ledger names
+        // Assuming you have a function to get ledger names from your XML file
+        const xmlLedgerNames = getLedgerNamesFromXml(xmlFile); 
+
+        // Check which ledger names from XML are not exported to Tally
+        notExportedLedgers = xmlLedgerNames.filter(name => !exportedLedgers.includes(name));
+
+        // Send response with exported and not exported ledger names
+        console.log("ledger namessss",notExportedLedgers);
+        res.status(200).json({ exported: exportedLedgers, notExported: notExportedLedgers });
+
     } catch (error) {
         console.error('Error handling file upload:', error);
         res.status(500).send('Internal Server Error');
     }
-
 });
+
 
 module.exports = tally_Export;

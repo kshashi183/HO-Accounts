@@ -36,7 +36,7 @@ customerOutstanding.get('/unitOutstandingData', (req, res) => {
         WHERE u.GrandTotal - u.PymtAmtRecd > 0 AND u.DCStatus NOT LIKE 'Closed' AND u.Inv_No IS NOT NULL AND u.UnitName = 'Jigani'
         GROUP BY u.Cust_Code
       ) AS a ON a.Cust_Code = u.Cust_Code
-      WHERE u.UnitName = 'Jigani'
+      WHERE u.UnitName = 'Jigani'  
     
 `;
 
@@ -153,6 +153,22 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
     FROM magod_hq_mis.unit_invoices_list u
     WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType='${selectedDCType}' AND InvoiceFor='${invoiceFor}'`;
 
+    const salesANDjobwork = `SELECT 
+    u.PO_No,
+    u.Inv_No,
+    @UnitName AS UnitName,
+    u.GrandTotal - u.PymtAmtRecd AS Balance,
+    DATEDIFF(CURRENT_DATE(), u.Inv_Date) AS duedays,
+    u.InvoiceFor,  
+    u.DCStatus, 
+    u.DC_InvType,
+    u.Inv_Date, 
+    u.GrandTotal,
+    u.Cust_Name,
+    u.PymtAmtRecd,u.PIN_Code,u.DC_Inv_No
+    FROM magod_hq_mis.unit_invoices_list u
+    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType IN ('Sales', 'Job work') AND InvoiceFor='${invoiceFor}'`;
+
     if (custcode === ' ' && (selectedDCType !== '' || invoiceFor !== '')) {
         return res.json({ Result: "customer err" });
     }
@@ -181,7 +197,7 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
                     console.log("err in query", err);
                 }
                 else {
-                    //  console.log("cust code result1111111", result);
+                     console.log("cust code result1111111", result);
                     return res.json({ Result: result });
                 }
             })
@@ -224,21 +240,23 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
         if (selectedDCType === 'Sales & Jobwork') {
 
 
+console.log("sales and jobworkkkkkk");
 
 
 
-
-            setupQueryMod(sql3, (err, result) => {
+            setupQueryMod(salesANDjobwork, (err, result) => {
                 if (err) {
+                    console.log("sales nad jobwork error ",err );
                     console.log("err in query", err);
                 }
                 else {
 
                     if (result.length === 0) {
+                        console.log("sales nad jobwork error  result length",result.length );
                         return res.json({ Result: "error in invoice for" });
                     }
                     else {
-                        //   console.log("cust code 4", result);
+                          console.log("cust code 4 sales and jobwork", result);
                         return res.json({ Result: result });
                     }
 
@@ -312,7 +330,7 @@ customerOutstanding.get('/getDCTypes', (req, res) => {
             console.log("err in query", err);
         }
         else {
-            //console.log("DC_Inv_type", result);
+          //  console.log("DC_Inv_type", result);
             return res.json({ Result: result });
         }
     })

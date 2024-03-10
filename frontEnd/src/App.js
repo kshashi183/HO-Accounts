@@ -29,6 +29,7 @@ import On_AccountList from "./pages/HoAccounts/Ho/HO_PRV/OnAccountList/On_Accoun
 import AccountSync from "./pages/HoAccounts/Sync/AccountSync/AccountSync";
 import SyncUnit from "./pages/HoAccounts/Sync/FromUnitSync/SyncUnit";
 import UnitUpdate from "./pages/HoAccounts/Sync/FromUnitUpdate/UnitUpdate";
+import NewForm from "./pages/HoAccounts/Ho/HO_PRV/CreateNew/NewForm";
 
 function App() {
   return (
@@ -63,7 +64,8 @@ function App() {
 
               <Route path="UnitSync" element={<UnitSyncForm />} />
               <Route path="HOPRV">
-                <Route path="CreateNew" element={<CreateNewForm />} />
+                <Route path="Adjustment" element={<CreateNewForm />} />
+                <Route path="CreateNew" element={<NewForm />} />
                 <Route path="DraftList" element={<Draft_List />} />
                 <Route path="PRVList" element={<PRV_List />} />
                 <Route path="OnAccountList" element={<On_AccountList />} />
