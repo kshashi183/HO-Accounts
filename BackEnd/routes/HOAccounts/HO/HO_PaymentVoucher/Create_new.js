@@ -158,28 +158,51 @@ createnew.post('/insertToparentForm', (req, res) => {
 createnew.delete("/deleteleft", (req, res) => {
   const ho = req.body.hoid
   // console.log("delete", req.params, typeof (uid));
-  console.log("deleyte ", req.body.onacc);
+  console.log("deleyte ", req.body.receipt_details);
 
 
   //update on account value after delete the form 
 
 
   const update = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
-SET u.On_account =u.On_account+'${req.body.onacc}'
+SET u.On_account =u.On_account +'${req.body.onacc}'
    
 WHERE u.Id = '${req.body.id}';
  `;
 
-  setupQueryMod(update, (err, result) => {
+
+ const receiptdetailsISNull=`UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
+ SET u.On_account ='${req.body.onacc}'
+    
+ WHERE u.Id = '${req.body.id}';
+  `;
+
+if(req.body.receipt_details.length===0){
+  setupQueryMod(receiptdetailsISNull, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      //console.log("err in query", err);
     }
     else {
-      console.log("update onaccount after result", result);
+     // console.log("update onaccount after result", result);
 
 
     }
   })
+}
+ else{
+  setupQueryMod(update, (err, result) => {
+    if (err) {
+      //console.log("err in query", err);
+    }
+    else {
+     // console.log("update onaccount after result", result);
+
+
+    }
+  })
+ }
+
+  
 
 
 
@@ -189,19 +212,19 @@ WHERE u.Id = '${req.body.id}';
     `DELETE FROM magod_hq_mis.ho_paymentrv_details  WHERE HOPrvId ='${ho}'`;
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("fail to delete", err);
+     // console.log("fail to delete", err);
       return res.json({ Error: " err in sql" });
     }
     else {
-      console.log("result delete", result);
+    //  console.log("result delete", result);
 
       const sql2 = `DELETE FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId ='${ho}'`;
       setupQueryMod(sql2, (err2, result2) => {
         if (err2) {
-          console.log("Failed to delete from ho_paymentrv_register", err2);
+        //  console.log("Failed to delete from ho_paymentrv_register", err2);
           return res.status(500).json({ Error: "Error in SQL query for ho_paymentrv_register" });
         } else {
-          console.log("Deleted from ho_paymentrv_register:", result2);
+        //  console.log("Deleted from ho_paymentrv_register:", result2);
           return res.json({ Status: "Success" });
         }
       });
@@ -215,7 +238,7 @@ WHERE u.Id = '${req.body.id}';
 
 createnew.put('/updateReceiveNowAmount', (req, res) => {
   const recept = req.body.receipt_details
-  console.log("recept update", req.body);
+ // console.log("recept update", req.body);
 
   recept.forEach(item => {
     const { Dc_inv_no, Receive_Now, HOPrvId } = item;
@@ -251,7 +274,7 @@ createnew.put('/updateReceiveNowAmount', (req, res) => {
 
 createnew.post('/cancelUpdate', async (req, res) => {
   const { HO_PrvId, custName, totalReceiveNow, id } = req.body;
-  console.log("req body cancel ", HO_PrvId, custName, req.body);
+ // console.log("req body cancel ", HO_PrvId, custName, req.body);
 
 
 
@@ -265,7 +288,7 @@ createnew.post('/cancelUpdate', async (req, res) => {
   setupQueryMod(rightTable, (rightErr, rightRes) => {
     if (rightErr) {
       // Handle error if needed
-      console.log("right table error after cancel", rightErr);
+     // console.log("right table error after cancel", rightErr);
     } else {
 
 
@@ -332,7 +355,7 @@ createnew.post('/cancelUpdate', async (req, res) => {
 
 
       const adjustmentForm = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register 
-      SET On_account=On_account+${totalReceiveNow} where Id='${id}'`
+      SET On_account=On_account+${totalReceiveNow}, fixedOnaccount=fixedOnaccount+${totalReceiveNow}  where Id='${id}'`
 
       console.log("adjustmentForm query", adjustmentForm, totalReceiveNow);
       setupQueryMod(adjustmentForm, (adjustmentFormErr, adjustmentFormRes) => {
@@ -354,7 +377,7 @@ createnew.post('/cancelUpdate', async (req, res) => {
 createnew.put('/updateOnaccountValue', (req, res) => {
   const { on_account, id } = req.body
   // const receipt_id=1
-  console.log("on account ", on_account, id);
+ // console.log("on account ", on_account, id);
   const sql = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
   SET u.On_account = '${on_account}'
      
@@ -426,7 +449,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
       }
 
       const count = selectResult[0]["COUNT(Id)"];
-      console.log("counttttttttttt", count);
+     // console.log("counttttttttttt", count);
 
       if (count === 0) {
         // If count is 0, execute the INSERT query
@@ -440,7 +463,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
         setupQueryMod(insertQuery, (insertError, insertResult) => {
           if (insertError) {
             logger.error(insertError);
-            console.log("error in insert fro running no", insertError);
+        //    console.log("error in insert fro running no", insertError);
             return next(insertResult);
           }
           else {
@@ -455,7 +478,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error("An error occurred:", error);
+    //console.error("An error occurred:", error);
     next(error);
   }
 });
@@ -468,7 +491,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
 
 
 createnew.post("/saveReceipt", (req, res) => {
-   console.log("qqqqqqqqqq", req.body);
+ //  console.log("qqqqqqqqqq", req.body);
   if (req.body.HO_PrvId != "") {
     if (req.body.Amount == "") {
       amount = 0.0;
@@ -548,7 +571,7 @@ createnew.post("/saveReceipt", (req, res) => {
             return res.json({ status: "query", Error: "inside signup query" });
           } else {
             console.log("55");
-            console.log("result after insert", result);
+          //  console.log("result after insert", result);
             return res.json({ Status: "Success", result: result });
           }
         });

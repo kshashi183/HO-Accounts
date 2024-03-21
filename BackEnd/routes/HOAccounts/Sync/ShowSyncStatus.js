@@ -19,7 +19,7 @@ showSyncRouter.get("/hoUnitNames", async (req, res, next) => {
 
 
 // common updateUnitInvoicePaymentStatus
-showSyncRouter.put("/updateUnitInvoicePaymentStatus/:getName",async (req, res, next) => {
+showSyncRouter.put("/updateHOInvoicePaymentStatus/:getName",async (req, res, next) => {
   const getName = req.params.getName;
  // console.log("updateUnitInvoicePaymentStatus1111", getName);
 
@@ -297,39 +297,41 @@ showSyncRouter.put(
     const dcInvNo = req.body.dcInvNo;
 
     // console.log("and", dcInvNo);
+    const sql= `UPDATE magodmis.draft_dc_inv_register d
+    JOIN (
+        SELECT
+            CASE
+                WHEN SUM(a.Receive_Now) IS NULL THEN 0
+                ELSE SUM(a.Receive_Now)
+            END AS Receive_now
+        FROM (
+            SELECT p.Receive_Now
+            FROM magodmis.payment_recd_voucher_details p
+            JOIN magodmis.payment_recd_voucher_register p1 ON p1.RecdPVID = p.RecdPVID
+            WHERE p.Dc_inv_no = '${dcInvNo}'
+                AND NOT (p1.ReceiptStatus LIKE 'Cancelled' OR p1.ReceiptStatus LIKE 'Draft')
+            UNION
+            SELECT p.Receive_Now
+            FROM magodmis.ho_paymentrv_details p
+            JOIN magodmis.ho_paymentrv_register p1 ON p1.Id = p.HOPrvId
+            WHERE p.Dc_inv_no = '${dcInvNo}'
+                AND NOT (p1.Status LIKE 'Cancelled' OR p1.Status LIKE 'Draft')
+        ) AS A
+    ) AS B ON 1=1
+    SET
+        d.PymtAmtRecd = B.Receive_now,
+        d.DCStatus = CASE
+            WHEN d.grandTotal - B.Receive_now = 0 THEN 'Closed'
+            WHEN d.grandTotal - B.Receive_now > 0 THEN 'Despatched'
+            ELSE 'OverPaid'
+        END
+    WHERE d.Dc_inv_no = '${dcInvNo}';`
 
     try {
-      hqQuery(
-        `UPDATE magodmis.draft_dc_inv_register d
-        JOIN (
-            SELECT
-                CASE
-                    WHEN SUM(a.Receive_Now) IS NULL THEN 0
-                    ELSE SUM(a.Receive_Now)
-                END AS Receive_now
-            FROM (
-                SELECT p.Receive_Now
-                FROM magodmis.payment_recd_voucher_details p
-                JOIN magodmis.payment_recd_voucher_register p1 ON p1.RecdPVID = p.RecdPVID
-                WHERE p.Dc_inv_no = '${dcInvNo}'
-                    AND NOT (p1.ReceiptStatus LIKE 'Cancelled' OR p1.ReceiptStatus LIKE 'Draft')
-                UNION
-                SELECT p.Receive_Now
-                FROM magodmis.ho_paymentrv_details p
-                JOIN magodmis.ho_paymentrv_register p1 ON p1.Id = p.HOPrvId
-                WHERE p.Dc_inv_no = '${dcInvNo}'
-                    AND NOT (p1.Status LIKE 'Cancelled' OR p1.Status LIKE 'Draft')
-            ) AS A
-        ) AS B ON 1=1
-        SET
-            d.PymtAmtRecd = B.Receive_now,
-            d.DCStatus = CASE
-                WHEN d.grandTotal - B.Receive_now = 0 THEN 'Closed'
-                WHEN d.grandTotal - B.Receive_now > 0 THEN 'Despatched'
-                ELSE 'OverPaid'
-            END
-        WHERE d.Dc_inv_no = '${dcInvNo}';`,
+      hqQuery(sql
+       ,
         (err, data) => {
+          console.log("hq query ", sql);
           res.send(data);
         }
       );

@@ -6,6 +6,10 @@ import { xml2js, js2xml } from "xml-js";
 import axios from "axios";
 import { baseURL } from "../../../../api/baseUrl";
 import { Tab, Table, Tabs } from "react-bootstrap";
+import Modal from 'react-bootstrap/Modal';
+import { Button } from 'react-bootstrap';
+import MailModal from "../../MailModal";
+
 
 export default function ShowSyncStatus() {
   const navigate = useNavigate();
@@ -30,7 +34,18 @@ export default function ShowSyncStatus() {
   const [selectedRowColor, setSelectedRowColor] = useState("");
   const [selectRowHO, setSelectRowHO] = useState([]);
 
+  //filter button for unit data
+  const [filteredUnit, setFilteredUnit]=useState(false)
+
+  //filter button for uHO data
+  const [filteredHO, setFilteredHO]=useState(false)
+
+
+  const [mailAlert,setMailAlert]=useState(false)
+  const [mailModal, setMailModal] = useState(false)
+
   const handleButtonClick = (e) => {
+
     if(getName){
     fileInputRef.current.click();
     console.log("Xml File", fileInputRef);
@@ -155,6 +170,7 @@ export default function ShowSyncStatus() {
     return js2xml(xmlData, options);
   };
 
+  
   const handleDownload = async () => {
     try {
       const xmlString = arrayToXML({
@@ -163,7 +179,7 @@ export default function ShowSyncStatus() {
       });
       const finalXmlString = `<?xml version="1.0" standalone="yes"?>\n${xmlString}`;
       const blob = new Blob([finalXmlString], { type: "text/xml" });
-
+     console.log("blobbb", blob);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -190,7 +206,12 @@ export default function ShowSyncStatus() {
     } catch (error) {
       console.error("Error saving file:", error);
     }
+
+    await setTimeout(callMailModal, 10000);
   };
+
+
+ 
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -266,10 +287,11 @@ export default function ShowSyncStatus() {
   //console.log("unit namee1111", getName);
 
   const handleApi = async () => {
+
 console.log("unit namee", getName);
 
     await axios
-      .put(baseURL + `/showSyncStatus/updateUnitInvoicePaymentStatus/`+getName)
+      .put(baseURL + `/showSyncStatus/updateHOInvoicePaymentStatus/`+getName)
       .then((res) => {
         console.log("Data updated sucessfully", res.data);
       })
@@ -326,19 +348,20 @@ console.log("unit namee", getName);
 
 
   useEffect(() => {
-    if (getUnitInvoice.length === 1) {
+    console.log("report ",report);
+    if (getUnitInvoice.length === 1  && getHOInvoice.length!==0 ) {
       compare(report);
       toast.success("Please wait data being Populating");
     }
-  }, [report]);
+  }, [getUnitInvoice,getHOInvoice]);
 
 
 
   useEffect(() => {
-    if (getHOInvoice.length === 1) {
+    if (getHOInvoice.length === 1 && report.length !==0 ) {
       HOCompare(report);
     }
-  }, [getHOInvoice]);
+  }, [getHOInvoice,report]);
 
 
 
@@ -347,13 +370,21 @@ console.log("unit namee", getName);
   const [unmatchedInvoices, setunmatchedInvoices] = useState([]);
 
   const compare = (report) => {
+    
    
     if (getUnitInvoice.length === 1) {
+      const hoInvoices = getHOInvoice[0].cmdHoInvList;
       const unitInvoices = getUnitInvoice[0].cmdInvList;
       setInvPaymentVrList(getUnitInvoice[0].cmdInvPaymentVrList);
       // Identify invoices in unitInvoices that are not in report.open_inv
       unitInvoices.forEach((unitInv) => {
-        const matchedInv = report.open_inv.find(
+        // const matchedInv = report.open_inv.find(
+        //   (importInv) =>
+        //     parseInt(importInv.DC_Inv_No) === parseInt(unitInv.DC_Inv_No) &&
+        //     importInv.PymtAmtRecd === unitInv.PymtAmtRecd
+        // );
+
+        const matchedInv = hoInvoices.find(
           (importInv) =>
             parseInt(importInv.DC_Inv_No) === parseInt(unitInv.DC_Inv_No) &&
             importInv.PymtAmtRecd === unitInv.PymtAmtRecd
@@ -371,15 +402,19 @@ console.log("unit namee", getName);
       });
 
       // Now matchedInvoices contains the matched invoices along with their corresponding importInv
-      console.log("matchedInvoices", matchedInvoices);
+      console.log("matchedInvoices of unit", matchedInvoices);
 
       // Now unmatchedInvoices contains the invoices present in unitInvoices but not in report.open_inv
-      console.log("unmatchedInvoices", unmatchedInvoices);
+      console.log("unmatchedInvoices of unit", unmatchedInvoices);
     } else {
      
       console.log("there is no length");
     }
   };
+
+
+
+
 
   // Initialize arrays to store matched and unmatched invoices
   const [matchedInvoicesHo, setmatchedInvoicesHo] = useState([]);
@@ -391,11 +426,19 @@ console.log("unit namee", getName);
       setInvPaymentVrListHO(getHOInvoice[0].cmdHoInvPaymentVrList);
       // Identify invoices in unitInvoices that are not in report.open_inv
       hoInvoices.forEach((unitInv) => {
-        const matchedInv = getUnitInvoice[0].cmdInvList.find(
+        // const matchedInv = getUnitInvoice[0].cmdInvList.find(
+        //   (importInv) =>
+        //     parseInt(importInv.DC_Inv_No) === parseInt(unitInv.DC_Inv_No) &&
+        //     importInv.PymtAmtRecd === unitInv.PymtAmtRecd
+        // );
+
+        const matchedInv = report.open_inv.find(
           (importInv) =>
             parseInt(importInv.DC_Inv_No) === parseInt(unitInv.DC_Inv_No) &&
             importInv.PymtAmtRecd === unitInv.PymtAmtRecd
         );
+
+       
 
         if (matchedInv) {
           // Invoice is matched, add to matchedInvoices array
@@ -407,10 +450,10 @@ console.log("unit namee", getName);
       });
 
       // Now matchedInvoices contains the matched invoices along with their corresponding importInv
-      console.log("matchedInvoicesHo", matchedInvoicesHo);
+    //  console.log("matchedInvoicesHo", matchedInvoicesHo);
 
       // Now unmatchedInvoices contains the invoices present in unitInvoices but not in report.open_inv
-      console.log("unmatchedInvoicesHO", unmatchedInvoicesHO);
+    //  console.log("unmatchedInvoicesHO", unmatchedInvoicesHO);
     } else {
       console.log("there is no length");
     }
@@ -573,8 +616,60 @@ console.log("unit namee", getName);
     return dataCopy;
   };
 
+
+  const [showMatchedFirst, setShowMatchedFirst] = useState(true); // State to track whether matched data should be shown first
+
+  // Function to handle the filter button click
+  const handleUnitInfoFilter = () => {
+    setShowMatchedFirst(!showMatchedFirst); // Toggle between showing matched data first and unmatched data first
+  };
+
+
+  // for HO table 
+  const [showMatchedFirstForHO, setShowMatchedFirstForHO] = useState(true);
+  const forHO=()=>{
+    setShowMatchedFirstForHO(!showMatchedFirstForHO);
+  }
+
+  const handleClose = () => {
+    setMailModal(false);
+    setMailAlert(false)
+  }
+  const yesmailSubmit=()=>{
+    setMailAlert(false);
+    setMailModal(true);
+  }
+
+  const callMailModal=()=>{
+    setMailAlert(true)
+  }
+
   return (
     <div>
+      <Modal 
+ show={mailAlert} 
+ onHide={handleClose}
+>
+        <Modal.Header closeButton>
+          <Modal.Title>magod_machine</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body> Accounts Sync Report Saved as (path filename.xml) Do you wish to mail it? 
+           
+
+         </Modal.Body> 
+
+        <Modal.Footer>
+        <Button variant="primary" onClick={yesmailSubmit}
+          >
+            Yes
+          </Button>
+          <Button variant="secondary" onClick={handleClose}>
+            No
+          </Button>
+         
+        </Modal.Footer>
+      </Modal>
       <div className="col-md-12">
         <div className="row">
           <h4 className="title">HO Unit Sync Review</h4>
@@ -677,6 +772,7 @@ console.log("unit namee", getName);
                     <button
                       className="button-style mt-2 group-button"
                       style={{ width: "80px" }}
+                      onClick={handleUnitInfoFilter}
                     >
                       Filter
                     </button>
@@ -692,6 +788,7 @@ console.log("unit namee", getName);
                     <button
                       className="button-style mt-2 group-button"
                       style={{ width: "80px" }}
+                      onClick={forHO}
                     >
                       Filter
                     </button>
@@ -720,8 +817,8 @@ console.log("unit namee", getName);
                       </tr>
                     </thead>
 
-                    <tbody className="tablebody">
-                      {/* Render rows for matchedInvoices */}
+                    {/* <tbody className="tablebody">
+                   
                       {sortedData()?.map((item, key) => {
                         return (
                           <tr
@@ -748,33 +845,10 @@ console.log("unit namee", getName);
                           </tr>
                         );
                       })}
-                      {/* {matchedInvoices.map((item, index) => {
-                        return (
-                          <tr
-                            onClick={() => selectedRowFun(item, index)}
-                            className={
-                              index === selectRow?.index
-                                ? "selcted-row-clr"
-                                : ""
-                            }
-                            key={`matched-${item.DC_Inv_No}`}
-                            style={{
-                              backgroundColor: "#92ec93",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <td>{item.DC_InvType}</td>
-                            <td>{item.Inv_No}</td>
-                            <td>{formatDate(item.Dc_inv_Date)}</td>
-                            <td>{item.InvTotal}</td>
-                            <td>{item.PymtAmtRecd}</td>
-                            <td>{item.Cust_Name}</td>
-                            <td>{item.DCStatus}</td>
-                          </tr>
-                        );
-                      })} */}
 
-                      {/* Render rows for unmatchedInvoices */}
+
+                   
+
                       {unmatchedInvoices?.map((item, key) => {
                         return (
                           <tr
@@ -801,26 +875,120 @@ console.log("unit namee", getName);
                           </tr>
                         );
                       })}
-                      {/* {unmatchedInvoices.map((item) => {
-                        return (
-                          <tr
-                            key={`unmatched-${item.DC_Inv_No}`}
-                            style={{
-                              backgroundColor: "#f48483",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <td>{item.DC_InvType}</td>
-                            <td>{item.Inv_No}</td>
-                            <td>{formatDate(item.Dc_inv_Date)}</td>
-                            <td>{item.InvTotal}</td>
-                            <td>{item.PymtAmtRecd}</td>
-                            <td>{item.Cust_Name}</td>
-                            <td>{item.DCStatus}</td>
-                          </tr>
-                        );
-                      })} */}
-                    </tbody>
+                      
+                    </tbody> */}
+<tbody className="tablebody">
+  {showMatchedFirst ? (
+    <>
+      {/* Display matched data first */}
+      {sortedData()?.map((item, key) => {
+        return (
+          <tr
+            style={{
+              whiteSpace: "nowrap",
+              backgroundColor: "#92ec93",
+            }}
+            onClick={() => selectedRowFun(item, key)}
+            className={key === selectRow?.index ? "selcted-row-clr" : ""}
+          >
+            <td>{item.DC_InvType}</td>
+            <td>{item.Inv_No}</td>
+            <td>{formatDate(item.Dc_inv_Date)}</td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.InvTotal)}
+            </td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.PymtAmtRecd)}
+            </td>
+            <td>{item.Cust_Name}</td>
+            <td>{item.DCStatus}</td>
+          </tr>
+        );
+      })}
+      {/* Then display unmatched data */}
+      {unmatchedInvoices?.map((item, key) => {
+        return (
+          <tr
+            style={{
+              whiteSpace: "nowrap",
+              backgroundColor: "#f48483",
+            }}
+            onClick={() => selectedRowFun(item, key, "#f48483")}
+            className={key === selectRow?.index ? "selcted-row-clr" : ""}
+          >
+            <td>{item.DC_InvType}</td>
+            <td>{item.Inv_No}</td>
+            <td>{formatDate(item.Dc_inv_Date)}</td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.InvTotal)}
+            </td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.PymtAmtRecd)}
+            </td>
+            <td>{item.Cust_Name}</td>
+            <td>{item.DCStatus}</td>
+          </tr>
+        );
+      })}
+    </>
+  ) : (
+    <>
+      {/* Display unmatched data first */}
+      {unmatchedInvoices?.map((item, key) => {
+        return (
+          <tr
+            style={{
+              whiteSpace: "nowrap",
+              backgroundColor: "#f48483",
+            }}
+            onClick={() => selectedRowFun(item, key, "#f48483")}
+            className={key === selectRow?.index ? "selcted-row-clr" : ""}
+          >
+            <td>{item.DC_InvType}</td>
+            <td>{item.Inv_No}</td>
+            <td>{formatDate(item.Dc_inv_Date)}</td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.InvTotal)}
+            </td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.PymtAmtRecd)}
+            </td>
+            <td>{item.Cust_Name}</td>
+            <td>{item.DCStatus}</td>
+          </tr>
+        );
+      })}
+      {/* Then display matched data */}
+      {sortedData()?.map((item, key) => {
+        return (
+          <tr
+            style={{
+              whiteSpace: "nowrap",
+              backgroundColor: "#92ec93",
+            }}
+            onClick={() => selectedRowFun(item, key)}
+            className={key === selectRow?.index ? "selcted-row-clr" : ""}
+          >
+            <td>{item.DC_InvType}</td>
+            <td>{item.Inv_No}</td>
+            <td>{formatDate(item.Dc_inv_Date)}</td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.InvTotal)}
+            </td>
+            <td style={{ textAlign: "right" }}>
+              {formatAmount(item.PymtAmtRecd)}
+            </td>
+            <td>{item.Cust_Name}</td>
+            <td>{item.DCStatus}</td>
+          </tr>
+        );
+      })}
+    </>
+  )}
+</tbody>
+
+
+
                   </Table>
                 </div>
 
@@ -835,7 +1003,7 @@ console.log("unit namee", getName);
                   <Table striped className="table-data border mt-1">
                     <thead className="tableHeaderBGColor">
                       <tr>
-                        <th style={{ whiteSpace: "nowrap" }}>Inv TType</th>
+                        <th style={{ whiteSpace: "nowrap" }}>Inv Type</th>
                         <th style={{ whiteSpace: "nowrap" }}>Inv No</th>
                         <th>Date</th>
                         <th style={{ whiteSpace: "nowrap" }}>Inv Total</th>
@@ -845,7 +1013,7 @@ console.log("unit namee", getName);
                       </tr>
                     </thead>
 
-                    <tbody className="tablebody">
+                    {/* <tbody className="tablebody">
                       {unmatchedInvoicesHO?.map((item, key) => {
                         return (
                           <tr
@@ -905,7 +1073,133 @@ console.log("unit namee", getName);
                           </tr>
                         );
                       })}
-                    </tbody>
+                    </tbody> */}
+
+<tbody className="tablebody">
+          {showMatchedFirstForHO ? (
+            <>
+              {/* Display unmatched data first */}
+              {unmatchedInvoicesHO?.map((item, key) => (
+                <tr
+                  key={key}
+                  style={{
+                    whiteSpace: "nowrap",
+                    backgroundColor: "#f48483",
+                  }}
+                  onClick={() =>
+                    selectedRowFunHO(item, key, "#f48483")
+                  }
+                  className={
+                    key === selectRowHO?.index
+                      ? "selcted-row-clr"
+                      : ""
+                  }
+                >
+                  <td>{item.DC_InvType}</td>
+                  <td>{item.Inv_No}</td>
+                  <td>{formatDate(item.DC_Date)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.InvTotal)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.PymtAmtRecd)}
+                  </td>
+                  <td>{item.Cust_Name}</td>
+                  <td>{item.DCStatus}</td>
+                </tr>
+              ))}
+              {/* Then display matched data */}
+              {matchedInvoicesHo?.map((item, key) => (
+                <tr
+                  key={key}
+                  style={{
+                    whiteSpace: "nowrap",
+                    backgroundColor: "#92ec93",
+                  }}
+                  onClick={() => selectedRowFunHO(item, key)}
+                  className={
+                    key === selectRowHO?.index
+                      ? "selcted-row-clr"
+                      : ""
+                  }
+                >
+                  <td>{item.DC_InvType}</td>
+                  <td>{item.Inv_No}</td>
+                  <td>{formatDate(item.DC_Date)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.InvTotal)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.PymtAmtRecd)}
+                  </td>
+                  <td>{item.Cust_Name}</td>
+                  <td>{item.DCStatus}</td>
+                </tr>
+              ))}
+            </>
+          ) : (
+            <>
+              {/* Display matched data first */}
+              {matchedInvoicesHo?.map((item, key) => (
+                <tr
+                  key={key}
+                  style={{
+                    whiteSpace: "nowrap",
+                    backgroundColor: "#92ec93",
+                  }}
+                  onClick={() => selectedRowFunHO(item, key)}
+                  className={
+                    key === selectRowHO?.index
+                      ? "selcted-row-clr"
+                      : ""
+                  }
+                >
+                  <td>{item.DC_InvType}</td>
+                  <td>{item.Inv_No}</td>
+                  <td>{formatDate(item.DC_Date)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.InvTotal)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.PymtAmtRecd)}
+                  </td>
+                  <td>{item.Cust_Name}</td>
+                  <td>{item.DCStatus}</td>
+                </tr>
+              ))}
+              {/* Then display unmatched data */}
+              {unmatchedInvoicesHO?.map((item, key) => (
+                <tr
+                  key={key}
+                  style={{
+                    whiteSpace: "nowrap",
+                    backgroundColor: "#f48483",
+                  }}
+                  onClick={() =>
+                    selectedRowFunHO(item, key, "#f48483")
+                  }
+                  className={
+                    key === selectRowHO?.index
+                      ? "selcted-row-clr"
+                      : ""
+                  }
+                >
+                  <td>{item.DC_InvType}</td>
+                  <td>{item.Inv_No}</td>
+                  <td>{formatDate(item.DC_Date)}</td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.InvTotal)}
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    {formatAmount(item.PymtAmtRecd)}
+                  </td>
+                  <td>{item.Cust_Name}</td>
+                  <td>{item.DCStatus}</td>
+                </tr>
+              ))}
+            </>
+          )}
+        </tbody>
                   </Table>
                 </div>
               </div>
@@ -989,6 +1283,9 @@ console.log("unit namee", getName);
           </Tabs>
         </div>
       </div>
+      {
+        <MailModal mailModal={mailModal} setMailModal={setMailModal}  />
+      }
     </div>
   );
 }

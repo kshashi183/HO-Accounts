@@ -36,7 +36,7 @@ createNewRouter.get("/customerNames", async (req, res, next) => {
 
 createNewRouter.post("/getInvoices", async (req, res, next) => {
   const { unit, custCode } = req.body;
-  console.log("unit open inv", req.body);
+ // console.log("unit open inv", req.body);
   try {
     hqQuery(
       `SELECT u.*
@@ -50,7 +50,7 @@ createNewRouter.post("/getInvoices", async (req, res, next) => {
 
         }
         else{
-console.log("open inv ", data);
+//console.log("open inv ", data);
         
         res.send(data);
         }
@@ -64,7 +64,7 @@ console.log("open inv ", data);
 createNewRouter.post("/getHOPrvId", async (req, res, next) => {
   const {  custCode } = req.body;
   
-  console.log("unit get horvid", custCode);
+  //console.log("unit get horvid", custCode);
   try {
     hqQuery(
       `SELECT HOPrvId FROM magod_hq_mis.ho_paymentrv_register h WHERE   h.Cust_code='${custCode}' AND h.HORef='Draft';
@@ -74,7 +74,7 @@ createNewRouter.post("/getHOPrvId", async (req, res, next) => {
           console.log("err", err);
         }
         else {
-          console.log("dattttttttttt", data);
+        //  console.log("dattttttttttt", data);
           res.send(data)
           
 
@@ -89,7 +89,7 @@ createNewRouter.post("/getHOPrvId", async (req, res, next) => {
 
 createNewRouter.post("/saveData", async (req, res, next) => {
   const { unit, custCode, custName, txnType, Amount, description } = req.body;
-  console.log("unittt", req.body);
+ // console.log("unittt", req.body);
   try {
     hqQuery(
       `INSERT INTO magod_hq_mis.ho_paymentrv_register (Unitname, Cust_code, CustName, TxnType, Amount, DESCRIPTION, HoRefDate)
@@ -99,7 +99,7 @@ createNewRouter.post("/saveData", async (req, res, next) => {
           console.error(err);
           res.status(500).send({ success: false, error: err.message });
         } else {
-          console.log("insert", data);
+        //  console.log("insert", data);
           res.send({ success: true, data });
         }
       }
@@ -115,7 +115,7 @@ createNewRouter.post("/updateData", async (req, res, next) => {
   const { unit, HO_PrvId, custCode, custName, txnType, description, Amount } =
     req.body;
 
-  console.log("body", req.body);
+  //console.log("body", req.body);
   try {
     hqQuery(
       `UPDATE magod_hq_mis.ho_paymentrv_register 
@@ -260,7 +260,7 @@ Unitname,
       });
     });
 
-    console.log("finalSelectData", finalSelectData);
+    //console.log("finalSelectData", finalSelectData);
 
     res.json(finalSelectData);
   } catch (error) {
@@ -272,7 +272,7 @@ Unitname,
 createNewRouter.post("/updateAmount", async (req, res, next) => {
   try {
     const { HO_PrvId, Amount, receipt_details } = req.body;
-    console.log("REQ_BODY", req.body);
+    //console.log("REQ_BODY", req.body);
 
 
     //  update receipt details
@@ -545,7 +545,7 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
 
 createNewRouter.post("/postInvoice", async (req, res, next) => {
   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
-console.log("req body after post", req.body);
+//console.log("req body after post", req.body);
   const date = new Date();
   // const date = new Date("2024-04-01");
   const year = date.getFullYear();
@@ -636,7 +636,7 @@ console.log("req body after post", req.body);
       //update the  magod_hq_mis.unit_payment_recd_voucher_register  
 
       const updateAdjustmentTable = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
-          SET u.On_account = '${onacc}',
+          SET u.On_account = '${onacc}', u.fixedOnaccount='${onacc}',
               u.PRV_Status = IF('${onacc}' = 0, 'Closed', 'Created')
           WHERE u.Id = '${id}';`
 
@@ -646,7 +646,7 @@ console.log("req body after post", req.body);
           console.log("error ", errTable);
         }
         else {
-          console.log("update onaccount value after POST");
+         // console.log("update onaccount value after POST");
         }
       })
 
@@ -712,7 +712,7 @@ createNewRouter.put("/updateReceptDetails", async (req, res, next) => {
             console.error("Failed to update Receive_Now:", err);
           }
           else {
-            console.log("update receipt details");
+           // console.log("update receipt details");
             //res.json(result);
           }
 

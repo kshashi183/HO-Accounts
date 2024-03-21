@@ -92,3 +92,6 @@ app.use("/user", userRouter);
 
 const createNewRouter = require("./routes/HOAccounts/HO/HOprvCreateNew");
 app.use("/hoCreateNew", createNewRouter);
+
+const mailRouter = require("./routes/HOAccounts/mailer");
+app.use("/mailer", mailRouter);

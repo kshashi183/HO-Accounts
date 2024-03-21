@@ -62,7 +62,7 @@ tally_Export.get('/getInvoiceTaxDetails', (req, res) => {
 tally_Export.get('/getPaymentReceipntData', (req, res) => {
     const date = req.query.date
     const unit = req.query.selectedUnitName
-    
+
 
     const sql1 = `SELECT  DISTINCT p.*, t.voucher_type, t.PreFix, t.LedgerName
       FROM magod_hq_mis.unit_payment_recd_voucher_register p
@@ -122,7 +122,7 @@ tally_Export.get('/getPayment', (req, res) => {
 
 
 // tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
-   
+
 //     try {
 //        // const xmlFile = req.file.buffer.toString(); // Assuming the file is XML 
 //         // console.log("xml file", xmlFile);
@@ -224,7 +224,7 @@ tally_Export.get('/getPayment', (req, res) => {
 //     </IMPORTDATA>
 //     </BODY>
 //     </ENVELOPE>
-    
+
 //     `
 //         const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
 //         const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
@@ -265,20 +265,22 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
     const tallyUrl = 'http://localhost:9000';
 
     // Fetch company Names
-  
-        try {
-            const response = await axios.post(tallyUrl, {
-                xmlRequest: '<ENVELOPE><HEADER><TALLYREQUEST>Export Data</TALLYREQUEST></HEADER><BODY><EXPORTDATA><REQUESTDESC><REPORTNAME>Current Company</REPORTNAME></REQUESTDESC></EXPORTDATA></BODY></ENVELOPE>'
-            });
-            // Process response XML here
-            console.log("tally company list",response.data);
-        } catch (error) {
-            console.error('Error fetching ledger names:', error);
-        }
-    
+
     try {
-        const xmlFile=`<ENVELOPE>
-        <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
+        const response = await axios.post(tallyUrl, {
+            xmlRequest: '<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Ledgers</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>'
+        });
+        // Process response XML here
+         console.log("tally .......",response.data);
+    } catch (error) {
+        console.error('Error fetching ledger names:', error);
+    }
+
+    try {
+        const xmlFile = `<ENVELOPE>
+        <HEADER>
+            <TALLYREQUEST>Import Data</TALLYREQUEST>
+            </HEADER>
         <BODY>
         <IMPORTDATA>
         <REQUESTDESC>
@@ -286,14 +288,14 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY></STATICVARIABLES>
         </REQUESTDESC>
         <TALLYMESSAGE xmlns:UDF='TallyUDF'>
-        <VOUCHER REMOTEID='SL2147387070' VCHTYPE='Sales' ACTION='Create'>
-        <DATE>20240222</DATE>
-        <GUID>2147387070</GUID>
+        <VOUCHER REMOTEID='SL2147387061' VCHTYPE='Job Work' ACTION='Create'>
+        <DATE>20240316</DATE>
+        <GUID>2147387061</GUID>
         <NARRATION>Our WO No :240492 Packing Note No :09014/ 23/24</NARRATION>
-        <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
+        <VOUCHERTYPENAME>Job Work</VOUCHERTYPENAME>
         <VOUCHERNUMBER>SL / JG1133/ 23/24</VOUCHERNUMBER>
         <REFERENCE>KE034 DTD/31.01.2024</REFERENCE>
-        <PARTYLEDGERNAME>KALPA ENGINEERING</PARTYLEDGERNAME>
+        <PARTYLEDGERNAME>ABCD</PARTYLEDGERNAME>
         <CSTFORMISSUETYPE />
         <CSTFORMRECVTYPE />
         <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
@@ -302,7 +304,7 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         <AUDITED>No</AUDITED>
         <FORJOBCOSTING>No</FORJOBCOSTING>
         <ISOPTIONAL>No</ISOPTIONAL>
-        <EFFECTIVEDATE>20240222</EFFECTIVEDATE>
+        <EFFECTIVEDATE>20240316</EFFECTIVEDATE>
         <USEFORINTEREST>No</USEFORINTEREST>
         <USEFORGAINLOSS>No</USEFORGAINLOSS>
         <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
@@ -320,7 +322,7 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         <ISDELETED>No</ISDELETED>
         <ASORIGINAL>No</ASORIGINAL>
         <ALLLEDGERENTRIES.LIST>
-        <LEDGERNAME>KALPA ENGINEERING</LEDGERNAME>
+        <LEDGERNAME>ABCD</LEDGERNAME>
         <GSTCLASS />
         <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
         <LEDGERFROMITEM>No</LEDGERFROMITEM>
@@ -335,6 +337,15 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         </BILLALLOCATIONS.LIST>
         </ALLLEDGERENTRIES.LIST>
         <ALLLEDGERENTRIES.LIST>
+<LEDGERNAME>CGST @ 9%</LEDGERNAME>
+<GSTCLASS />
+<ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+<LEDGERFROMITEM>No</LEDGERFROMITEM>
+<REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+<ISPARTYLEDGER>No</ISPARTYLEDGER>
+<AMOUNT>1993.95</AMOUNT>
+</ALLLEDGERENTRIES.LIST>
+        <ALLLEDGERENTRIES.LIST>
         <LEDGERNAME>SALES</LEDGERNAME>
         <GSTCLASS />
         <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
@@ -342,15 +353,6 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
         <ISPARTYLEDGER>No</ISPARTYLEDGER>
         <AMOUNT>22155.00</AMOUNT>
-        </ALLLEDGERENTRIES.LIST>
-        <ALLLEDGERENTRIES.LIST>
-        <LEDGERNAME>CGST @ 9%</LEDGERNAME>
-        <GSTCLASS />
-        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-        <LEDGERFROMITEM>No</LEDGERFROMITEM>
-        <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-        <ISPARTYLEDGER>No</ISPARTYLEDGER>
-        <AMOUNT>1993.95</AMOUNT>
         </ALLLEDGERENTRIES.LIST>
         <ALLLEDGERENTRIES.LIST>
         <LEDGERNAME>SGST @ 9%</LEDGERNAME>
@@ -384,45 +386,19 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
             },
         });
 
-       // console.log("Tally Response:", tallyResponse);
 
-        // Define arrays to store exported and not exported ledger names
-        let exportedLedgers = [];
-        let notExportedLedgers = [];
 
-        // Check if the response status is successful
         if (tallyResponse.status === 200) {
-            // Parse the XML response to extract the ledger names
-            parseString(tallyResponse.data, (err, result) => {
-                if (err) {
-                    console.error('Error parsing XML:', err);
-                    res.status(500).send('Error parsing XML from Tally server');
-                    return;
-                }
-               // console.log("resulttttttttt", result);
-                // Extract the ledger names from the parsed XML response
-                const ledgerEntries = result.ENVELOPE.BODY[0].IMPORTDATA[0].TALLYMESSAGE[0].VOUCHER[0]['ALLLEDGERENTRIES.LIST'];
-                for (let i = 0; i < ledgerEntries.length; i++) {
-                    const ledgerName = ledgerEntries[i].LEDGERNAME[0];
-                    exportedLedgers.push(ledgerName);
-                }
-            });
-        } else {
-           // console.error('Error from Tally server:', tallyResponse.statusText);
-            res.status(tallyResponse.status).send('Error communicating with Tally server: ' + tallyResponse.statusText);
-            return; // Return early to avoid further processing in case of an error
+
+            // Tally server responded with a success status
+            console.log('tally response ', tallyResponse.data);
+            res.status(200).send('File uploaded and sent to Tally successfully');
         }
-
-        // Logic to compare exported and not exported ledger names
-        // Assuming you have a function to get ledger names from your XML file
-        const xmlLedgerNames = getLedgerNamesFromXml(xmlFile); 
-
-        // Check which ledger names from XML are not exported to Tally
-        notExportedLedgers = xmlLedgerNames.filter(name => !exportedLedgers.includes(name));
-
-        // Send response with exported and not exported ledger names
-     //   console.log("ledger namessss",notExportedLedgers);
-        res.status(200).json({ exported: exportedLedgers, notExported: notExportedLedgers });
+        else {
+            // Tally server responded with an error status
+            console.error('Error from Tally server:', tallyResponse.statusText);
+            res.status(500).send('Error communicating with Tally server');
+        }
 
     } catch (error) {
         console.error('Error handling file upload:', error);

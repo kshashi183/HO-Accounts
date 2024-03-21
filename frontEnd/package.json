@@ -20,6 +20,7 @@
     "bootstrap": "^5.2.3",
     "crypto-js": "^4.2.0",
     "date-fns": "^2.30.0",
+    "force": "^0.0.3",
     "install": "^0.13.0",
     "moment": "^2.29.4",
     "react": "^18.2.0",

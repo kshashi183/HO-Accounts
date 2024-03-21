@@ -14,12 +14,11 @@ export default function TallyExportForm() {
 
   const handleChange = (e) => {
     setSelectedDate(e.target.value);
+setFlag(false)
     // setTallyDate(e.target.value);
   }
 
-  useEffect(() => {
 
-  }, [])
 
   const onLoadDataClick = () => {
 

@@ -298,7 +298,7 @@ export default function RvAdjustmentForm() {
                                     <th style={{ whiteSpace: 'nowrap' }}>Rv Date</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Description</th>
                                     <th style={{ whiteSpace: 'nowrap' }}>Txn Type</th>
-                                    {/* <th>HO_PrvId</th> */}
+                                    <th>HO_PrvId</th>
 
                                 </tr>
                             </thead>
@@ -324,7 +324,7 @@ export default function RvAdjustmentForm() {
                                                 <td style={{ whiteSpace: 'nowrap' }}>{item.Formatted_Recd_PV_Date}</td>
                                                 <td>{item.Description}</td>
                                                 <td>{item.TxnType}</td>
-                                                {/* <td>{item.HO_PrvId}</td> */}
+                                                <td>{item.fixedOnaccount}</td>
                                             </tr>
                                         )
                                     }) : ''

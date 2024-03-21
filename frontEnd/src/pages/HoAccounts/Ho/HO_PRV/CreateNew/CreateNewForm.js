@@ -16,7 +16,10 @@ export default function CreateNewForm() {
   const { adjustmentRows, adj_unit } = location.state ? location.state : "";
   let onAccountValue1 = adjustmentRows ? parseInt(adjustmentRows.On_account) : 0
   console.log("adj unit", adjustmentRows);
-  const adj_unitname=adj_unit;
+  const adj_unitname = adj_unit;
+
+  let fixedOnaccount = adjustmentRows ? parseInt(adjustmentRows.fixedOnaccount) : 0
+  
 
   let sum = 0;
 
@@ -40,7 +43,12 @@ export default function CreateNewForm() {
 
   const [pdfVoucher, setPdfVoucher] = useState(false);
 
-const [alertCancel, setAlertCancel]=useState(false)
+  const [alertCancel, setAlertCancel] = useState(false)
+
+
+
+  let onAccountValue = onAccountValue1
+  const [onAccountValue22, setOnAccountValue] = useState(onAccountValue1);
 
 
   const [rvData, setRvData] = useState({
@@ -110,7 +118,8 @@ const [alertCancel, setAlertCancel]=useState(false)
   }, [])
 
 
-  console.log("insert to form", adjustmentRows);
+  let z = rvData.postData.Amount;
+
 
   const insertToForm = async () => {
 
@@ -317,7 +326,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
 
 
-    
+
 
 
       if (rvData.data.receipt_details) {
@@ -412,7 +421,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
         console.log("Amount  else:", rvData.postData.Cust_code);
 
-      //  const unitToStore = getUnit === ' ' ? rvData.postData.UnitName : getUnit;
+        //  const unitToStore = getUnit === ' ' ? rvData.postData.UnitName : getUnit;
         const custCodetostore = getCustCode === '' ? rvData.postData.Cust_code : getCustCode
         const custnametostore = getCustomer === '' ? rvData.postData.CustName : getCustCode
         const updateResponse = await axios.post(
@@ -528,12 +537,13 @@ const [alertCancel, setAlertCancel]=useState(false)
 
   console.log("SecondTableArray", rvData.secondTableArray);
 
-  const nav = useNavigate();
 
 
 
 
-  const deleteLeftTable = () => {
+
+  const deleteWholeForm = () => {
+
     let sumOfReceive_Now = 0
     let sum = 0
     let stopExecution = false;
@@ -542,10 +552,11 @@ const [alertCancel, setAlertCancel]=useState(false)
     if (rvData.data.receipt_details && rvData.data.receipt_details.length > 0) {
 
       rvData.data.receipt_details.forEach((selectedRow) => {
-        if (stopExecution) return
+
         // Your code logic for each item goes here
         if (parseFloat(selectedRow.Receive_Now) < 0) {
           toast.error("Incorrect Value");
+          stopExecution = true;
           return;
         }
 
@@ -570,11 +581,11 @@ const [alertCancel, setAlertCancel]=useState(false)
         }
 
 
-       
+
 
       });
 
-
+      if (stopExecution) return;
       sum = sumOfReceive_Now + onAccountValue22
 
       console.log("onaccount value aftr delete", sumOfReceive_Now, sum, onAccountValue22, onAccountValue1);
@@ -582,7 +593,8 @@ const [alertCancel, setAlertCancel]=useState(false)
       axios.delete(
         baseURL + "/createnew/deleteleft",
 
-        { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: sumOfReceive_Now } }
+        { data: { hoid: rvData.postData.HO_PrvId, id: id, 
+          onacc: sumOfReceive_Now,receipt_details:rvData.data.receipt_details } }
 
       ).then(resp => {
         console.log("Response data:", resp.data);
@@ -605,24 +617,27 @@ const [alertCancel, setAlertCancel]=useState(false)
 
           }));
 
-          nav("/HOAccounts/HO/RvAdjustment")
+          navigate("/HOAccounts/HO/RvAdjustment")
+
         }
       })
         .catch(error => {
           console.error("Error:", error);
         });
-      
+
     }
 
 
 
 
     else {
+      
 
       axios.delete(
         baseURL + "/createnew/deleteleft",
 
-        { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: 0 } }
+        { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: adjustmentRows.fixedOnaccount ,
+           receipt_details:rvData.data.receipt_details} }
 
       ).then(resp => {
         console.log("Response data:", resp.data);
@@ -645,7 +660,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
           }));
 
-          nav("/HOAccounts/HO/RvAdjustment")
+          navigate("/HOAccounts/HO/RvAdjustment")
         }
       })
         .catch(error => {
@@ -656,7 +671,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
 
 
-    if (stopExecution) return;
+
 
     // axios.delete(
     //   baseURL + "/createnew/deleteleft",
@@ -694,14 +709,13 @@ const [alertCancel, setAlertCancel]=useState(false)
   }
 
 
-  let onAccountValue = onAccountValue1
-  const [onAccountValue22, setOnAccountValue] = useState(onAccountValue1);
+  
 
 
 
   const addInvoice = async () => {
-    console.log("noeie", onAccountValue22);
-    console.log("intial onaccount value", onAccountValue);
+    console.log("updated on account value", onAccountValue22);
+    console.log("intial onaccount value", onAccountValue1);
     onAccountValue = onAccountValue22;
     try {
       const selectedRows = rvData.secondTableArray;
@@ -721,7 +735,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
 
 
-
+      let stopExecution = false;
 
       for (const row of selectedRows) {
 
@@ -739,12 +753,14 @@ const [alertCancel, setAlertCancel]=useState(false)
           console.log("difference", diff);
 
           if (onAccountValue <= 0) {
-
+            console.log("onacc1111111111111111", onAccountValue);
             toast.error("Don't have sufficient Amount to Adjust");
-            return;
+            // stopExecution = true;
+            // return;
           }
           else if (onAccountValue < diff) {
-            console.log("onacc", onAccountValue);
+            console.log("onacc222222222222", onAccountValue);
+          
             // If onAccountValue is less than the difference, set Receive to onAccountValue
             rowsToAdd.push({ ...row, Receive: onAccountValue });
             onAccountValue = (onAccountValue - (diff >= onAccountValue ? onAccountValue : diff));
@@ -754,25 +770,23 @@ const [alertCancel, setAlertCancel]=useState(false)
             onAccountValue = (onAccountValue - (diff >= onAccountValue ? onAccountValue : diff));
           }
 
-          // Subtract the corresponding amount from onAccountValue
-          // onAccountValue -= Math.min(diff, onAccountValue);
-          // onAccountValue= ( onAccountValue-(diff>=onAccountValue ?onAccountValue: diff ));
-          // setonAccountValue(onAccountValue)
+          
           console.log("onmaccount123", onAccountValue);
           setOnAccountValue(onAccountValue)
           // Moved here to log updated value
         }
 
-        // console.log("fniofjqiofionfiowrfniow", onAccountValue22);
+        
       }
 
-      // console.log("rowsToAdd:", rowsToAdd);
-
+     
+      
       if (rowsToAdd.length === 0) {
         toast.error("Invoice already exists");
         return;
       }
 
+      
       const response = await axios.post(baseURL + "/hoCreateNew/addInvoice", {
         selectedRows: rowsToAdd,
         HO_PrvId: rvData.postData.HO_PrvId,
@@ -851,6 +865,17 @@ const [alertCancel, setAlertCancel]=useState(false)
           Amount: updateAmount.data.updatedAmount[0]?.Amount,
         },
       }));
+
+      const updateOnaccount = await axios.put(
+
+        baseURL + "/createnew/updateOnaccountValue",
+        {
+          on_account: onAccountValue,
+          id: id
+        }
+      );
+
+      console.log("update onaccount value in addinvoice", updateOnaccount);
       return response.data;
     } catch (error) {
       console.error("Error adding rows to voucher:", error);
@@ -862,7 +887,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
 
 
-
+  //console.log("onnnnnnnnnnnnnnn", onAccountValue1);
   const handleInputChange = async (e, rowData, dif) => {
     const { name, value } = e.target;
     const receiveNowValue = value !== '' ? parseFloat(value) : null;
@@ -875,14 +900,23 @@ const [alertCancel, setAlertCancel]=useState(false)
           : parseInt(item.Receive_Now, 10) || 0),
       0
     );
+    let a = parseInt(rvData.postData.Amount) > 0 ? parseInt(rvData.postData.Amount) : 0
+    let w = parseInt(onAccountValue1) + a;
+   
 
-    console.log("valueeee", totalReceiveNow);
+
     rvData.data.receipt_details.forEach(item => {
+      console.log("dc inv no", item.Dc_inv_no);
+      console.log("onaccount value", onAccountValue1);
       if (item.Dc_inv_no === rowData.Dc_inv_no) {
-
-
-        setOnAccountValue(onAccountValue1 - totalReceiveNow)
+        
+        // setOnAccountValue(onAccountValue1 - totalReceiveNow)
+        setOnAccountValue(fixedOnaccount - totalReceiveNow)
       }
+      else {
+        setOnAccountValue(w - totalReceiveNow)
+      }
+
     });
 
 
@@ -986,11 +1020,11 @@ const [alertCancel, setAlertCancel]=useState(false)
 
 
 
-  const alertformClose=()=>{
+  const alertformClose = () => {
     setAlertCancel(false)
   }
 
-  const forCancelFormOpen=()=>{
+  const forCancelFormOpen = () => {
     setAlertCancel(false)
     setCancelPopup(true);
   }
@@ -1038,13 +1072,13 @@ const [alertCancel, setAlertCancel]=useState(false)
     if (stopExecution) return;
 
     else {
-     
-     setAlertCancel(true);
+
+      setAlertCancel(true);
     }
   }
 
 
-  
+
 
   const handleCancelClose = () => {
     setCancelPopup(false)
@@ -1103,13 +1137,27 @@ const [alertCancel, setAlertCancel]=useState(false)
 
   }
 
+  useEffect(() => {
 
+    // const updateOnaccount = axios.put(
+
+    //   baseURL + "/createnew/updateOnaccountValue",
+    //   {
+    //     on_account: onAccountValue22,
+    //     id: id
+    //   }
+
+    // );
+
+
+  }, [rvData.receipt_details, rvData.firstTableArray])
 
   let totalamnt = 0;
 
 
   const removeInvoice = async () => {
 
+    let stopExecution = false;
     console.log("remove error", rvData.firstTableArray);
 
     try {
@@ -1120,11 +1168,13 @@ const [alertCancel, setAlertCancel]=useState(false)
 
       if (isAnyEmptyReceiveNow) {
         toast.error("Receive Now cannot be empty");
+        stopExecution = true;
         return;
       }
 
       if (rvData.firstTableArray.length === 0) {
         toast.error("No rows selected for removal of voucher.");
+        stopExecution = true;
         return;
       }
 
@@ -1133,6 +1183,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
       if (parseFloat(selectedRow.Receive_Now) < 0) {
         toast.error("Incorrect Value");
+        stopExecution = true;
         return;
       }
 
@@ -1142,10 +1193,12 @@ const [alertCancel, setAlertCancel]=useState(false)
 
       if (formattedValue > invoiceAmount - amountReceived) {
         toast.error("Cannot Receive More than Invoice Amount");
+        stopExecution = true;
         return;
       }
       if (formattedValue > onAccountValue1) {
         toast.error("Cannot Receive More than On_account Amount");
+        stopExecution = true;
         return;
       }
 
@@ -1227,23 +1280,26 @@ const [alertCancel, setAlertCancel]=useState(false)
       //  amnt=amnt+formattedValue;
 
 
-      if (totalReceiveNow === invamount) {
-        console.log(" 1111", totalReceiveNow);
+      // if (totalReceiveNow === invamount) {
+      //   console.log(" 1111", totalReceiveNow);
 
-      }
-      else {
-        console.log("2222", invamount);
-      }
+      // }
+      // else {
+      //   console.log("2222", invamount);
+      // }
 
 
       if (totalReceiveNow <= onAccountValue1) {
         if (totalReceiveNow === invamount) {
           let totalamnt = totalReceiveNow + onAccountValue22
+
           setOnAccountValue(totalamnt)
         }
 
         else if (totalReceiveNow < invamount && invamount !== onAccountValue1) {
-          setOnAccountValue(onAccountValue1)
+
+          console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, onAccountValue1);
+          setOnAccountValue(receiveNowValue + onAccountValue22)
         }
         else if (totalReceiveNow < invamount) {
 
@@ -1251,6 +1307,7 @@ const [alertCancel, setAlertCancel]=useState(false)
           setOnAccountValue(totalamnt)
         }
         else {
+
           let totalamnt = (invamount) + onAccountValue22
           setOnAccountValue(totalamnt)
         }
@@ -1260,6 +1317,14 @@ const [alertCancel, setAlertCancel]=useState(false)
       // set(amnttt)
 
 
+      const updateOnaccount = await axios.put(
+
+        baseURL + "/createnew/updateOnaccountValue",
+        {
+          on_account: onAccountValue22,
+          id: id
+        }
+      );
 
 
     } catch (error) {
@@ -1359,7 +1424,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
 
   console.log("rectttttttttt", rvData.data.receipt_details);
-  
+
 
   const handlePostYes = async () => {
 
@@ -1554,9 +1619,9 @@ const [alertCancel, setAlertCancel]=useState(false)
           <input className="" value={inputValue} />
         </div>
 
-       
 
-<div className="col-md-3">
+
+        <div className="col-md-3">
           <label className="form-label ">Transaction Type</label>
           <select
             className="ip-select mt-1"
@@ -1564,7 +1629,7 @@ const [alertCancel, setAlertCancel]=useState(false)
             id="TxnType"
             onChange={PaymentReceipts}
             value={rvData.postData.TxnType}
-          
+
           >
             <option value="">Select</option>
             <option value="Bank">Bank</option>
@@ -1596,7 +1661,7 @@ const [alertCancel, setAlertCancel]=useState(false)
       </div>
 
       <div className="row col-md-12 " >
-       
+
 
         <div className="col-md-2">
           <label className="form-label">Amount</label>
@@ -1641,9 +1706,9 @@ const [alertCancel, setAlertCancel]=useState(false)
       </div>
 
       <div className=" row ">
-        
 
-        
+
+
 
         <div className="col-md-5">
           <label className="form-label">Description</label>
@@ -1655,7 +1720,7 @@ const [alertCancel, setAlertCancel]=useState(false)
             onChange={PaymentReceipts}
             value={rvData.postData.Description}
 
-          
+
 
             style={{ height: "70px", resize: "none" }}
           ></textarea>
@@ -1691,7 +1756,7 @@ const [alertCancel, setAlertCancel]=useState(false)
               }
               style={{ width: "90px" }}
               //  onClick={deleteLeftTable}
-              onClick={deleteLeftTable}
+              onClick={deleteWholeForm}
               disabled={
                 rvData && rvData.postData.Status !== "Draft"
                   ? rvData.postData.Status
@@ -1787,7 +1852,11 @@ const [alertCancel, setAlertCancel]=useState(false)
 
             <div className="col-md-4 ">
               <label className="form-label">Amount Adjusted</label>
-              <input name="reason" disabled value={adjustmentRows ? adjustmentRows.On_account : ''} />
+              <input name="reason" disabled
+                // value={adjustmentRows ? adjustmentRows.On_account : ''}
+               // value={onAccountValue22}
+              value={adjustmentRows ? adjustmentRows.fixedOnaccount : ''}
+              />
             </div>
           </div>
 
@@ -1812,7 +1881,7 @@ const [alertCancel, setAlertCancel]=useState(false)
                   <th>Received</th>
                   <th>Receive Now</th>
                   <th>Id</th>
-                  
+
                 </tr>
               </thead>
 
@@ -1847,7 +1916,7 @@ const [alertCancel, setAlertCancel]=useState(false)
                         <td>{formatAmount(data.Amt_received)}</td>
                         <td>
                           <input
-                            type="number"
+                          //  type="number"
                             // onBlur={onBlurr}
                             name={"Receive_Now"}
                             value={data.Receive_Now}
@@ -1866,7 +1935,7 @@ const [alertCancel, setAlertCancel]=useState(false)
                           />
                         </td>
                         <td>{data.Id}</td>
-                        
+
                       </tr>
                     </>
                   ))
@@ -1888,7 +1957,7 @@ const [alertCancel, setAlertCancel]=useState(false)
               </label>
             </div>
 
-            
+
 
             <div className=" col-md-5 mb-1">
               <button
@@ -1898,7 +1967,7 @@ const [alertCancel, setAlertCancel]=useState(false)
                     ? "disabled-button"
                     : "button-style  group-button"
                 }
-                
+
                 disabled={
                   rvData && rvData.postData.Status !== "Draft"
                     ? rvData.postData.Status
@@ -2005,7 +2074,7 @@ const [alertCancel, setAlertCancel]=useState(false)
 
         <Modal.Body>
           Do You wish to open cancel form
-          
+
         </Modal.Body>
 
         <Modal.Footer>
