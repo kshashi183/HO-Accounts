@@ -430,12 +430,12 @@ export default function MonthlyReport() {
               getAllOutStandingValues={getAllOutStandingValues}
             />
           </Tab>
-          <Tab eventKey="machineUtilisation" title="Machine Utilisation">
+          {/* <Tab eventKey="machineUtilisation" title="Machine Utilisation">
             <MachineUtilisation />
           </Tab>
           <Tab eventKey="MaterialSalesSummary" title="Material Sales Summary">
             <MaterialSalesSummary />
-          </Tab>
+          </Tab> */}
         </Tabs>
       </div>
     </div>
