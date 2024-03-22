@@ -50,7 +50,7 @@ createNewRouter.post("/getInvoices", async (req, res, next) => {
 
         }
         else{
-//console.log("open inv ", data);
+console.log("open inv ", data);
         
         res.send(data);
         }
