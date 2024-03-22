@@ -18,12 +18,12 @@ export default function CreateNewForm() {
   console.log("adj unit", adjustmentRows);
   const adj_unitname = adj_unit;
 
-  let fixedOnaccount = adjustmentRows ? parseInt(adjustmentRows.fixedOnaccount) : 0
+  let fixedOnaccount = adjustmentRows ? parseInt(adjustmentRows.fixedOnaccount) : "zero"
   
 
   let sum = 0;
 
-
+console.log("fixed onaccountttttttttttttt", fixedOnaccount);
 
 
   const [sumofReceive, setSumofReceive] = useState()
@@ -320,6 +320,7 @@ export default function CreateNewForm() {
 
 
   const handleSave = async () => {
+    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
     let stopExecution = false;
 
     try {
@@ -351,7 +352,7 @@ export default function CreateNewForm() {
           }
 
 
-          else if (formattedValue > onAccountValue1) {
+          else if (formattedValue > (val)) {
             toast.error("Cannot Receive More than On_account Amount");
             stopExecution = true;
             return;
@@ -543,7 +544,7 @@ export default function CreateNewForm() {
 
 
   const deleteWholeForm = () => {
-
+    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
     let sumOfReceive_Now = 0
     let sum = 0
     let stopExecution = false;
@@ -574,7 +575,7 @@ export default function CreateNewForm() {
         }
 
 
-        else if (formattedValue > onAccountValue1) {
+        else if (formattedValue > val) {
           toast.error("Cannot Receive More than On_account Amount");
           stopExecution = true;
           return;
@@ -887,7 +888,7 @@ export default function CreateNewForm() {
 
 
 
-  //console.log("onnnnnnnnnnnnnnn", onAccountValue1);
+  console.log("fixed onaaaaaaaa", fixedOnaccount);
   const handleInputChange = async (e, rowData, dif) => {
     const { name, value } = e.target;
     const receiveNowValue = value !== '' ? parseFloat(value) : null;
@@ -1154,11 +1155,16 @@ export default function CreateNewForm() {
 
   let totalamnt = 0;
 
+  console.log("on aacunt value 11111111 ", onAccountValue1);
 
   const removeInvoice = async () => {
 
+   
+    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
     let stopExecution = false;
     console.log("remove error", rvData.firstTableArray);
+
+    console.log("on accountyyyyyyyyyyyyyyyyyyyyyyyy ", onAccountValue1, val, onAccountValue22);
 
     try {
       const isAnyEmptyReceiveNow = rvData.firstTableArray.some(
@@ -1196,11 +1202,21 @@ export default function CreateNewForm() {
         stopExecution = true;
         return;
       }
-      if (formattedValue > onAccountValue1) {
+      
+      // if (formattedValue > onAccountValue1) {
+      //   console.log("iiiiiiiii", onAccountValue1, val);
+      //   toast.error("Cannot Receive More than On_account Amount");
+      //   stopExecution = true;
+      //   return;
+      // }
+      if (formattedValue > val) {
+       
         toast.error("Cannot Receive More than On_account Amount");
         stopExecution = true;
         return;
       }
+
+
 
       const RecdPvSrl = selectedRow.RecdPvSrl;
       const receiveNowValue = parseFloat(selectedRow.Receive_Now || 0);
@@ -1289,16 +1305,70 @@ export default function CreateNewForm() {
       // }
 
 
-      if (totalReceiveNow <= onAccountValue1) {
+      // if (totalReceiveNow <= onAccountValue1) {
+      //   if (totalReceiveNow === invamount) {
+      //     let totalamnt = totalReceiveNow + onAccountValue22
+
+      //     setOnAccountValue(totalamnt)
+      //   }
+
+      //   else if (totalReceiveNow < invamount && invamount !== onAccountValue1) {
+
+      //     console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, onAccountValue1);
+      //     setOnAccountValue(receiveNowValue + onAccountValue22)
+      //   }
+      //   else if (totalReceiveNow < invamount) {
+
+      //     let totalamnt = (totalReceiveNow) + onAccountValue22
+      //     setOnAccountValue(totalamnt)
+      //   }
+      //   else {
+
+      //     let totalamnt = (invamount) + onAccountValue22
+      //     setOnAccountValue(totalamnt)
+      //   }
+
+      // }
+
+
+
+      // if (totalReceiveNow <= val) {
+      //   if (totalReceiveNow === invamount) {
+      //     let totalamnt = totalReceiveNow + onAccountValue22
+
+      //     setOnAccountValue(totalamnt)
+      //   }
+
+      //   else if (totalReceiveNow < invamount && invamount !== val) {
+
+      //     console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, val);
+      //     setOnAccountValue(receiveNowValue + onAccountValue22)
+      //   }
+      //   else if (totalReceiveNow < invamount) {
+
+      //     let totalamnt = (totalReceiveNow) + onAccountValue22
+      //     setOnAccountValue(totalamnt)
+      //   }
+      //   else {
+
+      //     let totalamnt = (invamount) + onAccountValue22
+      //     setOnAccountValue(totalamnt)
+      //   }
+
+      // }
+
+
+
+      if (totalReceiveNow <= fixedOnaccount) {
         if (totalReceiveNow === invamount) {
           let totalamnt = totalReceiveNow + onAccountValue22
 
           setOnAccountValue(totalamnt)
         }
 
-        else if (totalReceiveNow < invamount && invamount !== onAccountValue1) {
+        else if (totalReceiveNow < invamount && invamount !== fixedOnaccount) {
 
-          console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, onAccountValue1);
+          console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, val);
           setOnAccountValue(receiveNowValue + onAccountValue22)
         }
         else if (totalReceiveNow < invamount) {
@@ -1373,6 +1443,7 @@ export default function CreateNewForm() {
       return;
     }
 
+    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
 
     let stopExecution = false;
 
@@ -1402,7 +1473,7 @@ export default function CreateNewForm() {
         }
 
 
-        else if (formattedValue > onAccountValue1) {
+        else if (formattedValue > val) {
           toast.error("Cannot Receive More than On_account Amount");
           stopExecution = true;
           return;
