@@ -19,11 +19,11 @@ export default function CreateNewForm() {
   const adj_unitname = adj_unit;
 
   let fixedOnaccount = adjustmentRows ? parseInt(adjustmentRows.fixedOnaccount) : "zero"
-  
+
 
   let sum = 0;
 
-console.log("fixed onaccountttttttttttttt", fixedOnaccount);
+  console.log("fixed onaccountttttttttttttt", fixedOnaccount);
 
 
   const [sumofReceive, setSumofReceive] = useState()
@@ -320,7 +320,7 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
 
 
   const handleSave = async () => {
-    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
+    let val = (onAccountValue1 === 0 || onAccountValue22===0 || onAccountValue1!==fixedOnaccount) ? fixedOnaccount : onAccountValue1
     let stopExecution = false;
 
     try {
@@ -380,6 +380,17 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
         return;
       }
 
+
+      const sumofRecv = rvData.data.receipt_details.reduce(
+        (sum, obj) => sum + parseFloat(obj.Receive_Now),
+        0
+      );
+
+      if (sumofRecv > val) {
+        toast.error("Cannot Receive More than On_account Amount22");
+        stopExecution = true;
+        return;
+      }
 
 
       // If HO_PrvId is not present, it's an insert operation
@@ -544,7 +555,7 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
 
 
   const deleteWholeForm = () => {
-    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
+    let val = (onAccountValue1 === 0 || onAccountValue22===0 || onAccountValue1!==fixedOnaccount) ? fixedOnaccount : onAccountValue1
     let sumOfReceive_Now = 0
     let sum = 0
     let stopExecution = false;
@@ -582,6 +593,12 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
         }
 
 
+        else if (sumOfReceive_Now > val) {
+          toast.error("Cannot Receive More than On_account Amount22");
+          stopExecution = true;
+          return;
+        }
+  
 
 
       });
@@ -594,8 +611,12 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
       axios.delete(
         baseURL + "/createnew/deleteleft",
 
-        { data: { hoid: rvData.postData.HO_PrvId, id: id, 
-          onacc: sumOfReceive_Now,receipt_details:rvData.data.receipt_details } }
+        {
+          data: {
+            hoid: rvData.postData.HO_PrvId, id: id,
+            onacc: sumOfReceive_Now, receipt_details: rvData.data.receipt_details
+          }
+        }
 
       ).then(resp => {
         console.log("Response data:", resp.data);
@@ -632,13 +653,17 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
 
 
     else {
-      
+
 
       axios.delete(
         baseURL + "/createnew/deleteleft",
 
-        { data: { hoid: rvData.postData.HO_PrvId, id: id, onacc: adjustmentRows.fixedOnaccount ,
-           receipt_details:rvData.data.receipt_details} }
+        {
+          data: {
+            hoid: rvData.postData.HO_PrvId, id: id, onacc: adjustmentRows.fixedOnaccount,
+            receipt_details: rvData.data.receipt_details
+          }
+        }
 
       ).then(resp => {
         console.log("Response data:", resp.data);
@@ -710,7 +735,7 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
   }
 
 
-  
+
 
 
 
@@ -761,7 +786,7 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
           }
           else if (onAccountValue < diff) {
             console.log("onacc222222222222", onAccountValue);
-          
+
             // If onAccountValue is less than the difference, set Receive to onAccountValue
             rowsToAdd.push({ ...row, Receive: onAccountValue });
             onAccountValue = (onAccountValue - (diff >= onAccountValue ? onAccountValue : diff));
@@ -771,23 +796,23 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
             onAccountValue = (onAccountValue - (diff >= onAccountValue ? onAccountValue : diff));
           }
 
-          
+
           console.log("onmaccount123", onAccountValue);
           setOnAccountValue(onAccountValue)
           // Moved here to log updated value
         }
 
-        
+
       }
 
-     
-      
+
+
       if (rowsToAdd.length === 0) {
         toast.error("Invoice already exists");
         return;
       }
 
-      
+
       const response = await axios.post(baseURL + "/hoCreateNew/addInvoice", {
         selectedRows: rowsToAdd,
         HO_PrvId: rvData.postData.HO_PrvId,
@@ -903,14 +928,14 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
     );
     let a = parseInt(rvData.postData.Amount) > 0 ? parseInt(rvData.postData.Amount) : 0
     let w = parseInt(onAccountValue1) + a;
-   
+
 
 
     rvData.data.receipt_details.forEach(item => {
       console.log("dc inv no", item.Dc_inv_no);
       console.log("onaccount value", onAccountValue1);
       if (item.Dc_inv_no === rowData.Dc_inv_no) {
-        
+
         // setOnAccountValue(onAccountValue1 - totalReceiveNow)
         setOnAccountValue(fixedOnaccount - totalReceiveNow)
       }
@@ -1140,32 +1165,40 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
 
   useEffect(() => {
 
-    // const updateOnaccount = axios.put(
+    const sumofRecv = rvData.data.receipt_details.reduce(
+      (sum, obj) => sum + parseFloat(obj.Receive_Now),
+      0
+    );
 
-    //   baseURL + "/createnew/updateOnaccountValue",
-    //   {
-    //     on_account: onAccountValue22,
-    //     id: id
-    //   }
+    if(sumofRecv<=onAccountValue1){
 
-    // );
+    const updateOnaccount = axios.put(
 
+      baseURL + "/createnew/updateOnaccountValue",
+      {
+        on_account: onAccountValue22,
+        id: id
+      }
 
+    );
+
+    }
   }, [rvData.receipt_details, rvData.firstTableArray])
 
   let totalamnt = 0;
 
-  console.log("on aacunt value 11111111 ", onAccountValue1);
+  console.log("outside  ....onaccot22", onAccountValue22, "onacount1111", onAccountValue1);
 
   const removeInvoice = async () => {
 
    
-    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
+    // let val=onAccountValue22===0 || onAccountValue1==0 ? fixedOnaccount  : onAccountValue1
+    let val = (onAccountValue1 === 0 || onAccountValue22===0 || onAccountValue1!==fixedOnaccount) ? fixedOnaccount : onAccountValue1
     let stopExecution = false;
-    console.log("remove error", rvData.firstTableArray);
 
-    console.log("on accountyyyyyyyyyyyyyyyyyyyyyyyy ", onAccountValue1, val, onAccountValue22);
 
+
+    console.log("onaccot22", onAccountValue22, "onacount1111", onAccountValue1, "Val", val);
     try {
       const isAnyEmptyReceiveNow = rvData.firstTableArray.some(
         (row) => row.Receive_Now === ""
@@ -1198,25 +1231,32 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
       const amountReceived = parseFloat(selectedRow.Amt_received || 0);
 
       if (formattedValue > invoiceAmount - amountReceived) {
+
         toast.error("Cannot Receive More than Invoice Amount");
         stopExecution = true;
         return;
       }
-      
-      // if (formattedValue > onAccountValue1) {
-      //   console.log("iiiiiiiii", onAccountValue1, val);
-      //   toast.error("Cannot Receive More than On_account Amount");
-      //   stopExecution = true;
-      //   return;
-      // }
-      if (formattedValue > val) {
+
+      if (formattedValue > (val)) {
        
         toast.error("Cannot Receive More than On_account Amount");
         stopExecution = true;
         return;
       }
 
+      // if (formattedValue > (val)) {
 
+      //   toast.error("Cannot Receive More than On_account Amount");
+      //   stopExecution = true;
+      //   return;
+      // }
+
+      const sumofRecv = rvData.data.receipt_details.reduce(
+        (sum, obj) => sum + parseFloat(obj.Receive_Now),
+        0
+      );
+   
+      
 
       const RecdPvSrl = selectedRow.RecdPvSrl;
       const receiveNowValue = parseFloat(selectedRow.Receive_Now || 0);
@@ -1245,7 +1285,13 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
         (sum, obj) => sum + parseFloat(obj.Receive_Now),
         0
       );
-      console.log("amount valueeeeee", totalReceiveNow);
+
+
+      if (sumofRecv > val) {
+        toast.error("Cannot Receive More than On_account Amount22");
+        stopExecution = true;
+        return;
+      }
 
       // setAmnt(totalReceiveNow)
       const response = await axios.post(
@@ -1305,16 +1351,43 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
       // }
 
 
-      // if (totalReceiveNow <= onAccountValue1) {
+      if (totalReceiveNow <= (val)) {
+        if (totalReceiveNow === invamount) {
+          let totalamnt = totalReceiveNow + onAccountValue22
+
+          setOnAccountValue(totalamnt)
+        }
+
+        else if (totalReceiveNow < invamount && invamount !== onAccountValue1) {
+
+
+          setOnAccountValue(receiveNowValue + onAccountValue22)
+        }
+        else if (totalReceiveNow < invamount) {
+
+          let totalamnt = (totalReceiveNow) + onAccountValue22
+          setOnAccountValue(totalamnt)
+        }
+        else {
+
+          let totalamnt = (invamount) + onAccountValue22
+          setOnAccountValue(totalamnt)
+        }
+
+      }
+
+
+
+      // if (totalReceiveNow <= val) {
       //   if (totalReceiveNow === invamount) {
       //     let totalamnt = totalReceiveNow + onAccountValue22
 
       //     setOnAccountValue(totalamnt)
       //   }
 
-      //   else if (totalReceiveNow < invamount && invamount !== onAccountValue1) {
+      //   else if (totalReceiveNow < invamount && invamount !== val) {
 
-      //     console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, onAccountValue1);
+          
       //     setOnAccountValue(receiveNowValue + onAccountValue22)
       //   }
       //   else if (totalReceiveNow < invamount) {
@@ -1332,14 +1405,14 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
 
 
 
-      // if (totalReceiveNow <= val) {
+      // if (totalReceiveNow <= fixedOnaccount) {
       //   if (totalReceiveNow === invamount) {
       //     let totalamnt = totalReceiveNow + onAccountValue22
 
       //     setOnAccountValue(totalamnt)
       //   }
 
-      //   else if (totalReceiveNow < invamount && invamount !== val) {
+      //   else if (totalReceiveNow < invamount && invamount !== fixedOnaccount) {
 
       //     console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, val);
       //     setOnAccountValue(receiveNowValue + onAccountValue22)
@@ -1356,33 +1429,6 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
       //   }
 
       // }
-
-
-
-      if (totalReceiveNow <= fixedOnaccount) {
-        if (totalReceiveNow === invamount) {
-          let totalamnt = totalReceiveNow + onAccountValue22
-
-          setOnAccountValue(totalamnt)
-        }
-
-        else if (totalReceiveNow < invamount && invamount !== fixedOnaccount) {
-
-          console.log("recenowwwwwwwwwwwwwwwwwwwwwwww", receiveNowValue, val);
-          setOnAccountValue(receiveNowValue + onAccountValue22)
-        }
-        else if (totalReceiveNow < invamount) {
-
-          let totalamnt = (totalReceiveNow) + onAccountValue22
-          setOnAccountValue(totalamnt)
-        }
-        else {
-
-          let totalamnt = (invamount) + onAccountValue22
-          setOnAccountValue(totalamnt)
-        }
-
-      }
       console.log("total onaccount inside method", onAccountValue22);
       // set(amnttt)
 
@@ -1443,10 +1489,21 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
       return;
     }
 
-    let val=onAccountValue22===0   ? fixedOnaccount  : onAccountValue1
+    let val = (onAccountValue1 === 0 || onAccountValue22===0 || onAccountValue1!==fixedOnaccount) ? fixedOnaccount : onAccountValue1
 
     let stopExecution = false;
 
+
+    const sumofRecv = rvData.data.receipt_details.reduce(
+      (sum, obj) => sum + parseFloat(obj.Receive_Now),
+      0
+    );
+
+    
+    
+  
+    
+   
 
     if (rvData.data.receipt_details) {
 
@@ -1478,6 +1535,14 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
           stopExecution = true;
           return;
         }
+
+      else  if (sumofRecv > val) {
+          toast.error("Cannot Receive More than On_account Amount22");
+          stopExecution = true;
+          return;
+        }
+
+
       });
     }
 
@@ -1925,8 +1990,8 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
               <label className="form-label">Amount Adjusted</label>
               <input name="reason" disabled
                 // value={adjustmentRows ? adjustmentRows.On_account : ''}
-               // value={onAccountValue22}
-              value={adjustmentRows ? adjustmentRows.fixedOnaccount : ''}
+                // value={onAccountValue22}
+                value={adjustmentRows ? adjustmentRows.fixedOnaccount : ''}
               />
             </div>
           </div>
@@ -1987,7 +2052,7 @@ console.log("fixed onaccountttttttttttttt", fixedOnaccount);
                         <td>{formatAmount(data.Amt_received)}</td>
                         <td>
                           <input
-                          //  type="number"
+                            //  type="number"
                             // onBlur={onBlurr}
                             name={"Receive_Now"}
                             value={data.Receive_Now}

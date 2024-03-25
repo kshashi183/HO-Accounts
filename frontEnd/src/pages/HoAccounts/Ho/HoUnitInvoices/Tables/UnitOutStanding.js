@@ -81,7 +81,7 @@ export default function UnitOutStanding() {
                         <th onClick={() => requestSort("Cust_Code")}>Cust_Code</th>
                         <th onClick={() => requestSort("Cust_name")}>Cust_Name</th>
                         <th onClick={() => requestSort("Branch")}>Branch</th>
-                        <th  onClick={() => requestSort("OutStandingAmount")} style={{textAlign:'right'}}>Out_Standing_Amount</th>
+                        <th  onClick={() => requestSort("OutStandingAmount")} style={{textAlign:'right'}}>OutStanding Amount</th>
                         <th onClick={() => requestSort("OutStandingInvoiceCount")}>InvoiceCount</th>
                     </tr>
                 </thead>
