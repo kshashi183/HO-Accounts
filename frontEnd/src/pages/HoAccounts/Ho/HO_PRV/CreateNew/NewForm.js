@@ -15,9 +15,12 @@ export default function NewForm() {
   const location = useLocation();
 
 
-  const rowData = location.state ? location.state : "";
+  // const rowData = location.state ? location.state : "";
+  const { HOPrvId, unitname } = location.state ? location.state : {};
+   const rowData = HOPrvId ? HOPrvId:'' ;
+   const unitFromDraft=unitname ? unitname:''
 
-  //  console.log("row dataaaa",rowData);
+   console.log("row dataaaa",rowData,unitname );
 
 
 
@@ -101,6 +104,9 @@ export default function NewForm() {
   const deletecall = () => {
     if (rvData.postData.CustName) {
       setDeleteOverAllData(true);
+    }
+    else{
+      toast.error("select Customer")
     }
   }
 
@@ -193,31 +199,42 @@ export default function NewForm() {
   };
 
   const [cust, setCust] = useState()
+
   const handleSelectCustomer = async (selected) => {
     const selectedCustomer = selected[0];
     setSelectedCustOption(selected); // Update selected option state
     setGetCustomer(selectedCustomer ? selectedCustomer.Cust_Name : ""); // Update selected Name
     setGetCustCode(selectedCustomer ? selectedCustomer.Cust_Code : ""); // Update selected Code
 
+    let cust=selectedCustomer.Cust_Code
 
+    console.log("cust code", selectedCustomer);
 
-    setRvData(prevState => ({ ...prevState, postData: { ...prevState.postData, Unitname: getUnit } }));
+    setRvData(prevState => ({ ...prevState, postData: { ...prevState.postData, Unitname: getUnit,
+    CustName:selectedCustomer ? selectedCustomer.Cust_Name : "", Cust_code:selectedCustomer ? selectedCustomer.Cust_Code : ""
+    } }));
 
     if (selected.length > 0) {
       try {
-        const invoicesResponse = await axios.post(
-          baseURL + "/hoCreateNew/getInvoices",
-          {
-            unit: getUnit,
-            custCode: selectedCustomer.Cust_Code,
-          }
+        // const invoicesResponse = await axios.post(
+        //   baseURL + "/hoCreateNew/getInvoices",
+        //   {
+        //     unit: getUnit,
+        //     custCode: selectedCustomer.Cust_Code,
+        //   }
+        // );
+
+        const invoicesResponse = await axios.get(
+          baseURL + `/createnew/ho_openInvoices?customercode=${cust}&unitname=${getUnit}`
         );
+
+        console.log("inv",invoicesResponse );
 
         setRvData((prevRvData) => ({
           ...prevRvData,
           data: {
             ...prevRvData.data,
-            inv_data: invoicesResponse.data,
+            inv_data: invoicesResponse.data.Result,
 
           },
 
@@ -339,6 +356,7 @@ export default function NewForm() {
 
 
   const rowDataFetch = async () => {
+    
     if (rowData !== "") {
       try {
         //fetch Form data
@@ -401,6 +419,7 @@ export default function NewForm() {
 
 
   const getReceipts = async (cust_code, hoprvid, unit) => {
+    
     console.log("hoooooo", hoprvid, unit);
 
     try {
@@ -418,9 +437,10 @@ export default function NewForm() {
 
       try {
         const response = await axios.get(
-          baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}`
+          baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}&unitname=${unitFromDraft}`
         );
-        console.log("left table data ", resp);
+      
+        console.log("rightttttttttt with row data table data ", response);
 
         setRvData((prevRvData) => ({
           ...prevRvData,
@@ -760,6 +780,7 @@ export default function NewForm() {
         toast.error("Invoice already exists");
         return;
       }
+      console.log("rows to add", rowsToAdd);
 
       const response = await axios.post(baseURL + "/hoCreateNew/addInvoice", {
         selectedRows: rowsToAdd,
@@ -838,6 +859,7 @@ export default function NewForm() {
   //Delete Button 
 
   const deleteButton = async () => {
+  
     setDeleteOverAllData(false);
     let stopExecution = false;
 
@@ -910,7 +932,7 @@ export default function NewForm() {
               }));
               setSelectedCustOption([]);
               setSelectedOption([]);
-              toast.success("Deleted Successfully")
+             
 
 
             }
@@ -918,6 +940,7 @@ export default function NewForm() {
         }
 
       });
+      toast.success("Deleted Successfully")
 
     }
 
@@ -972,8 +995,8 @@ export default function NewForm() {
           }));
           setSelectedCustOption([]);
           setSelectedOption([]);
+         
           toast.success("Deleted Successfully")
-
 
         }
       })
@@ -1977,7 +2000,8 @@ export default function NewForm() {
               </thead>
 
               <tbody className="tablebody">
-                {rvData.data.inv_data?.map((row, index) => (
+
+                {rvData.data.inv_data && Array.isArray(rvData.data.inv_data) ?rvData.data.inv_data.map((row, index) => (
 
                   <tr
                     key={index}
@@ -2003,12 +2027,12 @@ export default function NewForm() {
                     <td>
                       {new Date(row.Inv_Date)
                         .toLocaleDateString("en-GB")
-                        .replace(/\//g, "-")}
+                        }
                     </td>
                     <td>{row.GrandTotal}</td>
                     <td>{row.PymtAmtRecd}</td>
                   </tr>
-                ))}
+                )):null}
               </tbody>
             </Table>
           </div>

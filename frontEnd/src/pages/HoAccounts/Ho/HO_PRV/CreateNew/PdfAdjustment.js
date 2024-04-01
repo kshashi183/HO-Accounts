@@ -245,7 +245,7 @@ export default function PdfAdjustment({ data }) {
 
 
 
-  console.log(">>>>>>>pdf", data.receipt_details, data.receipt_data, data);
+  //console.log(">>>>>>>pdf", data.receipt_details[0].Unitname, data.receipt_data.TxnType);
 
   const [currentDate, setCurrentDate] = useState('');
   // const [totalReceiveNow, setTotalReceiveNow] = useState(0);
@@ -262,10 +262,13 @@ export default function PdfAdjustment({ data }) {
   useEffect(() => {
     // Function to get and format the current date
     const getCurrentDate = () => {
+      
       const now = new Date();
-      const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
-      const formattedDate = now.toLocaleDateString('en-US', options);
-      setCurrentDate(formattedDate);
+    const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
+    const formattedDate = now.toLocaleDateString('en-US', options);
+    const parts = formattedDate.split('/');
+    const formattedDateInDDMMYY = `${parts[1]}-${parts[0]}-${parts[2]}`;
+    setCurrentDate(formattedDateInDDMMYY);
     };
 
 
@@ -315,7 +318,7 @@ export default function PdfAdjustment({ data }) {
 
         <View style={styles.mrgnbttm}>
           <Text style={{ marginLeft: '70px' }}>
-            Unit :
+            Unit : <Text>{data.receipt_details[0]?.Unitname}</Text> 
           </Text>
           <Text style={{ marginLeft: '130px' }}>
 
@@ -327,7 +330,7 @@ export default function PdfAdjustment({ data }) {
 
         <View style={styles.mrgnbttm}>
           <Text style={{ marginLeft: '30px' }}>
-            <Text style={{ fontFamily: "Helvetica-Bold" }}>Voucher No :  </Text>{data.receipt_data.Recd_PVNo}
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Voucher No :  </Text>{data.receipt_data.HORefNo}
           </Text>
 
 
@@ -343,8 +346,7 @@ export default function PdfAdjustment({ data }) {
           </Text>
           <Text style={{ marginLeft: '130px' }}>
 
-            <Text style={{ fontFamily: "Helvetica-Bold" }}>Vibe : </Text> {data.receipt_data.Description}
-          </Text>
+            <Text style={{ fontFamily: "Helvetica-Bold" }}>Vibe : </Text> {data.receipt_data.Description}  </Text>
         </View>
 
         <View style={styles.mrgnbttm}>
@@ -376,7 +378,8 @@ export default function PdfAdjustment({ data }) {
         <View style={styles.mrgnbttm}>
           <Text style={{ marginLeft: '330px' }}>
 
-            <Text style={{ fontFamily: "Helvetica-Bold" }}> On Account: </Text>{formatAmount(data.receipt_data.On_account)}
+            <Text style={{ fontFamily: "Helvetica-Bold" }}> On Account: </Text>
+            {/* {(data.receipt_data.On_account)} */} 0.00
           </Text>
         </View>
 
@@ -425,13 +428,16 @@ export default function PdfAdjustment({ data }) {
 
 
   const Header33 = () => (
-    <View>
+<>
+
+    
+   
       <View style={styles.mrgnbttm} >
         <View >
 
           <View style={styles.bttmgap}>
             <Text style={{ marginLeft: '70px' }}>
-              Unit :
+              Unit :  <Text>{data.receipt_details[0]?.Unitname}</Text> 
             </Text>
           </View>
 
@@ -440,7 +446,7 @@ export default function PdfAdjustment({ data }) {
           <View style={styles.bttmgap}>
             <Text style={{ marginLeft: '30px' }}>
               <Text style={{ fontFamily: "Helvetica-Bold" }}>Voucher No :  </Text>
-              {data.receipt_data.Recd_PVNo}
+              {data.receipt_data.HORefNo}
             </Text>
 
 
@@ -514,7 +520,8 @@ export default function PdfAdjustment({ data }) {
       <View style={styles.head4}>
         <Text style={{ marginLeft: '180px', }}>
 
-          <Text style={{ fontFamily: "Helvetica-Bold" }}> On Account:     </Text>{formatAmount(data.receipt_data.On_account)}
+          <Text style={{ fontFamily: "Helvetica-Bold" }}> On Account:     </Text>
+          {/* {(data.receipt_data.On_account)} */}0.00
         </Text>
       </View>
 
@@ -523,7 +530,8 @@ export default function PdfAdjustment({ data }) {
 
       </View>
 
-    </View>
+   
+    </>
   )
 
 
@@ -533,8 +541,9 @@ export default function PdfAdjustment({ data }) {
 
 
 
-  if (!data.receipt_details || data.receipt_details.length === 0) {
-    return <Header33 />;
+  if ( data.receipt_details.length === 0) {
+ 
+    return <Header22/>;
   }
 
 

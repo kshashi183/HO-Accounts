@@ -54,9 +54,9 @@ setFlag(false)
       .then((res) => {
         console.log("firstTable", res.data)
         setunitData(res.data);
-        if (res.data.length > 0) {
-          setSelectedUnitName([res.data[4]]);
-        }
+        // if (res.data.length > 0) {
+        //   setSelectedUnitName([res.data[4]]);
+        // }
       })
       .catch((err) => {
         console.log("err in table", err);

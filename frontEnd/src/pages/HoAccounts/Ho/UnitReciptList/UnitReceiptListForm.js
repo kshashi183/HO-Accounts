@@ -197,7 +197,7 @@ export default function UnitReceiptListForm() {
                                     
                                         <div className="col-md-2">
                                             <label className="form-label">Transaction Type</label>
-                                            <select className="ip-select"   disabled={selectRow.Recd_PVNo==='Draft'}>
+                                            <select className="ip-select"   disabled>
                                                 {/* <option value="option 1">{selectRow.TxnType}</option>
                                                 <option value="option 2">Online Payment</option>
                                                 <option value="option 3">Cheque</option> */}

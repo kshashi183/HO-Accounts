@@ -36,7 +36,7 @@ createNewRouter.get("/customerNames", async (req, res, next) => {
 
 createNewRouter.post("/getInvoices", async (req, res, next) => {
   const { unit, custCode } = req.body;
- // console.log("unit open inv", req.body);
+  // console.log("unit open inv", req.body);
   try {
     hqQuery(
       `SELECT u.*
@@ -44,15 +44,15 @@ createNewRouter.post("/getInvoices", async (req, res, next) => {
       WHERE u.UnitName = '${unit}'
       AND u.Cust_Code = ${custCode}
       AND ABS(u.GrandTotal - u.PymtAmtRecd) > 0
-      AND u.DCStatus != 'Closed'`,
+      AND u.DCStatus <>  'Closed'`,
       (err, data) => {
-        if(err){
+        if (err) {
 
         }
-        else{
-console.log("open inv ", data);
-        
-        res.send(data);
+        else {
+          //console.log("open inv ", data);
+
+          res.send(data);
         }
       }
     );
@@ -62,23 +62,23 @@ console.log("open inv ", data);
 });
 
 createNewRouter.post("/getHOPrvId", async (req, res, next) => {
-  const {  custCode } = req.body;
-  
+  const { custCode } = req.body;
+
   //console.log("unit get horvid", custCode);
   try {
     hqQuery(
-      `SELECT HOPrvId FROM magod_hq_mis.ho_paymentrv_register h WHERE   h.Cust_code='${custCode}' AND h.HORef='Draft';
+      `SELECT HOPrvId FROM magod_hq_mis.ho_paymentrv_register h WHERE   h.Cust_code='${custCode}' AND h.HORef='Draft' AND Unit_RecdPVid=0;
       `,
       (err, data) => {
         if (err) {
           console.log("err", err);
         }
         else {
-        //  console.log("dattttttttttt", data);
+          //  console.log("dattttttttttt", data);
           res.send(data)
-          
 
-          
+
+
         }
       }
     );
@@ -89,7 +89,7 @@ createNewRouter.post("/getHOPrvId", async (req, res, next) => {
 
 createNewRouter.post("/saveData", async (req, res, next) => {
   const { unit, custCode, custName, txnType, Amount, description } = req.body;
- // console.log("unittt", req.body);
+  // console.log("unittt", req.body);
   try {
     hqQuery(
       `INSERT INTO magod_hq_mis.ho_paymentrv_register (Unitname, Cust_code, CustName, TxnType, Amount, DESCRIPTION, HoRefDate)
@@ -99,7 +99,7 @@ createNewRouter.post("/saveData", async (req, res, next) => {
           console.error(err);
           res.status(500).send({ success: false, error: err.message });
         } else {
-        //  console.log("insert", data);
+          //  console.log("insert", data);
           res.send({ success: true, data });
         }
       }
@@ -149,7 +149,7 @@ createNewRouter.post("/updateData", async (req, res, next) => {
 createNewRouter.post("/addInvoice", async (req, res, next) => {
   try {
     const { selectedRows, HO_PrvId, unit } = req.body;
-    console.log("hoid",HO_PrvId);
+    console.log("hoid", HO_PrvId);
     const insertResults = [];
     let existingDraftIds = [];
 
@@ -186,6 +186,19 @@ createNewRouter.post("/addInvoice", async (req, res, next) => {
 
     for (const row of selectedRows) {
       const { DC_Inv_No } = row;
+      console.log("row inv date",typeof( row.Inv_Date));
+      const datePart = row.Inv_Date.split('T')[0];
+
+      console.log(" date",row.Inv_Date ,datePart);
+     
+
+
+
+
+
+
+
+
       if (DC_Inv_No === undefined) {
         throw new Error("One or more IDs are not present.");
       }
@@ -193,34 +206,65 @@ createNewRouter.post("/addInvoice", async (req, res, next) => {
       if (!existingDraftIds.includes(DC_Inv_No)) {
         const recdPvSrlToInsertIncremented = ++recdPvSrlToInsert;
 
-        const insertQuery = `
-      INSERT INTO magod_hq_mis.ho_paymentrv_details (
-Unitname,
-        HOPrvId,
-        RecdPvSrl,
-        DC_inv_no,
-        Inv_No,
-        Inv_Type,
-        Inv_Amount,
-        Amt_received,
-        Receive_Now,
-        Inv_Date,
-        RefNo
-      )
-      VALUES (
-        '${row.UnitName}',
-        ${HO_PrvId},
-        ${recdPvSrlToInsertIncremented},
-        '${row.DC_Inv_No}',
-        '${row.Inv_No}',
-        '${row.DC_InvType}',
-        ${row.GrandTotal},
-        ${row.PymtAmtRecd},
-       ${row.Receive},
+//         const insertQuery = `
+//       INSERT INTO magod_hq_mis.ho_paymentrv_details (
+// Unitname,
+//         HOPrvId,
+//         RecdPvSrl,
+//         DC_inv_no,
+//         Inv_No,
+//         Inv_Type,
+//         Inv_Amount,
+//         Amt_received,
+//         Receive_Now,
+//         Inv_Date,
+//         RefNo
+//       )
+//       VALUES (
+//         '${row.UnitName}',
+//        ' ${HO_PrvId}',
+//         ${recdPvSrlToInsertIncremented},
+//         '${row.DC_Inv_No}',
+//         '${row.Inv_No}',
+//         '${row.DC_InvType}',
+//         '${row.GrandTotal}',
+//         '${row.PymtAmtRecd}',
+//        '${row.Receive}',
 
-        CURDATE(),
-        '${row.Inv_No} / ${row.Inv_Fin_Year}'
-      )`;
+//        CurDate(),
+//         '${row.Inv_No} / ${row.Inv_Fin_Year}'
+//       )`;
+
+const insertQuery = `
+INSERT INTO magod_hq_mis.ho_paymentrv_details (
+Unitname,
+  HOPrvId,
+  RecdPvSrl,
+  DC_inv_no,
+  Inv_No,
+  Inv_Type,
+  Inv_Amount,
+  Amt_received,
+  Receive_Now,
+  Inv_Date,
+  RefNo
+)
+VALUES (
+  '${row.UnitName}',
+ ' ${HO_PrvId}',
+  ${recdPvSrlToInsertIncremented},
+  '${row.DC_Inv_No}',
+  '${row.Inv_No}',
+  '${row.DC_InvType}',
+  '${row.GrandTotal}',
+  '${row.PymtAmtRecd}',
+ '${row.Receive}',
+
+'${datePart}',
+  '${row.Inv_No} / ${row.Inv_Fin_Year}'
+)`;
+
+        console.log("insert queryy", insertQuery);
 
         await new Promise((resolve, reject) => {
           hqQuery(insertQuery, (err, data) => {
@@ -426,8 +470,10 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
   try {
     const { RecdPvSrl, HO_PrvId } = req.body;
 
+    console.log("hoprv id remove",HO_PrvId);
+
     // Delete query
-    const deleteQuery = `DELETE FROM magod_hq_mis.ho_paymentrv_details WHERE RecdPvSrl=${RecdPvSrl}`;
+    const deleteQuery = `DELETE FROM magod_hq_mis.ho_paymentrv_details WHERE RecdPvSrl=${RecdPvSrl} AND HOPrvId=${HO_PrvId}`;
     await hqQuery(deleteQuery);
 
     // Select query to get the updated data after deletion
@@ -545,7 +591,7 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
 
 createNewRouter.post("/postInvoice", async (req, res, next) => {
   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
-//console.log("req body after post", req.body);
+  //console.log("req body after post", req.body);
   const date = new Date();
   // const date = new Date("2024-04-01");
   const year = date.getFullYear();
@@ -572,7 +618,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
       let newHrefNo = "";
 
-      console.log("select result",selectResult);
+      console.log("select result", selectResult);
       if (selectResult && selectResult.length > 0) {
         const lastRunNo = selectResult[0].Running_No;
         const numericPart = parseInt(lastRunNo) + 1;
@@ -646,7 +692,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
           console.log("error ", errTable);
         }
         else {
-         // console.log("update onaccount value after POST");
+          // console.log("update onaccount value after POST");
         }
       })
 
@@ -712,7 +758,7 @@ createNewRouter.put("/updateReceptDetails", async (req, res, next) => {
             console.error("Failed to update Receive_Now:", err);
           }
           else {
-           // console.log("update receipt details");
+            // console.log("update receipt details");
             //res.json(result);
           }
 
