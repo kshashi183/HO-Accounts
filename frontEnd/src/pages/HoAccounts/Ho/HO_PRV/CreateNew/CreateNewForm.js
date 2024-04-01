@@ -118,7 +118,7 @@ export default function CreateNewForm() {
   }, [])
 
 
-  let z = rvData.postData.Amount;
+  
 
 
   const insertToForm = async () => {
@@ -161,7 +161,9 @@ export default function CreateNewForm() {
 
 
   const getleftandRightTabledata = async (cust_code, hoprvID) => {
-    console.log("CUST CODE AND HOPRVID", cust_code, hoprvID);
+  
+   
+   
     try {
       const resp = await axios.post(
         baseURL + '/createnew/getleftTable', {
@@ -175,7 +177,7 @@ export default function CreateNewForm() {
 
       try {
         const response = await axios.get(
-          baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}`
+          baseURL + `/createnew/ho_openInvoicesADJUST?customercode=${cust_code}`
         );
         //console.log("open inv ", response);
 
@@ -812,7 +814,7 @@ export default function CreateNewForm() {
         return;
       }
 
-
+      console.log("reow data adjustment", rowsToAdd);
       const response = await axios.post(baseURL + "/hoCreateNew/addInvoice", {
         selectedRows: rowsToAdd,
         HO_PrvId: rvData.postData.HO_PrvId,
@@ -1011,38 +1013,38 @@ export default function CreateNewForm() {
 
 
 
-  const getReceipts = async (cust_code, postdata) => {
-    //setRvData((prevRvData) => ({ ...prevRvData, postData: postdata }));
+//   const getReceipts = async (cust_code, postdata) => {
+//     //setRvData((prevRvData) => ({ ...prevRvData, postData: postdata }));
+// alert("22")
+//     try {
+//       const resp = await axios.get(
+//         baseURL + `/createnew/getleftTable?receipt_id=${hoprvid}`
+//       );
 
-    try {
-      const resp = await axios.get(
-        baseURL + `/createnew/getleftTable?receipt_id=${hoprvid}`
-      );
 
 
+//       try {
+//         const response = await axios.get(
+//           baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}`
+//         );
+//         console.log("open inv ", resp);
 
-      try {
-        const response = await axios.get(
-          baseURL + `/createnew/ho_openInvoices?customercode=${cust_code}`
-        );
-        console.log("open inv ", resp);
-
-        setRvData((prevRvData) => ({
-          ...prevRvData,
-          data: {
-            ...prevRvData.data,
-            inv_data: response.data.Result,
-            receipt_details: resp.data.Result,
-            //  receipt_id: rowData,
-          },
-        }));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+//         setRvData((prevRvData) => ({
+//           ...prevRvData,
+//           data: {
+//             ...prevRvData.data,
+//             inv_data: response.data.Result,
+//             receipt_details: resp.data.Result,
+//             //  receipt_id: rowData,
+//           },
+//         }));
+//       } catch (error) {
+//         console.error("Error fetching data:", error);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching data:", error);
+//     }
+//   };
 
 
 
@@ -1563,7 +1565,7 @@ export default function CreateNewForm() {
 
 
   const handlePostYes = async () => {
-
+    let val = (onAccountValue1 === 0 || onAccountValue22===0 || onAccountValue1!==fixedOnaccount) ? fixedOnaccount : onAccountValue1
     console.log("rece now sum post yes", sumofReceive);
 
     setShowPostModal(false);
@@ -1594,7 +1596,7 @@ export default function CreateNewForm() {
           }
 
 
-          else if (formattedValue > onAccountValue1) {
+          else if (formattedValue > val) {
             toast.error("Cannot Receive More than On_account Amount");
             stopExecution = true;
             return;
@@ -1638,6 +1640,9 @@ export default function CreateNewForm() {
           Amount: response.data[0].Amount,
           CustName: response.data[0].CustName,
           HO_PrvId: response.data[0].HOPrvId,
+          Description:response.data[0].Description,
+          TxnType:response.data[0].TxnType,
+          On_account:response.data[0].On_account
         },
 
         firstTableArray: [],
@@ -2161,7 +2166,7 @@ export default function CreateNewForm() {
                     <td>
                       {new Date(row.Inv_Date)
                         .toLocaleDateString("en-GB")
-                        .replace(/\//g, "-")}
+                        }
                     </td>
                     <td>{row.GrandTotal}</td>
                     <td>{row.PymtAmtRecd}</td>

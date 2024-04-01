@@ -58,16 +58,30 @@ useEffect(() => {
       // setState(true);
     };
 
-    const openVoucherButton = () => {
-        if (selectRow !== "") {
-          navigate("/HOAccounts/HO/HOPRV/CreateNew", {
-            state: selectRow.HOPrvId,
-          });
-        } else {
-          toast.error("Select Row");
-        }
-      };
+    // const openVoucherButton = () => {
+    //     if (selectRow !== "") {
+    //       navigate("/HOAccounts/HO/HOPRV/CreateNew", {
+    //         state: selectRow.HOPrvId,
+            
+    //       });
+    //     } else {
+    //       toast.error("Select Row");
+    //     }
+    //   };
 
+    const openVoucherButton = () => {
+      if (selectRow !== "") {
+        navigate("/HOAccounts/HO/HOPRV/CreateNew", {
+          state: {
+            HOPrvId: selectRow.HOPrvId,
+            unitname: selectRow.Unitname // assuming you have unitname variable defined
+          },
+          
+        });
+      } else {
+        toast.error("Select Row");
+      }
+    };
       console.log("sel", selectRow);
 
 

@@ -78,8 +78,8 @@ export default function UnitOutStanding() {
                 <thead className='tableHeaderBGColor' >
                     <tr>
                     <th onClick={() => requestSort("UnitName")}>UnitName</th>
-                        <th onClick={() => requestSort("Cust_Code")}>Cust_Code</th>
-                        <th onClick={() => requestSort("Cust_name")}>Cust_Name</th>
+                        <th onClick={() => requestSort("Cust_Code")}>CustCode</th>
+                        <th onClick={() => requestSort("Cust_name")}>CustName</th>
                         <th onClick={() => requestSort("Branch")}>Branch</th>
                         <th  onClick={() => requestSort("OutStandingAmount")} style={{textAlign:'right'}}>OutStanding Amount</th>
                         <th onClick={() => requestSort("OutStandingInvoiceCount")}>InvoiceCount</th>

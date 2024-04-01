@@ -7,14 +7,25 @@ const { setupQueryMod, misQuery,setupQuery } = require("../../../../helpers/dbco
 
 createnew.get('/ho_openInvoices', (req, res) => {
   const custcode = req.query.customercode;
-  console.log("HO INV custcodeeeee", custcode);
-  const sql = `SELECT *,
-      DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
-      FROM magod_hq_mis.unit_invoices_list
-      WHERE UnitName = 'Jigani'
-        AND Cust_Code='${custcode}'
-        AND ABS(GrandTotal - PymtAmtRecd) > 0
-        AND DCStatus <> 'Closed'; `;
+ 
+ const unitname = req.query.unitname;
+  
+  console.log("HO INV custcodeeeee", custcode,unitname);
+  // const sql = `SELECT *,
+  //     DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
+  //     FROM magod_hq_mis.unit_invoices_list
+  //     WHERE UnitName = 'Jigani'
+  //       AND Cust_Code='${custcode}'
+  //       AND ABS(GrandTotal - PymtAmtRecd) > 0
+  //       AND DCStatus <> 'Closed'; `;
+
+  const sql = `SELECT *
+  
+  FROM magod_hq_mis.unit_invoices_list
+  WHERE UnitName = '${unitname}'
+    AND Cust_Code='${custcode}'
+    AND ABS(GrandTotal - PymtAmtRecd) > 0
+    AND DCStatus <> 'Closed'; `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
@@ -22,7 +33,42 @@ createnew.get('/ho_openInvoices', (req, res) => {
       console.log("err in query", err);
     }
     else {
-        console.log("HO open invoice", result);
+      // console.log("HO open invoice", result);
+      return res.json({ Result: result });
+    }
+  })
+})
+
+
+createnew.get('/ho_openInvoicesADJUST', (req, res) => {
+  const custcode = req.query.customercode;
+ 
+ 
+  
+  console.log("HO INV custcodeeeee", custcode);
+  // const sql = `SELECT *,
+  //     DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
+  //     FROM magod_hq_mis.unit_invoices_list
+  //     WHERE UnitName = 'Jigani'
+  //       AND Cust_Code='${custcode}'
+  //       AND ABS(GrandTotal - PymtAmtRecd) > 0
+  //       AND DCStatus <> 'Closed'; `;
+
+  const sql = `SELECT *
+  
+  FROM magod_hq_mis.unit_invoices_list
+  WHERE 
+  Cust_Code='${custcode}'
+    AND ABS(GrandTotal - PymtAmtRecd) > 0
+    AND DCStatus <> 'Closed'; `;
+  //  const sql=`
+  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("err in query", err);
+    }
+    else {
+       console.log("HO open adjustment invoice", result);
       return res.json({ Result: result });
     }
   })
@@ -41,7 +87,7 @@ createnew.post('/getFormData', (req, res) => {
   console.log("receipt_id  hoprvid form", req.body)
   //const receipt_id = 245);
   // const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' `;
-  const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' AND Cust_code='${custCode}' `;
+  const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' AND Cust_code='${custCode}' AND Unit_RecdPVid=0 `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
@@ -49,7 +95,7 @@ createnew.post('/getFormData', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      console.log("form data", result);
+     console.log("form data", result);
       return res.json({ Result: result });
     }
   })
@@ -59,6 +105,7 @@ createnew.post('/getFormData', (req, res) => {
 createnew.post('/getleftTable', (req, res) => {
   const { receipt_id } = req.body
   // const receipt_id=1
+  console.log("left table dataaaaaaaaaaaaaaaaaaaaaaaa");
   
   const unit='Jigani'
   console.log(" left table data", receipt_id, unit);
@@ -848,7 +895,7 @@ createnew.get('/getFormByRowData', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      console.log("result row data", result);
+    //  console.log("result row data", result);
       return res.json({ Result: result });
     }
   })

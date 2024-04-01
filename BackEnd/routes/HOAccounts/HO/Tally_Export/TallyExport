@@ -121,137 +121,6 @@ tally_Export.get('/getPayment', (req, res) => {
 
 
 
-// tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
-
-//     try {
-//        // const xmlFile = req.file.buffer.toString(); // Assuming the file is XML 
-//         // console.log("xml file", xmlFile);
-//     const xmlFile=`<ENVELOPE>
-//     <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
-//     <BODY>
-//     <IMPORTDATA>
-//     <REQUESTDESC>
-//     <REPORTNAME>Vouchers</REPORTNAME>
-//     <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY></STATICVARIABLES>
-//     </REQUESTDESC>
-//     <TALLYMESSAGE xmlns:UDF='TallyUDF'>
-//     <VOUCHER REMOTEID='SL2147387070' VCHTYPE='Sales' ACTION='Create'>
-//     <DATE>20240222</DATE>
-//     <GUID>2147387070</GUID>
-//     <NARRATION>Our WO No :240492 Packing Note No :09014/ 23/24</NARRATION>
-//     <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
-//     <VOUCHERNUMBER>SL / JG1133/ 23/24</VOUCHERNUMBER>
-//     <REFERENCE>KE034 DTD/31.01.2024</REFERENCE>
-//     <PARTYLEDGERNAME>KALPA ENGINEERING</PARTYLEDGERNAME>
-//     <CSTFORMISSUETYPE />
-//     <CSTFORMRECVTYPE />
-//     <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
-//     <VCHGSTCLASS />
-//     <DIFFACTUALQTY>No</DIFFACTUALQTY>
-//     <AUDITED>No</AUDITED>
-//     <FORJOBCOSTING>No</FORJOBCOSTING>
-//     <ISOPTIONAL>No</ISOPTIONAL>
-//     <EFFECTIVEDATE>20240222</EFFECTIVEDATE>
-//     <USEFORINTEREST>No</USEFORINTEREST>
-//     <USEFORGAINLOSS>No</USEFORGAINLOSS>
-//     <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
-//     <USEFORCOMPOUND>No</USEFORCOMPOUND>
-//     <ALTERID>2</ALTERID>
-//     <EXCISEOPENING>No</EXCISEOPENING>
-//     <ISCANCELLED>No</ISCANCELLED>
-//     <HASCASHFLOW>No</HASCASHFLOW>
-//     <ISPOSTDATED>No</ISPOSTDATED>
-//     <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
-//     <ISINVOICE>No</ISINVOICE>
-//     <MFGJOURNAL>No</MFGJOURNAL>
-//     <HASDISCOUNTS>No</HASDISCOUNTS>
-//     <ASPAYSLIP>No</ASPAYSLIP>
-//     <ISDELETED>No</ISDELETED>
-//     <ASORIGINAL>No</ASORIGINAL>
-//     <ALLLEDGERENTRIES.LIST>
-//     <LEDGERNAME>KALPA ENGINEERING</LEDGERNAME>
-//     <GSTCLASS />
-//     <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
-//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-//     <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-//     <AMOUNT>-26143.00</AMOUNT>
-//     <BILLALLOCATIONS.LIST>
-//     <NAME>SL / JG1133/ 23/24</NAME>
-//     <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
-//     <BILLTYPE>New Ref</BILLTYPE>
-//     <AMOUNT>-26143.00</AMOUNT>
-//     </BILLALLOCATIONS.LIST>
-//     </ALLLEDGERENTRIES.LIST>
-//     <ALLLEDGERENTRIES.LIST>
-//     <LEDGERNAME>SALES</LEDGERNAME>
-//     <GSTCLASS />
-//     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-//     <ISPARTYLEDGER>No</ISPARTYLEDGER>
-//     <AMOUNT>22155.00</AMOUNT>
-//     </ALLLEDGERENTRIES.LIST>
-//     <ALLLEDGERENTRIES.LIST>
-//     <LEDGERNAME>CGST @ 9%</LEDGERNAME>
-//     <GSTCLASS />
-//     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-//     <ISPARTYLEDGER>No</ISPARTYLEDGER>
-//     <AMOUNT>1993.95</AMOUNT>
-//     </ALLLEDGERENTRIES.LIST>
-//     <ALLLEDGERENTRIES.LIST>
-//     <LEDGERNAME>SGST @ 9%</LEDGERNAME>
-//     <GSTCLASS />
-//     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-//     <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-//     <AMOUNT>1993.95</AMOUNT>
-//     </ALLLEDGERENTRIES.LIST>
-//     <ALLLEDGERENTRIES.LIST>
-//     <LEDGERNAME>Round Off</LEDGERNAME>
-//     <GSTCLASS />
-//     <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-//     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-//     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-//     <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-//     <AMOUNT>0.10</AMOUNT>
-//     </ALLLEDGERENTRIES.LIST>
-//     </VOUCHER>
-//     </TALLYMESSAGE>
-//     </IMPORTDATA>
-//     </BODY>
-//     </ENVELOPE>
-
-//     `
-//         const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
-//         const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
-//             headers: {
-//                 'Content-Type': 'application/xml',
-//             },
-//         });
-
-//         // Check the response from the Tally server
-//         const tallyXmlResponse = parseXml(tallyResponse.data);
-//        console.log("tally response", tallyXmlResponse);
-//       if (tallyResponse.status === 200 ) {
-//         // Tally server responded with a success status
-//         console.log('File uploaded and sent to Tally successfully');
-//         res.status(200).send('File uploaded and sent to Tally successfully');
-//     }
-//         else {
-//             // Tally server responded with an error status
-//             console.error('Error from Tally server:', tallyResponse.statusText);
-//             res.status(500).send('Error communicating with Tally server');
-//         }
-//     } catch (error) {
-//         console.error('Error handling file upload:', error);
-//         res.status(500).send('Internal Server Error');
-//     }
-
-// });
 
 
 
@@ -260,20 +129,198 @@ const { parseString } = require('xml2js');
 //tally after exporting i need to compre which ledger is not export
 
 
+// tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
+
+//     const tallyUrl = 'http://localhost:9000';
+
+//     // Fetch company Names
+//     console.log("hoiooooooooooo");
+
+//     try {
+//         const response = await axios.post(tallyUrl, {
+//             xmlRequest: '<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Ledgers</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>'
+//         });
+//         // Process response XML here
+//         // console.log("tally .......",response.data);
+//         const xmlData = response.data;
+//         console.log("hoiooooooooooo22222");
+//          parseString(xmlData, (err, result) => {
+//             if (err) {
+//               console.error("Error parsing XML:", err);
+//               return;
+//             }
+//             const ledgerElements = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].LEDGER;
+//             const ledgerNames = ledgerElements.map(ledger => ledger.$.NAME);
+//             if (ledgerNames.length > 0) {
+//               console.log("Ledger Names:");
+//               ledgerNames.forEach(name => console.log(name));
+//             } else {
+//               console.log("No ledger names found in the XML data.");
+//             }
+//           });
+//     } catch (error) {
+//         console.error('Error fetching ledger names:', error);
+//     }
+
+//     try {
+//         const xmlFile = `<ENVELOPE>
+//         <HEADER>
+//             <TALLYREQUEST>Import Data</TALLYREQUEST>
+//             </HEADER>
+//         <BODY>
+//         <IMPORTDATA>
+//         <REQUESTDESC>
+//         <REPORTNAME>Vouchers</REPORTNAME>
+//         <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY></STATICVARIABLES>
+//         </REQUESTDESC>
+//         <TALLYMESSAGE xmlns:UDF='TallyUDF'>
+//         <VOUCHER REMOTEID='SL2147387061' VCHTYPE='Sales' ACTION='Create'>
+//         <DATE>20240316</DATE>
+//         <GUID>2147387061</GUID>
+//         <NARRATION>Our WO No :240492 Packing Note No :09014/ 23/24</NARRATION>
+//         <VOUCHERTYPENAME>Job Work</VOUCHERTYPENAME>
+//         <VOUCHERNUMBER>SL / JG1133/ 23/24</VOUCHERNUMBER>
+//         <REFERENCE>KE034 DTD/31.01.2024</REFERENCE>
+//         <PARTYLEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</PARTYLEDGERNAME>
+//         <CSTFORMISSUETYPE />
+//         <CSTFORMRECVTYPE />
+//         <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+//         <VCHGSTCLASS />
+//         <DIFFACTUALQTY>No</DIFFACTUALQTY>
+//         <AUDITED>No</AUDITED>
+//         <FORJOBCOSTING>No</FORJOBCOSTING>
+//         <ISOPTIONAL>No</ISOPTIONAL>
+//         <EFFECTIVEDATE>20240316</EFFECTIVEDATE>
+//         <USEFORINTEREST>No</USEFORINTEREST>
+//         <USEFORGAINLOSS>No</USEFORGAINLOSS>
+//         <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
+//         <USEFORCOMPOUND>No</USEFORCOMPOUND>
+//         <ALTERID>2</ALTERID>
+//         <EXCISEOPENING>No</EXCISEOPENING>
+//         <ISCANCELLED>No</ISCANCELLED>
+//         <HASCASHFLOW>No</HASCASHFLOW>
+//         <ISPOSTDATED>No</ISPOSTDATED>
+//         <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
+//         <ISINVOICE>No</ISINVOICE>
+//         <MFGJOURNAL>No</MFGJOURNAL>
+//         <HASDISCOUNTS>No</HASDISCOUNTS>
+//         <ASPAYSLIP>No</ASPAYSLIP>
+//         <ISDELETED>No</ISDELETED>
+//         <ASORIGINAL>No</ASORIGINAL>
+//         <ALLLEDGERENTRIES.LIST>
+//         <LEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</LEDGERNAME>
+//         <GSTCLASS />
+//         <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
+//         <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//         <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+//         <AMOUNT>-26143.00</AMOUNT>
+//         <BILLALLOCATIONS.LIST>
+//         <NAME>SL / JG1133/ 23/24</NAME>
+//         <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
+//         <BILLTYPE>New Ref</BILLTYPE>
+//         <AMOUNT>-26143.00</AMOUNT>
+//         </BILLALLOCATIONS.LIST>
+//         </ALLLEDGERENTRIES.LIST>
+//         <ALLLEDGERENTRIES.LIST>
+// <LEDGERNAME>CGST @ 9%</LEDGERNAME>
+// <GSTCLASS />
+// <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+// <LEDGERFROMITEM>No</LEDGERFROMITEM>
+// <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+// <ISPARTYLEDGER>No</ISPARTYLEDGER>
+// <AMOUNT>1993.95</AMOUNT>
+// </ALLLEDGERENTRIES.LIST>
+//         <ALLLEDGERENTRIES.LIST>
+//         <LEDGERNAME>SALES</LEDGERNAME>
+//         <GSTCLASS />
+//         <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+//         <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//         <ISPARTYLEDGER>No</ISPARTYLEDGER>
+//         <AMOUNT>22155.00</AMOUNT>
+//         </ALLLEDGERENTRIES.LIST>
+//         <ALLLEDGERENTRIES.LIST>
+//         <LEDGERNAME>SGST @ 9%</LEDGERNAME>
+//         <GSTCLASS />
+//         <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+//         <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//         <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+//         <AMOUNT>1993.95</AMOUNT>
+//         </ALLLEDGERENTRIES.LIST>
+//         <ALLLEDGERENTRIES.LIST>
+//         <LEDGERNAME>Round Off</LEDGERNAME>
+//         <GSTCLASS />
+//         <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+//         <LEDGERFROMITEM>No</LEDGERFROMITEM>
+//         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+//         <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+//         <AMOUNT>0.10</AMOUNT>
+//         </ALLLEDGERENTRIES.LIST>
+//         </VOUCHER>
+//         </TALLYMESSAGE>
+//         </IMPORTDATA>
+//         </BODY>
+//         </ENVELOPE>
+//         `// Your XML data
+
+//         const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
+//         const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
+//             headers: {
+//                 'Content-Type': 'application/xml',
+//             },
+//         });
+
+
+
+//         if (tallyResponse.status === 200) {
+
+//             // Tally server responded with a success status
+//            // console.log('tally response ', tallyResponse.data);
+//             res.status(200).send('File uploaded and sent to Tally successfully');
+//         }
+//         else {
+//             // Tally server responded with an error status
+//             console.error('Error from Tally server:', tallyResponse.statusText);
+//             res.status(500).send('Error communicating with Tally server');
+//         }
+
+//     } catch (error) {
+//         console.error('Error handling file upload:', error);
+//         res.status(500).send('Internal Server Error');
+//     }
+// });
+
 tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => {
 
     const tallyUrl = 'http://localhost:9000';
 
-    // Fetch company Names
-
     try {
         const response = await axios.post(tallyUrl, {
-            xmlRequest: '<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Ledgers</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>'
+            xmlRequest: '<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Voucher Numbers</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>'
         });
-        // Process response XML here
-         console.log("tally .......",response.data);
+
+        const xmlData = response.data;
+
+        parseString(xmlData, (err, result) => {
+            if (err) {
+                console.error('Error parsing XML:', err);
+                return;
+            }
+
+            const voucherElements = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].VOUCHER;
+            const voucherNumbers = voucherElements.map(voucher => voucher.VOUCHERNUMBER[0]);
+
+            if (voucherNumbers.length > 0) {
+                console.log('Voucher Numbers:');
+                voucherNumbers.forEach(number => console.log(number));
+            } else {
+                console.log('No voucher numbers found in the XML data.');
+            }
+        });
     } catch (error) {
-        console.error('Error fetching ledger names:', error);
+        console.error('Error fetching voucher numbers:', error);
     }
 
     try {
@@ -288,14 +335,14 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY></STATICVARIABLES>
         </REQUESTDESC>
         <TALLYMESSAGE xmlns:UDF='TallyUDF'>
-        <VOUCHER REMOTEID='SL2147387061' VCHTYPE='Job Work' ACTION='Create'>
+        <VOUCHER REMOTEID='SL2147387061' VCHTYPE='Sales' ACTION='Create'>
         <DATE>20240316</DATE>
         <GUID>2147387061</GUID>
         <NARRATION>Our WO No :240492 Packing Note No :09014/ 23/24</NARRATION>
         <VOUCHERTYPENAME>Job Work</VOUCHERTYPENAME>
         <VOUCHERNUMBER>SL / JG1133/ 23/24</VOUCHERNUMBER>
         <REFERENCE>KE034 DTD/31.01.2024</REFERENCE>
-        <PARTYLEDGERNAME>ABCD</PARTYLEDGERNAME>
+        <PARTYLEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</PARTYLEDGERNAME>
         <CSTFORMISSUETYPE />
         <CSTFORMRECVTYPE />
         <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
@@ -322,7 +369,7 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         <ISDELETED>No</ISDELETED>
         <ASORIGINAL>No</ASORIGINAL>
         <ALLLEDGERENTRIES.LIST>
-        <LEDGERNAME>ABCD</LEDGERNAME>
+        <LEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</LEDGERNAME>
         <GSTCLASS />
         <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
         <LEDGERFROMITEM>No</LEDGERFROMITEM>
@@ -391,7 +438,7 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         if (tallyResponse.status === 200) {
 
             // Tally server responded with a success status
-            console.log('tally response ', tallyResponse.data);
+           // console.log('tally response ', tallyResponse.data);
             res.status(200).send('File uploaded and sent to Tally successfully');
         }
         else {
@@ -405,6 +452,67 @@ tally_Export.post('/exporttally', upload.single('xmlFile'), async (req, res) => 
         res.status(500).send('Internal Server Error');
     }
 });
+
+
+
+
+//get company from magod database
+tally_Export.post('/getCompanyGuid', (req, res) => {
+    const { selectedUnitName } = req.body;
+ //console.log("unit name for company", selectedUnitName);
+    const sql = `SELECT  Tally_account_Name, CurrentTallyAcctGUID FROM magod_setup.magodlaser_units where 
+    UnitName='${selectedUnitName}'`
+//console.log("query",sql);
+    setupQueryMod(sql, (err, result) => {
+//console.log("112123");
+        if (err) {
+            console.log("error", err);
+            return res.json({ Error: " error in sql" })
+        }
+        else {
+           // console.log("invoice", result);
+            return res.json({ Status: 'Success', Result: result })
+        }
+    })
+
+})
+
+
+
+//get compnies from the tally software
+tally_Export.get('/getCompanyFromTally', async (req, res) => {
+        const tallyUrl = 'http://localhost:9000';
+
+    // Fetch company Names
+    console.log("get compny from tally");
+  
+    try {
+        const response = await axios.post(tallyUrl, {
+            xmlRequest: '<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>All Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>'
+        });
+
+        const xmlData = response.data;
+
+        parseString(xmlData, (err, result) => {
+            if (err) {
+                console.error('Error parsing XML:', err);
+                return;
+            }
+
+            const companyElements = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
+            const companyNames = companyElements.map(company => company.NAME[0]);
+
+            if (companyNames.length > 0) {
+                console.log('Company Names:');
+                companyNames.forEach(name => console.log(name));
+            } else {
+                console.log('No companies found in the XML data.');
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching companies from Tally:', error);
+    }
+})
 
 
 module.exports = tally_Export;
