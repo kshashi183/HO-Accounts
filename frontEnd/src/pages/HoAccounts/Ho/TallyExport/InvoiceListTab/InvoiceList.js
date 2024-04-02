@@ -77,7 +77,7 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
     //fetch the company from tally software
 
     const companyFromTally=async ()=>{
-        alert("a;ret")
+      
         const companiesfromtally = await axios.get(
             baseURL + '/tallyExport/getCompanyFromTally'
             
@@ -470,6 +470,9 @@ export default function InvoiceList({ selectedDate, setFlag, flag, exportTally, 
         }
         return dataCopyReceipt;
     };
+
+
+    
     return (
         <>
             <div className='row col-md-12'>

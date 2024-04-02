@@ -299,7 +299,7 @@ export default function SaveChangesModal(
 
       <Modal show={saveChangeModal} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>magod_machine</Modal.Title>
+          <Modal.Title >magod_machine</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>

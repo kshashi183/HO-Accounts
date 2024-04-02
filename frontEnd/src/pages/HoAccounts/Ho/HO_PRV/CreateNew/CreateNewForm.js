@@ -1061,6 +1061,7 @@ export default function CreateNewForm() {
 
   const canacleButton = () => {
 
+    let val = (onAccountValue1 === 0 || onAccountValue22===0 || onAccountValue1!==fixedOnaccount) ? fixedOnaccount : onAccountValue1
     let stopExecution = false;
 
 
@@ -1086,7 +1087,7 @@ export default function CreateNewForm() {
         }
 
 
-        else if (formattedValue > onAccountValue1) {
+        else if (formattedValue > val) {
           toast.error("Cannot Receive More than On_account Amount");
           stopExecution = true;
           return;
@@ -1994,9 +1995,10 @@ export default function CreateNewForm() {
             <div className="col-md-4 ">
               <label className="form-label">Amount Adjusted</label>
               <input name="reason" disabled
-                // value={adjustmentRows ? adjustmentRows.On_account : ''}
+               value={adjustmentRows.On_account>0 ? adjustmentRows.On_account : 0.00}
                 // value={onAccountValue22}
-                value={adjustmentRows ? adjustmentRows.fixedOnaccount : ''}
+                //value={adjustmentRows ? adjustmentRows.fixedOnaccount : 0.00}
+               
               />
             </div>
           </div>
