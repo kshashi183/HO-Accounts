@@ -24,6 +24,7 @@ export const getRequest = async (url, callback) => {
   };
   
   export const postRequestFormData = async (url, data, callback) => {
+    
     let response = await fetch(url, {
       method: "POST",
       headers: {
@@ -32,6 +33,7 @@ export const getRequest = async (url, callback) => {
       },
       body: data,
     });
+   
     callback(response);
   };
   

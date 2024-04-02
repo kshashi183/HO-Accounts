@@ -18,6 +18,7 @@ mailRouter.post('/sendmail', async (req, res, next) => {
 });
 
 mailRouter.post('/sendDirectMail', upload.single("file"), async (req, res, next) => {
+    console.log("mail sending");
     try {
         console.log("req  body mail", req.body);
         const { toAddress, ccAddress, subjectLine, mailBody,fromAddress } = req.body;

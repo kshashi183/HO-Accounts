@@ -10,6 +10,7 @@ import Modal from 'react-bootstrap/Modal';
 
 
 
+
 const {
   // getRequest,
   // postRequest,
@@ -67,14 +68,15 @@ console.log("xml file", xmlFile);
     formData.append("ccAddress", copyto);
     formData.append("subjectLine", subject);
     formData.append("mailBody", mailbody);
-    // formData.append("file",  files[0]);
-    formData.append("file", xmlFile, xmlFile.name);
+     formData.append("file",  files[0]);
+   // formData.append("file", xmlFile, xmlFile.name);
 
     formData.append("fromAddress", from);
 
     console.log("form datra",formData);
 
     postRequestFormData(endpoints.sendAttachmentMails, formData, (data) => {
+      console.log("data after sent mail", data);
       if (data != null) {
         if (isFirstClickRef.current) {
           toast.success("Email Sent Successfully..", {

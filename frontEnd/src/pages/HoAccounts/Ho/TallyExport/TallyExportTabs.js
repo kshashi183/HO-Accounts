@@ -17,14 +17,24 @@ export default function TallyExportTabs({selectedDate ,setFlag, flag, exportTall
       className="mb-2 tab_font "
     >
       <Tab eventKey="Inv" title="Invoices List">
-    <InvoiceList selectedDate={selectedDate} flag={flag} setFlag={setFlag} 
-    exportTally={exportTally} setExportTally={setExportTally}  selectedUnitName={selectedUnitName}/>
+    <InvoiceList 
+    selectedDate={selectedDate}
+     flag={flag} 
+     setFlag={setFlag} 
+    exportTally={exportTally}
+     setExportTally={setExportTally} 
+      selectedUnitName={selectedUnitName}/>
        
       </Tab>
 
       <Tab eventKey="PR" title="Payment Receipt Details">
-       <PaymentReceiptFormTable selectedDate={selectedDate}  flag={flag} setFlag={setFlag}
-       exportTally={exportTally} setExportTally={setExportTally}  selectedUnitName={selectedUnitName}
+       <PaymentReceiptFormTable 
+       selectedDate={selectedDate} 
+        flag={flag}
+         setFlag={setFlag}
+       exportTally={exportTally} 
+       setExportTally={setExportTally}  
+       selectedUnitName={selectedUnitName}
        />
       </Tab>
 
