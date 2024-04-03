@@ -530,19 +530,35 @@ tally_Export.post('/exporttally', async (req, res) => {
         });
 
         console.log("next step33",tallyResponse.data);
+        const createdValue = parseInt(tallyResponse.data.match(/<CREATED>(\d+)<\/CREATED>/)[1]);
+        if (createdValue === 1) {
+          // If createdValue is 1, indicating success
+          // res.status(200).json({
+          //     message: 'File uploaded and created in Tally successfully',
+          //     tallyData: tallyResponse.data // Send the Tally response data to the frontend
+          // });
+          console.log("not exception");
+      }
+      else{
+        console.log(" exception");
+         res.status(200).json({
+              message: 'Exception'
+             // Send the Tally response data to the frontend
+          });
+      }
 
 
-        if (tallyResponse.status === 200) {
+        // if (tallyResponse.status === 200) {
 
-            // Tally server responded with a success status
-           // console.log('tally response ', tallyResponse.data);
-            res.status(200).send('File uploaded and sent to Tally successfully');
-        }
-        else {
-            // Tally server responded with an error status
-            console.error('Error from Tally server:', tallyResponse.statusText);
-            res.status(500).send('Error communicating with Tally server');
-        }
+        //     // Tally server responded with a success status
+        //    // console.log('tally response ', tallyResponse.data);
+        //     res.status(200).send('File uploaded and sent to Tally successfully');
+        // }
+        // else {
+        //     // Tally server responded with an error status
+        //     console.error('Error from Tally server:', tallyResponse.statusText);
+        //     res.status(500).send('Error communicating with Tally server');
+        // }
 
     } catch (error) {
         console.error('Error handling file upload:', error);
