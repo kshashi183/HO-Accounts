@@ -521,7 +521,91 @@ tally_Export.post('/exporttally', async (req, res) => {
           </ImportData>
         </Body>
       </ENVELOPE>`
-        console.log("next step22");
+       
+      const xmlService=`<ENVELOPE>
+      <HEADER>
+        <TALLYREQUEST>Import Data</TALLYREQUEST>
+      </HEADER>
+      <Body>
+        <ImportData>
+          <REQUESTDESC>
+            <REPORTNAME>Vouchers</REPORTNAME>
+            <STATICVARIABLES>
+              <SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+          </REQUESTDESC>
+          <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <VOUCHER REMOTEID="SL2147323838" VCHTYPE="Sales" ACTION="Create">
+              <DATE>20240401</DATE>
+              <GUID>2147323838</GUID>
+              <NARRATION>Our WO No: 176785 Packing Note No: 06790/ 17/18</NARRATION>
+              <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
+              <VOUCHERNUMBER>SR /JS3793 / 17/18</VOUCHERNUMBER>
+              <REFERENCE>528 DT 05/12/17 DC NO 723 DT 25/12/17</REFERENCE>
+              <PARTYLEDGERNAME>20 GAUGE ENGINEERING</PARTYLEDGERNAME>
+              <CSTFORMISSUETYPE/>
+              <CSTFORMRECVTYPE/>
+              <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+              <VCHGSTCLASS/>
+              <DIFFACTUALQTY>No</DIFFACTUALQTY>
+              <AUDITED>No</AUDITED>
+              <FORJOBCOSTING>No</FORJOBCOSTING>
+              <ISOPTIONAL>No</ISOPTIONAL>
+              <EFFECTIVEDATE>20240401</EFFECTIVEDATE>
+              <USEFORINTEREST>No</USEFORINTEREST>
+              <USEFORGAINLOSS>No</USEFORGAINLOSS>
+              <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
+              <USEFORCOMPOUND>No</USEFORCOMPOUND>
+              <ALTERID>2</ALTERID>
+              <EXCISEOPENING>No</EXCISEOPENING>
+              <ISCANCELLED>No</ISCANCELLED>
+              <HASCASHFLOW>No</HASCASHFLOW>
+              <ISPOSTDATED>No</ISPOSTDATED>
+              <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
+              <ISINVOICE>No</ISINVOICE>
+              <MFGJOURNAL>No</MFGJOURNAL>
+              <HASDISCOUNTS>No</HASDISCOUNTS>
+              <ASPAYSLIP>No</ASPAYSLIP>
+              <ISDELETED>No</ISDELETED>
+              <ASORIGINAL>No</ASORIGINAL>
+              <ALLLEDGERENTRIES_LIST>
+                <LEDGERNAME>20 GAUGE ENGINEERING</LEDGERNAME>
+                <GSTCLASS/>
+                <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+                <AMOUNT>39318.00</AMOUNT>
+                <BILLALLOCATIONS_LIST>
+                  <NAME>SL /JS3793 / 17/18</NAME>
+                  <BILLCREDITPERIOD>90</BILLCREDITPERIOD>
+                  <BILLTYPE>New Ref</BILLTYPE>
+                  <AMOUNT>39318.00</AMOUNT>
+                </BILLALLOCATIONS_LIST>
+              </ALLLEDGERENTRIES_LIST>
+              <ALLLEDGERENTRIES_LIST>
+                <LEDGERNAME>Sales</LEDGERNAME>
+                <GSTCLASS/>
+                <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+                <AMOUNT>33320.00</AMOUNT>
+              </ALLLEDGERENTRIES_LIST>
+              <ALLLEDGERENTRIES_LIST>
+                <LEDGERNAME>Round Off</LEDGERNAME>
+                <GSTCLASS/>
+                <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+                <AMOUNT>0.40</AMOUNT>
+              </ALLLEDGERENTRIES_LIST>
+            </VOUCHER>
+          </TALLYMESSAGE>
+        </ImportData>
+      </Body>
+    </ENVELOPE>`
         const tallyServerUrl = 'http://localhost:9000'; // Replace with your actual Tally server URL
         const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
             headers: {

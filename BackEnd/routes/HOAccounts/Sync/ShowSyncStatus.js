@@ -21,7 +21,7 @@ showSyncRouter.get("/hoUnitNames", async (req, res, next) => {
 // common updateUnitInvoicePaymentStatus
 showSyncRouter.put("/updateHOInvoicePaymentStatus/:getName",async (req, res, next) => {
   const getName = req.params.getName;
- // console.log("updateUnitInvoicePaymentStatus1111", getName);
+ //console.log("updateUnitInvoicePaymentStatus1111", getName);
 
   const unit='Jigani';
     try {
@@ -100,7 +100,7 @@ showSyncRouter.get(
   "/getHoOpenInvAndReceipts/:getName",
   async (req, res, next) => {
      const getName = req.params.getName;
-    // console.log("getHoOpenInvAndReceipts2222", getName);
+     console.log("getHoOpenInvAndReceipts2222", getName);
    
 
     const responseData = [];
@@ -165,7 +165,7 @@ showSyncRouter.get(
 //getUnitOpenInvAndReceipts
 showSyncRouter.get( "/getUnitOpenInvAndReceipts/:getName", async (req, res, next) => {
     const getName = req.params.getName;
- //   console.log("getUnitOpenInvAndReceipts333", getName);
+   console.log("getUnitOpenInvAndReceipts333", getName);
 
     
     const responseData = [];

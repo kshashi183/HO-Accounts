@@ -26,7 +26,7 @@ unitReceiptList.get('/receiptBasedOnCustomer', (req, res) => {
     console.log(" ------",unit);
     const sql = `SELECT * ,DATE_FORMAT(Recd_PV_Date, '%d-%m-%Y') AS Formatted_Recd_PV_Date
 FROM magod_hq_mis.unit_payment_recd_voucher_register u 
-WHERE u.Unitname = 'Jigani'
+WHERE u.Unitname = '${unit}'
   AND u.Cust_Code = '${custcode}'
 ORDER BY u.Recd_PV_Date DESC;`
 
@@ -36,7 +36,7 @@ ORDER BY u.Recd_PV_Date DESC;`
             return res.json({ Error: " error in sql" })
         }
         else {
-            // console.log("result", result);
+            // console.log("result  recpt list", result);
             return res.json({ Status: 'Success', Result: result })
         }
     })

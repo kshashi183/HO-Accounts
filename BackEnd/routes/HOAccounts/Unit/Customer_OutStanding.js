@@ -7,6 +7,8 @@ var bodyParser = require('body-parser')
 
 
 customerOutstanding.get('/unitOutstandingData', (req, res) => {
+    const unitname = req.query.unitname;
+    console.log("unit nameeeeeeeeeeee", unitname);
 
     const sqlQ = `
         SELECT @UnitName AS UnitName, u.*, a.OutStandingInvoiceCount, a.OutStandingAmount
@@ -33,10 +35,10 @@ customerOutstanding.get('/unitOutstandingData', (req, res) => {
       INNER JOIN (
         SELECT COUNT(u.Cust_Code) AS OutStandingInvoiceCount, SUM(u.GrandTotal - u.PymtAmtRecd) AS OutStandingAmount, u.Cust_Code
         FROM magod_hq_mis.unit_invoices_list u
-        WHERE u.GrandTotal - u.PymtAmtRecd > 0 AND u.DCStatus NOT LIKE 'Closed' AND u.Inv_No IS NOT NULL AND u.UnitName = 'Jigani'
+        WHERE u.GrandTotal - u.PymtAmtRecd > 0 AND u.DCStatus NOT LIKE 'Closed' AND u.Inv_No IS NOT NULL AND u.UnitName = '${unitname}'
         GROUP BY u.Cust_Code
       ) AS a ON a.Cust_Code = u.Cust_Code
-      WHERE u.UnitName = 'Jigani'  
+      WHERE u.UnitName = '${unitname}'  
     
 `;
 
@@ -99,16 +101,19 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
     const custcode = req.query.selectedCustCode;
     const selectedDCType = req.query.selectedDCType;
     const invoiceFor = req.query.flag;
+    const unitname = req.query.unitname
     console.log("custcode, ", custcode,);
     console.log("dctype", selectedDCType);
     console.log("invoiceFor, ", invoiceFor,);
+
+    console.log("unitnmmaee", req.query.unitname);
 
 
 
     const sql1 = `SELECT 
     u.PO_No,
     u.Inv_No,
-    @UnitName AS UnitName,
+   
     u.GrandTotal - u.PymtAmtRecd AS Balance,
     DATEDIFF(CURRENT_DATE(), u.Inv_Date) AS duedays,
     u.InvoiceFor,  
@@ -119,12 +124,12 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
     u.Cust_Name,
     u.PymtAmtRecd,u.PIN_Code,u.DC_Inv_No
     FROM magod_hq_mis.unit_invoices_list u
-    WHERE  u.Cust_Code = '${custcode}'`
+    WHERE  u.Cust_Code = '${custcode}'  AND  u.UnitName='${unitname}'`
 
     const sql2 = `SELECT 
     u.PO_No,
     u.Inv_No,
-    @UnitName AS UnitName,
+  
     u.GrandTotal - u.PymtAmtRecd AS Balance,
     DATEDIFF(CURRENT_DATE(), u.Inv_Date) AS duedays,
     u.InvoiceFor,  
@@ -135,12 +140,12 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
     u.Cust_Name,
     u.PymtAmtRecd,u.PIN_Code,u.DC_Inv_No
     FROM magod_hq_mis.unit_invoices_list u
-    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType='${selectedDCType}'`
+    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType='${selectedDCType}' AND  u.UnitName='${unitname}'`
 
     const sql3 = `SELECT 
     u.PO_No,
     u.Inv_No,
-    @UnitName AS UnitName,
+  
     u.GrandTotal - u.PymtAmtRecd AS Balance,
     DATEDIFF(CURRENT_DATE(), u.Inv_Date) AS duedays,
     u.InvoiceFor,  
@@ -151,12 +156,13 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
     u.Cust_Name,
     u.PymtAmtRecd,u.PIN_Code,u.DC_Inv_No
     FROM magod_hq_mis.unit_invoices_list u
-    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType='${selectedDCType}' AND InvoiceFor='${invoiceFor}'`;
+    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType='${selectedDCType}'  AND  u.UnitName='${unitname}' AND
+    InvoiceFor='${invoiceFor}'`;
 
     const salesANDjobwork = `SELECT 
     u.PO_No,
     u.Inv_No,
-    @UnitName AS UnitName,
+  
     u.GrandTotal - u.PymtAmtRecd AS Balance,
     DATEDIFF(CURRENT_DATE(), u.Inv_Date) AS duedays,
     u.InvoiceFor,  
@@ -167,12 +173,15 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
     u.Cust_Name,
     u.PymtAmtRecd,u.PIN_Code,u.DC_Inv_No
     FROM magod_hq_mis.unit_invoices_list u
-    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType IN ('Sales', 'Job work') AND InvoiceFor='${invoiceFor}'`;
+    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType IN ('Sales', 'Job work') AND InvoiceFor='${invoiceFor}' AND  u.UnitName='${unitname}'`;
 
     if (custcode === ' ' && (selectedDCType !== '' || invoiceFor !== '')) {
         return res.json({ Result: "customer err" });
     }
 
+    else if (!unitname && ((custcode !== ' ' && (selectedDCType !== '' || invoiceFor !== '')))) {
+        //return res.json({ Result: 'selectUnit' })
+    }
 
 
     // setupQueryMod(sql1, (err, result)=>{
@@ -197,7 +206,7 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
                     console.log("err in query", err);
                 }
                 else {
-                     console.log("cust code result1111111", result);
+                 console.log("cust code result1111111 no data for this unit" , );
                     return res.json({ Result: result });
                 }
             })
@@ -240,23 +249,23 @@ customerOutstanding.get('/getDataBasedOnCustomer', (req, res) => {
         if (selectedDCType === 'Sales & Jobwork') {
 
 
-console.log("sales and jobworkkkkkk");
+            console.log("sales and jobworkkkkkk");
 
 
 
             setupQueryMod(salesANDjobwork, (err, result) => {
                 if (err) {
-                    console.log("sales nad jobwork error ",err );
+                    console.log("sales nad jobwork error ", err);
                     console.log("err in query", err);
                 }
                 else {
 
                     if (result.length === 0) {
-                        console.log("sales nad jobwork error  result length",result.length );
+                        console.log("sales nad jobwork error  result length", result.length);
                         return res.json({ Result: "error in invoice for" });
                     }
                     else {
-                          console.log("cust code 4 sales and jobwork", result);
+                        console.log("cust code 4 sales and jobwork", result);
                         return res.json({ Result: result });
                     }
 
@@ -330,7 +339,7 @@ customerOutstanding.get('/getDCTypes', (req, res) => {
             console.log("err in query", err);
         }
         else {
-          //  console.log("DC_Inv_type", result);
+            //  console.log("DC_Inv_type", result);
             return res.json({ Result: result });
         }
     })
