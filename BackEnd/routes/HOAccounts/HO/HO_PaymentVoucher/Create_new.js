@@ -448,6 +448,91 @@ createnew.put('/updateOnaccountValue', (req, res) => {
 
 
 
+// createnew.post("/getDCNo", async (req, res, next) => {
+//   // const { unit, srlType, ResetPeriod, ResetValue, VoucherNoLength, prefix } =
+//   //   req.body;
+//   const { unit, srlType, ResetPeriod, ResetValue, VoucherNoLength } =
+//     req.body;
+//   console.log("UNIT NAME=", unit, srlType);
+
+//   const prefix = 'JG';
+
+//   const unitName = `${unit}`;
+//   const date = new Date();
+//   // const date = new Date("2024-04-01");
+//   const year = date.getFullYear();
+//   const startYear = date.getMonth() >= 3 ? year : year - 1;
+//   const endYear = startYear + 1;
+
+//   console.log("startYear", startYear);
+//   console.log("endYear", endYear);
+
+//   const firstLetter = unitName.charAt(0).toUpperCase();
+//   const financialYearStartDate = new Date(`${startYear}-04-01`);
+//   const financialYearEndDate = new Date(`${endYear}-04-01`);
+
+//   const formattedStartDate = financialYearStartDate.toISOString().slice(0, 10);
+//   const formattedEndDate = financialYearEndDate.toISOString().slice(0, 10);
+
+//   const getYear =
+//     date.getMonth() >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+//   const yearParts = getYear.split("-");
+//   const startYearShort = yearParts[0].slice(-2);
+//   const endYearShort = yearParts[1].slice(-2);
+//   const finYear = `${startYearShort}/${endYearShort}`;
+
+//   console.log("finYear", finYear);
+
+//   try {
+//     const selectQuery = `
+//     SELECT COUNT(Id) FROM magod_setup.magod_runningno  WHERE SrlType='${srlType}'
+//     AND UnitName='${unit}' AND Period='${finYear}'
+//     `;
+
+//     setupQueryMod(selectQuery, (selectError, selectResult) => {
+//       if (selectError) {
+//         logger.error(selectError);
+//         return next(selectResult);
+//       }
+
+//       const count = selectResult[0]["COUNT(Id)"];
+//      // console.log("counttttttttttt", count);
+
+//       if (count === 0) {
+//         // If count is 0, execute the INSERT query
+//         const insertQuery = `
+//           INSERT INTO magod_setup.magod_runningno
+//           (UnitName, SrlType, ResetPeriod, ResetValue, EffectiveFrom_date, Reset_date, Running_No, Prefix, Length, Period, Running_EffectiveDate)
+//           VALUES ('${unit}', '${srlType}', '${ResetPeriod}', ${ResetValue}, '${formattedStartDate}', '${formattedEndDate}',${ResetValue}, '${prefix}', ${VoucherNoLength}, '${finYear}', CurDate());
+//         `;
+
+//         // Execute the INSERT query
+//         setupQueryMod(insertQuery, (insertError, insertResult) => {
+//           if (insertError) {
+//             logger.error(insertError);
+//         //    console.log("error in insert fro running no", insertError);
+//             return next(insertResult);
+//           }
+//           else {
+
+//             res.json({ message: "Record inserted successfully." });
+//           }
+//         });
+//       }
+
+//       else {
+//         res.json({ message: "Record already existsssssssssss." });
+//       }
+//     });
+//   } catch (error) {
+//     //console.error("An error occurred:", error);
+//     next(error);
+//   }
+// });
+
+
+
+
 createnew.post("/getDCNo", async (req, res, next) => {
   // const { unit, srlType, ResetPeriod, ResetValue, VoucherNoLength, prefix } =
   //   req.body;
@@ -499,11 +584,30 @@ createnew.post("/getDCNo", async (req, res, next) => {
      // console.log("counttttttttttt", count);
 
       if (count === 0) {
+
+
+        const selectPrefixQuery = `
+        SELECT * FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}'
+        AND UnitName='${unit}'
+        `;
+
+        setupQueryMod(selectPrefixQuery, (prefixError, prefixResult) => {
+          if (prefixError) {
+            logger.error(prefixError);
+            return next(prefixError);
+          }
+ 
+          const prefix = prefixResult[0].Prefix;
+          const suffix =
+            prefixResult[0].Suffix !== null ? prefixResult[0].Suffix : "";
+ 
+          console.log("Prefix Suffix", prefix, suffix);
+
         // If count is 0, execute the INSERT query
         const insertQuery = `
           INSERT INTO magod_setup.magod_runningno
-          (UnitName, SrlType, ResetPeriod, ResetValue, EffectiveFrom_date, Reset_date, Running_No, Prefix, Length, Period, Running_EffectiveDate)
-          VALUES ('${unit}', '${srlType}', '${ResetPeriod}', ${ResetValue}, '${formattedStartDate}', '${formattedEndDate}',${ResetValue}, '${prefix}', ${VoucherNoLength}, '${finYear}', CurDate());
+          (UnitName, SrlType, ResetPeriod, ResetValue, EffectiveFrom_date, Reset_date, Running_No, Prefix, Suffix, Length, Period, Running_EffectiveDate)
+          VALUES ('${unit}', '${srlType}', '${ResetPeriod}', ${ResetValue}, '${formattedStartDate}', '${formattedEndDate}',${ResetValue}, '${prefix}','${suffix}', ${VoucherNoLength}, '${finYear}', CurDate());
         `;
 
         // Execute the INSERT query
@@ -518,6 +622,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
             res.json({ message: "Record inserted successfully." });
           }
         });
+      });
       }
 
       else {
@@ -529,8 +634,6 @@ createnew.post("/getDCNo", async (req, res, next) => {
     next(error);
   }
 });
-
-
 
 //----------------------------------------------------------------------
 
@@ -754,6 +857,137 @@ createnew.post('/leftTable', (req, res) => {
 
 
 //post data
+// createnew.post("/postInvoiceCreateNew", async (req, res, next) => {
+//   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
+// console.log("req body after post", req.body);
+//   const date = new Date();
+//   // const date = new Date("2024-04-01");
+//   const year = date.getFullYear();
+
+//   const getYear =
+//     date.getMonth() >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+//   const yearParts = getYear.split("-");
+//   const startYearShort = yearParts[0].slice(-2);
+//   const endYearShort = yearParts[1].slice(-2);
+//   const finYear = `${startYearShort}/${endYearShort}`;
+
+//   console.log("finYear", finYear);
+
+//   try {
+
+
+
+    
+//     const selectQuery = `
+//     SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
+//     `;
+
+//     setupQueryMod(selectQuery, async (selectError, selectResult) => {
+//       if (selectError) {
+//         logger.error(selectError);
+//         return next(selectResult);
+//       }
+
+//       let newHrefNo = "";
+
+//       console.log("select result",selectResult);
+//       if (selectResult && selectResult.length > 0) {
+//         const lastRunNo = selectResult[0].Running_No;
+//         const numericPart = parseInt(lastRunNo) + 1;
+
+//         const paddedNumericPart = numericPart.toString().padStart(4, "0");
+
+//         newHrefNo = `HO RV/ ${paddedNumericPart}`;
+//         console.log("New HrefNo:", newHrefNo);
+
+//         // Update Running_No in magod_setup.magod_runningno
+//         const updateRunningNoQuery = `
+//           UPDATE magod_setup.magod_runningno
+//           SET Running_No = ${numericPart}
+//           WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
+//         `;
+
+//         setupQueryMod(updateRunningNoQuery, (updateError, updateResult) => {
+//           if (updateError) {
+//             logger.error(updateError);
+//             return next(updateResult);
+//           }
+//         });
+//       }
+
+
+
+
+//       //update open invoice table(right side table)
+
+
+//       if (receipt_details.length > 0) {
+
+//         receipt_details.forEach((item, index) => {
+
+
+//           const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
+//           SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
+//               u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
+//           WHERE u.UnitName = 'Jigani' AND u.DC_Inv_No = ${item.Dc_inv_no};
+//           `
+
+//           setupQueryMod(updateRightTable, (rightError, rightResult) => {
+//             if (rightError) {
+//               console.log("righterror", rightError);
+//             }
+
+//             else {
+
+//               console.log("update right table successfully");
+//             }
+//           })
+
+//         })
+
+
+
+//       }
+
+
+
+//       // Your existing update query
+//       setupQueryMod(
+//         `UPDATE magod_Hq_Mis.ho_paymentrv_register
+//         SET HoRefDate = curdate(), Unitname='${unit}',
+//         HORef = '${newHrefNo}',
+        
+//         Status = 'Pending'
+//         WHERE HOPrvId = '${HO_PrvId}'`,
+//         async (updateError, updateResult) => {
+//           if (updateError) {
+//             logger.error(updateError);
+//             return next(updateResult);
+//           }
+
+//           // Your existing select query after update
+//           const postUpdateSelectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId = ${HO_PrvId}`;
+//           setupQueryMod(
+//             postUpdateSelectQuery,
+//             (postUpdateSelectError, postUpdateSelectResult) => {
+//               if (postUpdateSelectError) {
+//                 logger.error(postUpdateSelectError);
+//                 return next(postUpdateSelectResult);
+//               }
+
+//               res.json(postUpdateSelectResult);
+//             }
+//           );
+//         }
+//       );
+//     });
+//   } catch (error) {
+//     console.error("An error occurred:", error);
+//     next(error);
+//   }
+// });
+
+
 createnew.post("/postInvoiceCreateNew", async (req, res, next) => {
   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
 console.log("req body after post", req.body);
@@ -771,6 +1005,25 @@ console.log("req body after post", req.body);
   console.log("finYear", finYear);
 
   try {
+
+
+
+    const prefixQuery = `
+    SELECT Prefix, Suffix FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}' AND UnitName='${unit}';
+    `;
+ 
+    setupQueryMod(prefixQuery, async (prefixError, prefixResult) => {
+      if (prefixError) {
+        logger.error(prefixError);
+        return next(prefixError);
+      }
+      console.log("PREFIX RESULT",prefixResult);
+ 
+      const prefix = prefixResult[0].Prefix;
+      const suffix =
+        prefixResult[0].Suffix !== null ? prefixResult[0].Suffix : "";
+
+
     const selectQuery = `
     SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
     `;
@@ -796,13 +1049,15 @@ console.log("req body after post", req.body);
         // Update Running_No in magod_setup.magod_runningno
         const updateRunningNoQuery = `
           UPDATE magod_setup.magod_runningno
-          SET Running_No = ${numericPart}
+          SET Running_No = ${numericPart},
+          Prefix = '${prefix}',
+          Suffix = '${suffix}'
           WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
         `;
 
         setupQueryMod(updateRunningNoQuery, (updateError, updateResult) => {
           if (updateError) {
-            logger.error(updateError);
+           // logger.error(updateError);
             return next(updateResult);
           }
         });
@@ -854,7 +1109,7 @@ console.log("req body after post", req.body);
         WHERE HOPrvId = '${HO_PrvId}'`,
         async (updateError, updateResult) => {
           if (updateError) {
-            logger.error(updateError);
+           // logger.error(updateError);
             return next(updateResult);
           }
 
@@ -874,12 +1129,12 @@ console.log("req body after post", req.body);
         }
       );
     });
+  });
   } catch (error) {
     console.error("An error occurred:", error);
     next(error);
   }
 });
-
 
 //get details from  rowData through drfts
 

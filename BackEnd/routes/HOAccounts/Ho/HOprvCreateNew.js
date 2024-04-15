@@ -206,34 +206,7 @@ createNewRouter.post("/addInvoice", async (req, res, next) => {
       if (!existingDraftIds.includes(DC_Inv_No)) {
         const recdPvSrlToInsertIncremented = ++recdPvSrlToInsert;
 
-//         const insertQuery = `
-//       INSERT INTO magod_hq_mis.ho_paymentrv_details (
-// Unitname,
-//         HOPrvId,
-//         RecdPvSrl,
-//         DC_inv_no,
-//         Inv_No,
-//         Inv_Type,
-//         Inv_Amount,
-//         Amt_received,
-//         Receive_Now,
-//         Inv_Date,
-//         RefNo
-//       )
-//       VALUES (
-//         '${row.UnitName}',
-//        ' ${HO_PrvId}',
-//         ${recdPvSrlToInsertIncremented},
-//         '${row.DC_Inv_No}',
-//         '${row.Inv_No}',
-//         '${row.DC_InvType}',
-//         '${row.GrandTotal}',
-//         '${row.PymtAmtRecd}',
-//        '${row.Receive}',
 
-//        CurDate(),
-//         '${row.Inv_No} / ${row.Inv_Fin_Year}'
-//       )`;
 
 const insertQuery = `
 INSERT INTO magod_hq_mis.ho_paymentrv_details (
@@ -376,53 +349,6 @@ createNewRouter.post("/updateAmount", async (req, res, next) => {
 });
 
 
-// createNewRouter.post("/updateAmount", async (req, res, next) => {
-//   try {
-//     const { HO_PrvId, Amount, receipt_details } = req.body;
-//     console.log("REQ_BODY", req.body);
-
-//     // Update receipt details
-//     if (receipt_details) {
-//       for (const item of receipt_details) {
-//         const { Dc_inv_no, Receive_Now } = item;
-
-//         // Construct the SQL query to update the Receive_Now field
-//         const sql = `
-//         UPDATE magod_hq_mis.ho_paymentrv_details 
-//         SET Receive_Now = ? 
-//         WHERE Dc_inv_no = ? AND HOPrvId = ?`;
-
-//       const values = [Receive_Now, Dc_inv_no, HO_PrvId];
-
-//       await hqQuery(sql, values);
-
-//         console.log("Updated receipt details");
-//       }
-//     }
-
-//     // Update query
-//     const updateQuery = `
-//       UPDATE magod_hq_mis.ho_paymentrv_register 
-//       SET Amount = ${Amount}
-//       WHERE HOPrvId = '${HO_PrvId}'`;
-//     await hqQuery(updateQuery);
-//     console.log("Updated ho_paymentrv_register");
-
-//     // Select query to get the updated data after deletion
-//     const selectQuery = `
-//       SELECT Amount 
-//       FROM magod_hq_mis.ho_paymentrv_register 
-//       WHERE HOPrvId = '${HO_PrvId}'`;
-//     const selectResult = await hqQuery(selectQuery);
-//     console.log("Selected amount:", selectResult);
-
-//     // Send the updated data after successful DELETE and SELECT
-//     res.json({ updatedAmount: selectResult });
-//   } catch (error) {
-//     console.error("Error:", error.message);
-//     res.status(500).json({ error: "Internal server error" });
-//   }  
-// });
 
 
 
@@ -430,40 +356,7 @@ createNewRouter.post("/updateAmount", async (req, res, next) => {
 
 
 
-// createNewRouter.post("/removeInvoice", async (req, res, next) => {
-//   try {
-//     const { RecdPvSrl, HO_PrvId } = req.body;
 
-//  //  console.log("RecdPvSrl", req.body);
-
-//     // Delete query
-//     const deleteQuery = `DELETE FROM magod_hq_mis.ho_paymentrv_details WHERE RecdPvSrl=${RecdPvSrl}`;
-//     hqQuery(deleteQuery, (deleteErr) => {
-//       if (deleteErr) {
-//         console.log("Delete error", deleteErr);
-//       //  return res.json({ Error: "Error in DELETE query", Details: deleteErr });
-//       }
-
-//       // Select query to get the updated data after deletion
-//       const selectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId=${HO_PrvId}`;
-//       hqQuery(selectQuery, (selectErr, selectResult) => {
-//         if (selectErr) {
-//           console.log("Select error", selectErr);
-//           // return res.json({
-//           //   Error: "Error in SELECT query after deletion",
-//           //   Details: selectErr,
-//           // });
-//         }
-
-//         // Send the updated data after successful DELETE and SELECT
-//         res.send(selectResult);
-//       });
-//     });
-//   } catch (error) {
-//     console.log("Errorrrrrr:", error.message);
-//     next(error);
-//   }
-// });
 
 
 createNewRouter.post("/removeInvoice", async (req, res, next) => {
@@ -489,11 +382,11 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
 });
 
 
-// kanaka's  code
+
 
 // createNewRouter.post("/postInvoice", async (req, res, next) => {
-//   const { HO_PrvId, unit, srlType } = req.body;
-
+//   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
+//   //console.log("req body after post", req.body);
 //   const date = new Date();
 //   // const date = new Date("2024-04-01");
 //   const year = date.getFullYear();
@@ -520,6 +413,7 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
 
 //       let newHrefNo = "";
 
+//       console.log("select result", selectResult);
 //       if (selectResult && selectResult.length > 0) {
 //         const lastRunNo = selectResult[0].Running_No;
 //         const numericPart = parseInt(lastRunNo) + 1;
@@ -545,16 +439,69 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
 //       }
 
 
+
+
 //       //update open invoice table(right side table)
+
+
+//       if (receipt_details.length > 0) {
+
+//         receipt_details.forEach((item, index) => {
+
+
+//           const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
+//           SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
+//               u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
+//           WHERE u.UnitName = 'Jigani' AND u.DC_Inv_No = ${item.Dc_inv_no};
+//           `
+
+//           hqQuery(updateRightTable, (rightError, rightResult) => {
+//             if (rightError) {
+//               console.log("righterror", rightError);
+//             }
+
+//             else {
+
+//               console.log("update right table successfully");
+//             }
+//           })
+
+//         })
+
+
+
+//       }
+
+
+
+//       //update the  magod_hq_mis.unit_payment_recd_voucher_register  
+
+//       const updateAdjustmentTable = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
+//           SET u.On_account = '${onacc}', u.fixedOnaccount='${onacc}',
+//               u.PRV_Status = IF('${onacc}' = 0, 'Closed', 'Created')
+//           WHERE u.Id = '${id}';`
+
+//       hqQuery(updateAdjustmentTable, (errTable, resTable) => {
+
+//         if (errTable) {
+//           console.log("error ", errTable);
+//         }
+//         else {
+//           // console.log("update onaccount value after POST");
+//         }
+//       })
+
+
+
 
 
 
 //       // Your existing update query
 //       hqQuery(
 //         `UPDATE magod_Hq_Mis.ho_paymentrv_register
-//         SET HoRefDate = curdate(),
+//         SET HoRefDate = curdate(), Unitname='${unit}',
 //         HORef = '${newHrefNo}',
-
+        
 //         Status = 'Pending'
 //         WHERE HOPrvId = '${HO_PrvId}'`,
 //         async (updateError, updateResult) => {
@@ -587,11 +534,9 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
 
 
 
-//my code
-
 createNewRouter.post("/postInvoice", async (req, res, next) => {
   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
-  //console.log("req body after post", req.body);
+  console.log("req body after post", unit, srlType);
   const date = new Date();
   // const date = new Date("2024-04-01");
   const year = date.getFullYear();
@@ -606,6 +551,25 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
   console.log("finYear", finYear);
 
   try {
+
+    const prefixQuery = `
+    SELECT Prefix, Suffix FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}' AND UnitName='${unit}';
+    `;
+ 
+    setupQuery(prefixQuery, async (prefixError, prefixResult) => {
+      if (prefixError) {
+        logger.error(prefixError);
+        return next(prefixError);
+      }
+      console.log("PREFIX RESULT",prefixResult);
+ 
+      const prefix = prefixResult[0].Prefix;
+      const suffix =
+        prefixResult[0].Suffix !== null ? prefixResult[0].Suffix : "";
+
+
+
+
     const selectQuery = `
     SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
     `;
@@ -631,7 +595,9 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
         // Update Running_No in magod_setup.magod_runningno
         const updateRunningNoQuery = `
           UPDATE magod_setup.magod_runningno
-          SET Running_No = ${numericPart}
+          SET Running_No = ${numericPart},
+          Prefix = '${prefix}',
+          Suffix = '${suffix}'
           WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
         `;
 
@@ -731,12 +697,12 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
         }
       );
     });
+  });
   } catch (error) {
     console.error("An error occurred:", error);
     next(error);
   }
 });
-
 
 createNewRouter.put("/updateReceptDetails", async (req, res, next) => {
   try {
