@@ -20,7 +20,7 @@ unitlist.get('/getUnitData', (req, res, next) => {
                 console.log("err in query", err);
             }
             else {
-           //  console.log("data", data);
+                //  console.log("data", data);
                 return res.json({ Status: 'Success', Result: data });
             }
 
@@ -58,21 +58,21 @@ unitlist.get('/getStates', (req, res) => {
 
 
 unitlist.post("/postUnitDetails", (req, res) => {
-    
- let StateId = 0;
+
+    let StateId = 0;
     const Cust_Code = 0;
     const GST_URL = 'http://www.magodlaserWELD.in';
 
-   // console.log("postdata", req.body);
+     console.log("postdata", req.body);
     let store = 0;
 
 
     const q = `SELECT StateCode ,State FROM magod_setup.state_codelist WHERE State='${req.body.State}'`
     setupQueryMod(q, (err, re) => {
-        if(err){
+        if (err) {
             console.log("errrrrrrr", err);
         }
-        
+
         for (let i = 0; i < re.length; i++) {
             console.log("hi");
 
@@ -87,54 +87,57 @@ unitlist.post("/postUnitDetails", (req, res) => {
         }
     })
 
-    const sqlquery = `SELECT  UnitID, UnitName, UnitIntial FROM magod_setup.magodlaser_units`;
+    const sqlquery = `SELECT  UnitID, UnitName, UnitIntial FROM magod_setup.magodlaser_units 
+    where UnitID='${req.body.UnitID}' OR UnitName='${req.body.UnitName}' `;
 
+    console.log("query print ", sqlquery);
     setupQueryMod(sqlquery, (err, results) => {
 
 
-        for (let i = 0; i < results.length; i++) {
-            console.log("hi");
+        // for (let i = 0; i < results.length; i++) {
+        //     console.log("hi");
 
-            if (results[i].UnitID === req.body.UnitID  ||results[i].UnitName === req.body.UnitName || req.body.UnitIntial===results[i].UnitIntial ) {
-                console.log("database", results[i].UnitID, results[i].UnitName);
-                console.log("req body", req.body.UnitID, req.body.UnitName);
+        //     if (results[i].UnitID === req.body.UnitID  ||results[i].UnitName === req.body.UnitName || req.body.UnitIntial===results[i].UnitIntial ) {
+        //         console.log("database", results[i].UnitID, results[i].UnitName);
+        //         console.log("req body", req.body.UnitID, req.body.UnitName);
 
-                store++;
-            }
+        //         store++;
+        //     }
 
 
-        }
-        console.log("store", store);
-        if (store >= 1) {
-           
+        // }
+
+
+        if (results.length !== 0) {
+            console.log(" eroor no result");
             return res.json({ status: 'fail', message: 'Data already exists in the database.' });
         }
 
-        else if(store==0){
+        else {
 
             // const sqlpost =
             //     `INSERT INTO magod_setup.magodlaser_units(UnitID, UnitName, Unit_Address, Place, PIN, State, Country, Unit_contactDetails, Unit_GSTNo, Tally_account_Name,  Mail_Id, UnitIntial,Cust_Code,StateId,GST_URL,Current) VALUES (?)`;
             const sqlpost =
-                `INSERT INTO magod_setup.magodlaser_units(UnitID, UnitName, Unit_Address, Place, PIN, State, Country, Unit_contactDetails, Unit_GSTNo, Tally_account_Name,  Mail_Id, UnitIntial,Cust_Code,StateId,GST_URL,Current) VALUES ('${req.body.UnitID}','${req.body.UnitName}','${req.body.Unit_Address}','${req.body.Place}','${req.body.PIN}', '${req.body.State}','${req.body.Country}','${req.body.Unit_contactDetails}','${req.body.Unit_GSTNo}','${req.body.Tally_account_Name}' ,'${req.body.Mail_Id}','${req.body.UnitIntial}', '99','${StateId}','http://www.magodlaserWELD.in', '${req.body.Current}')`;
+                `INSERT INTO magod_setup.magodlaser_units(UnitID, UnitName, Unit_Address, City, PIN_Code, State, Country,
+                     Unit_contactDetails,GST_No, Tally_account_Name, Gm_Mail_Id, UnitIntial,State_Id,GST_URL,Current) VALUES ('${req.body.UnitID}','${req.body.UnitName}','${req.body.Unit_Address}','${req.body.City}','${req.body.PIN_Code}', '${req.body.State}','${req.body.Country}','${req.body.Unit_contactDetails}','${req.body.GST_No}','${req.body.Tally_account_Name}' ,'${req.body.Gm_Mail_Id}','${req.body.UnitIntial}','${StateId}','http://www.magodlaserWELD.in', '${req.body.Current}')`;
 
             // console.log(sqlpost)
             const values = [
                 req.body.UnitID,
                 req.body.UnitName,
                 req.body.Unit_Address,
-                req.body.Place,
+                req.body.City,
                 req.body.PIN,
-
                 req.body.State,
                 req.body.Country,
                 req.body.Unit_contactDetails,
                 req.body.Unit_GSTNo,
                 req.body.Tally_account_Name,
-                //   req.body.Cash_in_Hand,
                 req.body.Mail_Id,
                 req.body.UnitIntial,
+                StateId,
+                GST_URL,
                 req.body.Current,
-                Cust_Code, StateId, GST_URL
             ]
             //console.log("val", values);
 
@@ -165,7 +168,7 @@ unitlist.delete("/deleteUnit/:UnitID", (req, res) => {
     const uid = req.params.UnitID;
     console.log("delete", uid);
 
-    const sql = `DELETE FROM magod_setup.magodlaser_units WHERE UnitID='${uid}'`;
+    const sql = `DELETE FROM magod_setup.magodlaser_units WHERE ID='${uid}'`;
 
     setupQueryMod(sql, (err, result) => {
         if (err) return res.json({ Error: ' err in sql' });
@@ -175,21 +178,21 @@ unitlist.delete("/deleteUnit/:UnitID", (req, res) => {
 })
 
 
-unitlist.put("/updateData/:UnitID", (req, res) => {
-let StateId=0;
-    const id = req.params.UnitID;
- //   console.log("update id", id);
-    const up = 'SELECT UnitID , UnitIntial FROM magod_setup.magodlaser_units';
+unitlist.put("/updateData/:ID", (req, res) => {
+    let StateId = 0;
+    const id = req.params.ID;
+      console.log("update id", id);
+   
 
 
     const q = `SELECT StateCode ,State FROM magod_setup.state_codelist WHERE State='${req.body.State}'`
     setupQueryMod(q, (err, re) => {
-        if(err){
-            console.log("errrrrrrr", err);
+        if (err) {
+           // console.log("errrrrrrr", err);
         }
-        
+
         for (let i = 0; i < re.length; i++) {
-          //  console.log("hi");
+            //  console.log("hi");
 
             if (re[i].State === req.body.State) {
 
@@ -201,48 +204,49 @@ let StateId=0;
 
         }
     })
+
+    // const up = `SELECT UnitName ,UnitID FROM magod_setup.magodlaser_units where UnitName='${req.body.UnitName}' OR UnitID='${req.body.UnitID}'`;
+    const up = `SELECT UnitName ,UnitID FROM magod_setup.magodlaser_units WHERE (UnitName='${req.body.UnitName}' OR UnitID='${req.body.UnitID}') AND UnitID != '${req.body.UnitID}'`;
+
     setupQueryMod(up, (e, r) => {
 
-        // console.log("rr", r);
-
-        let x = 0;
-        for (let i = 0; i < r.length; i++) {
-            if (r[i].UnitID === id || req.body.UnitIntial===r[i].UnitIntial) {
-
-                x++;
-                console.log("req id and ", req.body.UnitID, r[i].UnitID);
-            }
+        if(e){
+           // console.log("errin update query", e);
         }
+        else  if (r.length === 0) {
 
-        if (x === 1) {
-            const updatequery = `UPDATE magod_setup.magodlaser_units SET UnitName='${req.body.UnitName}', Unit_Address='${req.body.Unit_Address}', Place='${req.body.Place}',PIN='${req.body.PIN}',State='${req.body.State}', Country='${req.body.Country}',Unit_contactDetails='${req.body.Unit_contactDetails}',Unit_GSTNo='${req.body.Unit_GSTNo}',Tally_account_Name='${req.body.Tally_account_Name}', Mail_Id='${req.body.Mail_Id}',UnitIntial='${req.body.UnitIntial}', Current='${req.body.Current}', StateId='${StateId}'  WHERE UnitID='${req.body.UnitID}'`;
+            const updatequery = `UPDATE magod_setup.magodlaser_units SET UnitID='${req.body.UnitID}', UnitName='${req.body.UnitName}', Unit_Address='${req.body.Unit_Address}', City='${req.body.City}',PIN_Code='${req.body.PIN_Code}',State='${req.body.State}', 
+            Country='${req.body.Country}',Unit_contactDetails='${req.body.Unit_contactDetails}',GST_No='${req.body.GST_No}',Tally_account_Name='${req.body.Tally_account_Name}', Gm_Mail_Id='${req.body.Gm_Mail_Id}',UnitIntial='${req.body.UnitIntial}',  State_Id='${StateId}',Current='${req.body.Current}'  WHERE UnitID='${req.body.UnitID}'`;
 
-            console.log("updt qry", updatequery);
+           console.log("updt qry", updatequery);
             const values = [
 
                 req.body.UnitName,
                 req.body.Unit_Address,
-                req.body.Place,
-                req.body.PIN,
+                req.body.City,
+                req.body.PIN_Code,
                 req.body.State,
                 req.body.Country,
                 req.body.Unit_contactDetails,
-                req.body.Unit_GSTNo,
+                req.body.GST_No,
                 req.body.Tally_account_Name,
                 //   req.body.Cash_in_Hand,
                 StateId,
-                req.body.Mail_Id,
+                req.body.Gm_Mail_Id,
                 req.body.UnitIntial,
             ];
-          //  console.log("updt values", values);
+             console.log("updt values", values);
 
             setupQueryMod(updatequery, values, (err, result) => {
-                if (err) console.log("err in update query", err);
+                if (err) {
+                   // console.log("err in update query", err);
+                }
                 else return res.json({ status: 'success' });
             })
         }
+
         else {
-            console.log("error becoz unit is not in db");
+            console.log("error becoz unitname already  in db");
             return res.json({ status: 'query' })
         }
 

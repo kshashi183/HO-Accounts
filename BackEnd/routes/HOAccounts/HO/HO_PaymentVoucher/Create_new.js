@@ -11,13 +11,7 @@ createnew.get('/ho_openInvoices', (req, res) => {
  const unitname = req.query.unitname;
   
   console.log("HO INV custcodeeeee", custcode,unitname);
-  // const sql = `SELECT *,
-  //     DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
-  //     FROM magod_hq_mis.unit_invoices_list
-  //     WHERE UnitName = 'Jigani'
-  //       AND Cust_Code='${custcode}'
-  //       AND ABS(GrandTotal - PymtAmtRecd) > 0
-  //       AND DCStatus <> 'Closed'; `;
+  
 
   const sql = `SELECT *
   
@@ -33,8 +27,9 @@ createnew.get('/ho_openInvoices', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      // console.log("HO open invoice", result);
-      return res.json({ Result: result });
+    // console.log("HO open invoice", result);
+      // return res.json({ Result: result });
+      res.send(result)
     }
   })
 })
@@ -1019,7 +1014,7 @@ console.log("req body after post", req.body);
       }
       console.log("PREFIX RESULT",prefixResult);
  
-      const prefix = prefixResult[0].Prefix;
+      const prefix = prefixResult[0].Prefix!== null ? prefixResult[0].Prefix : "";
       const suffix =
         prefixResult[0].Suffix !== null ? prefixResult[0].Suffix : "";
 
