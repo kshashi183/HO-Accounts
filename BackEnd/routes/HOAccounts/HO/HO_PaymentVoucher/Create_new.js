@@ -1,6 +1,7 @@
 const createnew = require("express").Router();
 
-const { setupQueryMod, misQuery,setupQuery } = require("../../../../helpers/dbconn")
+const { setupQueryMod, misQuery,setupQuery } = require("../../../../helpers/dbconn");
+const { logger } = require("../../../../helpers/logger");
 
 
 
@@ -592,9 +593,8 @@ createnew.post("/getDCNo", async (req, res, next) => {
             return next(prefixError);
           }
  
-          const prefix = prefixResult[0].Prefix;
-          const suffix =
-            prefixResult[0].Suffix !== null ? prefixResult[0].Suffix : "";
+          const prefix = prefixResult[0]?.Prefix!== null ? prefixResult[0]?.Prefix : "";
+          const suffix =  prefixResult[0]?.Suffix !== null ? prefixResult[0]?.Suffix : "";
  
           console.log("Prefix Suffix", prefix, suffix);
 
@@ -1014,9 +1014,9 @@ console.log("req body after post", req.body);
       }
       console.log("PREFIX RESULT",prefixResult);
  
-      const prefix = prefixResult[0].Prefix!== null ? prefixResult[0].Prefix : "";
+      const prefix = prefixResult[0]?.Prefix!== null ? prefixResult[0]?.Prefix : "";
       const suffix =
-        prefixResult[0].Suffix !== null ? prefixResult[0].Suffix : "";
+        prefixResult[0]?.Suffix !== null ? prefixResult[0]?.Suffix : "";
 
 
     const selectQuery = `
@@ -1235,6 +1235,7 @@ createnew.post('/cancelCreateNewScreen', (req, res) => {
 
         }
         else {
+          res.send({ StatusCancel: "Cancelled" })
           console.log("update form after cancell");
         }
 
