@@ -6,9 +6,9 @@ var bodyParser = require("body-parser");
 showSyncRouter.get("/hoUnitNames", async (req, res, next) => {
   try {
     setupQuery(
-      `SELECT DISTINCT UnitName FROM magod_setup.magodlaser_units;`,
+      `SELECT DISTINCT UnitName FROM magod_hq_mis.unit_cust_data;`,
       (err, data) => {
-      //  console.log("unit name show sync status", data);
+        //  console.log("unit name show sync status", data);
         res.send(data);
       }
     );
@@ -17,13 +17,14 @@ showSyncRouter.get("/hoUnitNames", async (req, res, next) => {
   }
 });
 
-
 // common updateUnitInvoicePaymentStatus
-showSyncRouter.put("/updateHOInvoicePaymentStatus/:getName",async (req, res, next) => {
-  const getName = req.params.getName;
- //console.log("updateUnitInvoicePaymentStatus1111", getName);
+showSyncRouter.put(
+  "/updateHOInvoicePaymentStatus/:getName",
+  async (req, res, next) => {
+    const getName = req.params.getName;
+    //console.log("updateUnitInvoicePaymentStatus1111", getName);
 
-  const unit='Jigani';
+    const unit = "Jigani";
     try {
       hqQuery(
         `
@@ -99,9 +100,8 @@ showSyncRouter.put("/updateHOInvoicePaymentStatus/:getName",async (req, res, nex
 showSyncRouter.get(
   "/getHoOpenInvAndReceipts/:getName",
   async (req, res, next) => {
-     const getName = req.params.getName;
-     console.log("getHoOpenInvAndReceipts2222", getName);
-   
+    const getName = req.params.getName;
+    console.log("getHoOpenInvAndReceipts2222", getName);
 
     const responseData = [];
     try {
@@ -157,17 +157,13 @@ showSyncRouter.get(
   }
 );
 
-
-
-
-
-
 //getUnitOpenInvAndReceipts
-showSyncRouter.get( "/getUnitOpenInvAndReceipts/:getName", async (req, res, next) => {
+showSyncRouter.get(
+  "/getUnitOpenInvAndReceipts/:getName",
+  async (req, res, next) => {
     const getName = req.params.getName;
-   console.log("getUnitOpenInvAndReceipts333", getName);
+    console.log("getUnitOpenInvAndReceipts333", getName);
 
-    
     const responseData = [];
     try {
       const cmdInvList = await hqQuery(
@@ -225,7 +221,6 @@ showSyncRouter.get( "/getUnitOpenInvAndReceipts/:getName", async (req, res, next
       //   const cmdInvPaymentVrList = responseData[i].cmdInvPaymentVrList;
       //   console.log("cmdInvPaymentVrList:", cmdInvPaymentVrList);
 
-
       // }
 
       //console.log("respond data show sync", responseData);
@@ -237,19 +232,14 @@ showSyncRouter.get( "/getUnitOpenInvAndReceipts/:getName", async (req, res, next
   }
 );
 
+showSyncRouter.put("/updateUnmatchedRowsOfUnit", async (req, res, next) => {
+  const { getName, dcInvNo } = req.body;
 
+  // console.log("44444444444",getName, 'and', dcInvNo);
 
-showSyncRouter.put(
-  "/updateUnmatchedRowsOfUnit",
-  async (req, res, next) => {
-    const { getName, dcInvNo } = req.body;
-   
-
-    // console.log("44444444444",getName, 'and', dcInvNo);
-
-    try {
-      hqQuery(
-        `UPDATE magod_hq_mis.unit_invoices_list d
+  try {
+    hqQuery(
+      `UPDATE magod_hq_mis.unit_invoices_list d
         JOIN (
             SELECT
                 CASE
@@ -280,24 +270,20 @@ showSyncRouter.put(
         WHERE
             d.Unitname = '${getName}' AND d.Dc_inv_no = '${dcInvNo}';
         `,
-        (err, data) => {
-          res.send(data);
-        }
-      );
-    } catch (error) {
-      next(error);
-    }
+      (err, data) => {
+        res.send(data);
+      }
+    );
+  } catch (error) {
+    next(error);
   }
-);
+});
 
+showSyncRouter.put("/updateUnmatchedRowsOfHO/", async (req, res, next) => {
+  const dcInvNo = req.body.dcInvNo;
 
-showSyncRouter.put(
-  "/updateUnmatchedRowsOfHO/",
-  async (req, res, next) => {
-    const dcInvNo = req.body.dcInvNo;
-
-    // console.log("and", dcInvNo);
-    const sql= `UPDATE magodmis.draft_dc_inv_register d
+  // console.log("and", dcInvNo);
+  const sql = `UPDATE magodmis.draft_dc_inv_register d
     JOIN (
         SELECT
             CASE
@@ -325,41 +311,36 @@ showSyncRouter.put(
             WHEN d.grandTotal - B.Receive_now > 0 THEN 'Despatched'
             ELSE 'OverPaid'
         END
-    WHERE d.Dc_inv_no = '${dcInvNo}';`
+    WHERE d.Dc_inv_no = '${dcInvNo}';`;
 
-    try {
-      hqQuery(sql
-       ,
-        (err, data) => {
-          console.log("hq query ", sql);
-          res.send(data);
-        }
-      );
-    } catch (error) {
-      next(error);
-    }
+  try {
+    hqQuery(sql, (err, data) => {
+      console.log("hq query ", sql);
+      res.send(data);
+    });
+  } catch (error) {
+    next(error);
   }
-);
-
+});
 
 //Export Open invoices XML file
 showSyncRouter.get(
   "/getUnitOpenInvAndReceiptsForExport/:getName",
   async (req, res, next) => {
-   const getName = req.params.getName;
+    const getName = req.params.getName;
     //const getName = 'Jigani'
-   // console.log("55555", getName);
+    // console.log("55555", getName);
     const responseData = [];
     try {
       const cmdInvList = await hqQuery(
-      `SELECT '${getName}' AS unitName, u.*
+        `SELECT '${getName}' AS unitName, u.*
       FROM magod_hq_mis.unit_invoices_list u
       WHERE u.UnitName ='${getName}'  AND NOT (u.DCStatus = 'Closed' OR u.DCStatus = 'Cancelled');
       `
       );
 
       const cmdInvPaymentVrList = await hqQuery(
-       `SELECT u.UnitName, u.DC_Inv_No, u1.Receive_Now, u2.Recd_PVNo AS VoucherNo, 
+        `SELECT u.UnitName, u.DC_Inv_No, u1.Receive_Now, u2.Recd_PVNo AS VoucherNo, 
        u2.TxnType, u2.PRV_Status AS VoucherStatus
 FROM magod_hq_mis.unit_invoices_list u
 JOIN magod_hq_mis.unit_payment_recd_voucher_details u1 ON u1.Dc_inv_no = u.DC_Inv_No
@@ -381,7 +362,7 @@ WHERE u.UnitName = '${getName}' AND NOT (u.DCStatus LIKE 'Closed' OR u.DCStatus 
         cmdInvPaymentVrList: cmdInvPaymentVrList,
       });
 
-   //   console.log("export data",responseData);
+      //   console.log("export data",responseData);
       res.send(responseData);
     } catch (error) {
       next(error);
