@@ -108,7 +108,7 @@ showSyncRouter.get(
       const cmdHoInvList = await hqQuery(
         `SELECT u.*
         FROM magod_hq_mis.unit_invoices_list u
-        WHERE u.UnitName = '${getName}' AND NOT (u.DCStatus = 'Closed' OR u.DCStatus = 'Cancelled');
+        WHERE u.UnitName = '${getName}' AND NOT (u.DCStatus = 'Closed' OR u.DCStatus = 'Cancelled') ;
         `
       );
 
@@ -168,7 +168,7 @@ showSyncRouter.get(
     try {
       const cmdInvList = await hqQuery(
         `SELECT '${getName}' AS unitName,d.*, d.Dc_Inv_No AS Unit_Uid FROM magodmis.draft_dc_inv_register d
-          WHERE d.Inv_No IS NOT NULL  AND NOT (d.DCStatus='Closed' OR d.DCStatus='Cancelled') AND NOT d.IsDC;`
+          WHERE d.Inv_No IS NOT NULL  AND NOT (d.DCStatus='Closed' OR d.DCStatus='Cancelled') AND NOT d.IsDC  ;`
       );
 
       const cmdInvPaymentVrList = await hqQuery(
@@ -217,13 +217,12 @@ showSyncRouter.get(
         cmdInvPaymentVrList: cmdInvPaymentVrList,
       });
 
-      // for (let i = 0; i < responseData.length; i++) {
-      //   const cmdInvPaymentVrList = responseData[i].cmdInvPaymentVrList;
-      //   console.log("cmdInvPaymentVrList:", cmdInvPaymentVrList);
+      for (let i = 0; i < responseData.length; i++) {
+        const cmdInvList1 = responseData[i].cmdInvList;
+        //  console.log("cmdInvPaymentVrList:", cmdInvList1);
+      }
 
-      // }
-
-      //console.log("respond data show sync", responseData);
+      // console.log("respond data show sync", responseData.cmdInvList);
 
       res.send(responseData);
     } catch (error) {
