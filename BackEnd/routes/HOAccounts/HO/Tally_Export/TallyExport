@@ -1,5 +1,6 @@
 const tally_Export = require("express").Router();
 const axios = require("axios");
+const xml2js = require("xml2js");
 // const cors = require('cors');
 // const { dbco, dbco1, dbgetData, deleteUnitData, updateUnitData } = require("../../../helpers/dbconn")
 const { setupQueryMod, misQuery } = require("../../../../helpers/dbconn");
@@ -10,13 +11,23 @@ const upload = multer({ storage: storage });
 tally_Export.get("/getInvoiceData", (req, res) => {
   const date = req.query.date;
   const unit = req.query.selectedUnitName;
-  //  console.log("unit", unit.UnitName);
+  //console.log("unit", unit.UnitName);
   const sql = `SELECT u.*, t.voucher_type, t.PreFix, t.LedgerName
-FROM magod_hq_mis.tally_voucher_ref t
-JOIN magod_hq_mis.unit_invoices_list u
-ON t.inv_type = u.dc_invType
-WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
-ORDER BY t.voucher_type, u.Inv_no;`;
+  FROM magod_hq_mis.tally_voucher_ref t
+  JOIN magod_hq_mis.unit_invoices_list u
+  ON t.inv_type = u.dc_invType
+  WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
+  ORDER BY t.voucher_type, u.Inv_no;`;
+
+  //   const sql = ` SELECT u.BillType,u.DC_InvType, u.Inv_No, u.Cust_Name, u.GrandTotal,u.PO_No,u.TallyRef,u.Cust_Code,u.DC_No,u.Inv_Date,
+  //  u.Cust_place,u.Net_Total,u.Cust_state,u.PIN_Code, u.AssessableValue, u.Cust_address,u.TaxAmount,u.InvTotal,u.Round_Off,
+  //   u.DC_Inv_No,u.OrderNo,
+  //   t.voucher_type, t.PreFix, t.LedgerName
+  //   FROM magod_hq_mis.tally_voucher_ref t
+  //   JOIN magod_hq_mis.unit_invoices_list u
+  //   ON t.inv_type = u.dc_invType
+  //   WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
+  //   ORDER BY t.voucher_type, u.Inv_no;`;
 
   setupQueryMod(sql, (err, result) => {
     // console.log("hiii");
@@ -24,7 +35,7 @@ ORDER BY t.voucher_type, u.Inv_no;`;
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      //  console.log("invoiceee",  result.LedgerName);
+      //console.log("invoiceee", result);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -45,7 +56,7 @@ tally_Export.get("/getInvoiceTaxDetails", (req, res) => {
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      //console.log("invoice", result);
+      console.log("invoice", result);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -71,7 +82,7 @@ WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PV_Date = '${date}';
      `;
 
   setupQueryMod(sql1, (err, result) => {
-    console.log("hiii, payment");
+    //console.log("hiii, payment");
     if (err) {
       console.log("error", err);
       return res.json({ Error: " error in sql" });
@@ -85,9 +96,9 @@ WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PV_Date = '${date}';
 tally_Export.get("/getPayment", (req, res) => {
   const Recd_PVNo = req.query.Recd_PVNo;
   const unit = req.query.selectedUnitName;
-  // console.log("recd pvno",Recd_PVNo);
+  console.log("recd pvno", Recd_PVNo);
 
-  const sql = `SELECT   p1.*, t.voucher_type, t.PreFix, t.LedgerName
+  const sql = `SELECT   p1.*, t.voucher_type, t.PreFix, t.LedgerName,p.Recd_PVNo
     FROM magod_hq_mis.unit_payment_recd_voucher_register p
     JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID
     JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
@@ -99,6 +110,28 @@ tally_Export.get("/getPayment", (req, res) => {
       return res.json({ Error: " error in sql" });
     } else {
       // console.log("paymnet", result);
+      return res.json({ Status: "Success", Result: result });
+    }
+  });
+});
+
+tally_Export.get("/getPaymentForXml", (req, res) => {
+  const unit = req.query.selectedUnitName;
+  const date = req.query.date;
+  console.log("date and unit", unit, date);
+
+  const sql = `SELECT   p1.*, t.voucher_type, t.PreFix, t.LedgerName,p.Recd_PVNo
+    FROM magod_hq_mis.unit_payment_recd_voucher_register p
+    JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID
+    JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
+    WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PV_Date = '${date}' `;
+
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("error", err);
+      return res.json({ Error: " error in sql" });
+    } else {
+      //  console.log("paymnetxmlll", result);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -268,325 +301,159 @@ const { parseString } = require("xml2js");
 //     }
 // });
 
+const fs = require("fs");
+
 tally_Export.post("/exporttally", async (req, res) => {
   const cleanedXml = req.body.xml.replace(/\n/g, "");
 
   const xmlData = req.body.xml;
-  console.log("xml file ", xmlData);
-
+  console.log("xml daata", xmlData, "----------------");
   const tallyUrl = "http://localhost:9000";
 
+  //check company is exist or not
   // try {
-  //     const response = await axios.post(tallyUrl, {
-  //         xmlRequest: '<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Voucher Numbers</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>'
-  //     });
+  //   const response = await axios.post(tallyUrl, {
+  //     body: "<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>",
+  //   });
+  //   parseString(response.data, (err, result) => {
+  //     if (err) {
+  //       console.error("Error parsing XML:", err);
+  //       return;
+  //     }
+  //     const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
+  //     const companyNames = cmpny.map((company) => company.$.NAME);
+  //     console.log("Company Names:", companyNames);
 
-  //     const xmlData = response.data;
-
-  //     parseString(xmlData, (err, result) => {
-  //         if (err) {
-  //             console.error('Error parsing XML:', err);
-  //             return;
-  //         }
-
-  //         const voucherElements = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].VOUCHER;
-  //         const voucherNumbers = voucherElements.map(voucher => voucher.VOUCHERNUMBER[0]);
-
-  //         if (voucherNumbers.length > 0) {
-  //             console.log('Voucher Numbers:');
-  //             voucherNumbers.forEach(number => console.log(number));
-  //         } else {
-  //             console.log('No voucher numbers found in the XML data.');
-  //         }
-  //     });
+  //     const matchingCompanies = companyNames.filter((name) => name === cmpname);
+  //     console.log("matched compnay", matchingCompanies);
+  //     if (matchingCompanies.length === 0) {
+  //       res.json({ company: "companyNot" });
+  //       console.log("Match not found! .");
+  //     } else {
+  //       console.log("Match found! Sending message to frontend...");
+  //     }
+  //   });
   // } catch (error) {
-  //     console.error('Error fetching voucher numbers:', error);
+  //   console.error("Error fetching company names:", error);
   // }
 
+  const xml11 = `</ENVELOPE>
+  <HEADER>
+    <TALLYREQUEST>Import Data</TALLYREQUEST>
+  </HEADER>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDESC>
+        <REPORTNAME>Vouchers</REPORTNAME>
+        <STATICVARIABLES>
+          <SVCURRENTCOMPANY>MLMPL_Jigani_08_09</SVCURRENTCOMPANY>
+        </STATICVARIABLES>
+      </REQUESTDESC>
+      <TALLYMESSAGE xmlns:UDF="TallyUDF">
+        <VOUCHER REMOTEID="SL2147325631" VCHTYPE="Sales" ACTION="Create">
+          <DATE>20180302</DATE>
+          <GUID>2147325631</GUID>
+          <NARRATION>Our WO No: 181107 Packing Note No: 08298/ 17/18</NARRATION>
+          <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
+          <VOUCHERNUMBER>SL /JG0760 / 17/18</VOUCHERNUMBER>
+          <REFERENCE>SAMPLE</REFERENCE>
+          <PARTYLEDGERNAME>KAVIA ENGINEERING PRIVATE LIMITED</PARTYLEDGERNAME>
+          <CSTFORMISSUETYPE/>
+          <CSTFORMRECVTYPE/>
+          <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+          <VCHGSTCLASS/>
+          <DIFFACTUALQTY>No</DIFFACTUALQTY>
+          <AUDITED>No</AUDITED>
+          <FORJOBCOSTING>No</FORJOBCOSTING>
+          <ISOPTIONAL>No</ISOPTIONAL>
+          <EFFECTIVEDATE>20180302</EFFECTIVEDATE>
+          <USEFORINTEREST>No</USEFORINTEREST>
+          <USEFORGAINLOSS>No</USEFORGAINLOSS>
+          <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
+          <USEFORCOMPOUND>No</USEFORCOMPOUND>
+          <ALTERID>1</ALTERID>
+          <EXCISEOPENING>No</EXCISEOPENING>
+          <ISCANCELLED>No</ISCANCELLED>
+          <HASCASHFLOW>No</HASCASHFLOW>
+          <ISPOSTDATED>No</ISPOSTDATED>
+          <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
+          <ISINVOICE>No</ISINVOICE>
+          <MFGJOURNAL>No</MFGJOURNAL>
+          <HASDISCOUNTS>No</HASDISCOUNTS>
+          <ASPAYSLIP>No</ASPAYSLIP>
+          <ISDELETED>No</ISDELETED>
+          <ASORIGINAL>No</ASORIGINAL>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>KAVIA ENGINEERING PRIVATE LIMITED</LEDGERNAME>
+            <GSTCLASS/>
+            <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>-1121</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>SALES</LEDGERNAME>
+            <GSTCLASS/>
+            <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>950.00</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+          <BILLALLOCATIONS.LIST>
+            <NAME>SL /JG0760 / 17/18</NAME>
+            <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
+            <BILLTYPE>New Ref</BILLTYPE>
+            <AMOUNT>1121</AMOUNT>
+          </BILLALLOCATIONS.LIST>
+          <BILLALLOCATIONS.LIST>
+            <NAME>SL /JG0760 / 17/18</NAME>
+            <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
+            <BILLTYPE>New Ref</BILLTYPE>
+            <AMOUNT>-950</AMOUNT>
+          </BILLALLOCATIONS.LIST>
+        </VOUCHER>
+      </TALLYMESSAGE>
+    </IMPORTDATA>
+  </BODY>
+</ENVELOPE>`;
+
+  //sending the .xml file to tally not xml format
+
+  // Write the XML data to a file
+  // fs.writeFileSync("exportedData.xml", xmlData);
+
+  // Read the XML file
+  //const xmlFileToTally = fs.readFileSync("exportedData.xml");
+
   try {
-    console.log("next step11");
-    //         const xmlFile = `<ENVELOPE>
-    //         <HEADER>
-    //             <TALLYREQUEST>Import Data</TALLYREQUEST>
-    //             </HEADER>
-    //         <BODY>
-    //         <IMPORTDATA>
-    //         <REQUESTDESC>
-    //         <REPORTNAME>Vouchers</REPORTNAME>
-    //         <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY></STATICVARIABLES>
-    //         </REQUESTDESC>
-    //         <TALLYMESSAGE xmlns:UDF='TallyUDF'>
-    //         <VOUCHER REMOTEID='SL2147387061' VCHTYPE='Sales' ACTION='Create'>
-    //         <DATE>20240316</DATE>
-    //         <GUID>2147387061</GUID>
-    //         <NARRATION>Our WO No :240492 Packing Note No :09014/ 23/24</NARRATION>
-    //         <VOUCHERTYPENAME>Job Work</VOUCHERTYPENAME>
-    //         <VOUCHERNUMBER>SL / JG1133/ 23/24</VOUCHERNUMBER>
-    //         <REFERENCE>KE034 DTD/31.01.2024</REFERENCE>
-    //         <PARTYLEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</PARTYLEDGERNAME>
-    //         <CSTFORMISSUETYPE />
-    //         <CSTFORMRECVTYPE />
-    //         <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
-    //         <VCHGSTCLASS />
-    //         <DIFFACTUALQTY>No</DIFFACTUALQTY>
-    //         <AUDITED>No</AUDITED>
-    //         <FORJOBCOSTING>No</FORJOBCOSTING>
-    //         <ISOPTIONAL>No</ISOPTIONAL>
-    //         <EFFECTIVEDATE>20240316</EFFECTIVEDATE>
-    //         <USEFORINTEREST>No</USEFORINTEREST>
-    //         <USEFORGAINLOSS>No</USEFORGAINLOSS>
-    //         <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
-    //         <USEFORCOMPOUND>No</USEFORCOMPOUND>
-    //         <ALTERID>2</ALTERID>
-    //         <EXCISEOPENING>No</EXCISEOPENING>
-    //         <ISCANCELLED>No</ISCANCELLED>
-    //         <HASCASHFLOW>No</HASCASHFLOW>
-    //         <ISPOSTDATED>No</ISPOSTDATED>
-    //         <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
-    //         <ISINVOICE>No</ISINVOICE>
-    //         <MFGJOURNAL>No</MFGJOURNAL>
-    //         <HASDISCOUNTS>No</HASDISCOUNTS>
-    //         <ASPAYSLIP>No</ASPAYSLIP>
-    //         <ISDELETED>No</ISDELETED>
-    //         <ASORIGINAL>No</ASORIGINAL>
-    //         <ALLLEDGERENTRIES.LIST>
-    //         <LEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</LEDGERNAME>
-    //         <GSTCLASS />
-    //         <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
-    //         <LEDGERFROMITEM>No</LEDGERFROMITEM>
-    //         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-    //         <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-    //         <AMOUNT>-26143.00</AMOUNT>
-    //         <BILLALLOCATIONS.LIST>
-    //         <NAME>SL / JG1133/ 23/24</NAME>
-    //         <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
-    //         <BILLTYPE>New Ref</BILLTYPE>
-    //         <AMOUNT>-26143.00</AMOUNT>
-    //         </BILLALLOCATIONS.LIST>
-    //         </ALLLEDGERENTRIES.LIST>
-    //         <ALLLEDGERENTRIES.LIST>
-    // <LEDGERNAME>CGST @ 9%</LEDGERNAME>
-    // <GSTCLASS />
-    // <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-    // <LEDGERFROMITEM>No</LEDGERFROMITEM>
-    // <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-    // <ISPARTYLEDGER>No</ISPARTYLEDGER>
-    // <AMOUNT>1993.95</AMOUNT>
-    // </ALLLEDGERENTRIES.LIST>
-    //         <ALLLEDGERENTRIES.LIST>
-    //         <LEDGERNAME>SALES</LEDGERNAME>
-    //         <GSTCLASS />
-    //         <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-    //         <LEDGERFROMITEM>No</LEDGERFROMITEM>
-    //         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-    //         <ISPARTYLEDGER>No</ISPARTYLEDGER>
-    //         <AMOUNT>22155.00</AMOUNT>
-    //         </ALLLEDGERENTRIES.LIST>
-    //         <ALLLEDGERENTRIES.LIST>
-    //         <LEDGERNAME>SGST @ 9%</LEDGERNAME>
-    //         <GSTCLASS />
-    //         <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-    //         <LEDGERFROMITEM>No</LEDGERFROMITEM>
-    //         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-    //         <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-    //         <AMOUNT>1993.95</AMOUNT>
-    //         </ALLLEDGERENTRIES.LIST>
-    //         <ALLLEDGERENTRIES.LIST>
-    //         <LEDGERNAME>Round Off</LEDGERNAME>
-    //         <GSTCLASS />
-    //         <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-    //         <LEDGERFROMITEM>No</LEDGERFROMITEM>
-    //         <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-    //         <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-    //         <AMOUNT>0.10</AMOUNT>
-    //         </ALLLEDGERENTRIES.LIST>
-    //         </VOUCHER>
-    //         </TALLYMESSAGE>
-    //         </IMPORTDATA>
-    //         </BODY>
-    //         </ENVELOPE>
-    //         `
-    // Your XML data
-
-    const xmlFile = ` <ENVELOPE>
-        <HEADER>
-          <TALLYREQUEST>Import Data</TALLYREQUEST>
-        </HEADER>
-        <Body>
-          <ImportData>
-            <REQUESTDESC>
-              <REPORTNAME>Vouchers</REPORTNAME>
-              <STATICVARIABLES>
-                <SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY>
-              </STATICVARIABLES>
-            </REQUESTDESC>
-            <TALLYMESSAGE xmlns:UDF="TallyUDF">
-              <VOUCHER REMOTEID="SL2147323843" VCHTYPE="Sales" ACTION="Create">
-                <DATE>20240401</DATE>
-                <GUID>2147323843</GUID>
-                <NARRATION>Our WO No: 176860 Packing Note No: 06795/ 17/18</NARRATION>
-                <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
-                <VOUCHERNUMBER>SL /JG0476 / 17/18</VOUCHERNUMBER>
-                <REFERENCE>PO-17GEME-097 December 28, 2017</REFERENCE>
-                <PARTYLEDGERNAME>FLEXI MANUFACTURING SOLUTIONS PRIVATE LIMITED</PARTYLEDGERNAME>
-                <CSTFORMISSUETYPE/>
-                <CSTFORMRECVTYPE/>
-                <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
-                <VCHGSTCLASS/>
-                <DIFFACTUALQTY>No</DIFFACTUALQTY>
-                <AUDITED>No</AUDITED>
-                <FORJOBCOSTING>No</FORJOBCOSTING>
-                <ISOPTIONAL>No</ISOPTIONAL>
-                <EFFECTIVEDATE>20240401</EFFECTIVEDATE>
-                <USEFORINTEREST>No</USEFORINTEREST>
-                <USEFORGAINLOSS>No</USEFORGAINLOSS>
-                <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
-                <USEFORCOMPOUND>No</USEFORCOMPOUND>
-                <ALTERID>2</ALTERID>
-                <EXCISEOPENING>No</EXCISEOPENING>
-                <ISCANCELLED>No</ISCANCELLED>
-                <HASCASHFLOW>No</HASCASHFLOW>
-                <ISPOSTDATED>No</ISPOSTDATED>
-                <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
-                <ISINVOICE>No</ISINVOICE>
-                <MFGJOURNAL>No</MFGJOURNAL>
-                <HASDISCOUNTS>No</HASDISCOUNTS>
-                <ASPAYSLIP>No</ASPAYSLIP>
-                <ISDELETED>No</ISDELETED>
-                <ASORIGINAL>No</ASORIGINAL>
-                <ALLLEDGERENTRIES_LIST>
-                  <LEDGERNAME>FLEXI MANUFACTURING SOLUTIONS PRIVATE LIMITED</LEDGERNAME>
-                  <GSTCLASS/>
-                  <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                  <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                  <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                  <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-                  <AMOUNT>555.00</AMOUNT>
-                  <BILLALLOCATIONS_LIST>
-                    <NAME>SL /JG0476 / 17/18</NAME>
-                    <BILLCREDITPERIOD>60</BILLCREDITPERIOD>
-                    <BILLTYPE>New Ref</BILLTYPE>
-                    <AMOUNT>555.00</AMOUNT>
-                  </BILLALLOCATIONS_LIST>
-                </ALLLEDGERENTRIES_LIST>
-                <ALLLEDGERENTRIES_LIST>
-                  <LEDGERNAME>SALES</LEDGERNAME>
-                  <GSTCLASS/>
-                  <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                  <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                  <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                  <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-                  <AMOUNT>470.00</AMOUNT>
-                </ALLLEDGERENTRIES_LIST>
-                <ALLLEDGERENTRIES_LIST>
-                  <LEDGERNAME>Round Off</LEDGERNAME>
-                  <GSTCLASS/>
-                  <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                  <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                  <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                  <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-                  <AMOUNT>0.40</AMOUNT>
-                </ALLLEDGERENTRIES_LIST>
-              </VOUCHER>
-            </TALLYMESSAGE>
-          </ImportData>
-        </Body>
-      </ENVELOPE>`;
-
-    const xmlService = `<ENVELOPE>
-      <HEADER>
-        <TALLYREQUEST>Import Data</TALLYREQUEST>
-      </HEADER>
-      <Body>
-        <ImportData>
-          <REQUESTDESC>
-            <REPORTNAME>Vouchers</REPORTNAME>
-            <STATICVARIABLES>
-              <SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY>
-            </STATICVARIABLES>
-          </REQUESTDESC>
-          <TALLYMESSAGE xmlns:UDF="TallyUDF">
-            <VOUCHER REMOTEID="SL2147323838" VCHTYPE="Sales" ACTION="Create">
-              <DATE>20240401</DATE>
-              <GUID>2147323838</GUID>
-              <NARRATION>Our WO No: 176785 Packing Note No: 06790/ 17/18</NARRATION>
-              <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
-              <VOUCHERNUMBER>SR /JS3793 / 17/18</VOUCHERNUMBER>
-              <REFERENCE>528 DT 05/12/17 DC NO 723 DT 25/12/17</REFERENCE>
-              <PARTYLEDGERNAME>20 GAUGE ENGINEERING</PARTYLEDGERNAME>
-              <CSTFORMISSUETYPE/>
-              <CSTFORMRECVTYPE/>
-              <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
-              <VCHGSTCLASS/>
-              <DIFFACTUALQTY>No</DIFFACTUALQTY>
-              <AUDITED>No</AUDITED>
-              <FORJOBCOSTING>No</FORJOBCOSTING>
-              <ISOPTIONAL>No</ISOPTIONAL>
-              <EFFECTIVEDATE>20240401</EFFECTIVEDATE>
-              <USEFORINTEREST>No</USEFORINTEREST>
-              <USEFORGAINLOSS>No</USEFORGAINLOSS>
-              <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
-              <USEFORCOMPOUND>No</USEFORCOMPOUND>
-              <ALTERID>2</ALTERID>
-              <EXCISEOPENING>No</EXCISEOPENING>
-              <ISCANCELLED>No</ISCANCELLED>
-              <HASCASHFLOW>No</HASCASHFLOW>
-              <ISPOSTDATED>No</ISPOSTDATED>
-              <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
-              <ISINVOICE>No</ISINVOICE>
-              <MFGJOURNAL>No</MFGJOURNAL>
-              <HASDISCOUNTS>No</HASDISCOUNTS>
-              <ASPAYSLIP>No</ASPAYSLIP>
-              <ISDELETED>No</ISDELETED>
-              <ASORIGINAL>No</ASORIGINAL>
-              <ALLLEDGERENTRIES_LIST>
-                <LEDGERNAME>20 GAUGE ENGINEERING</LEDGERNAME>
-                <GSTCLASS/>
-                <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-                <AMOUNT>39318.00</AMOUNT>
-                <BILLALLOCATIONS_LIST>
-                  <NAME>SL /JS3793 / 17/18</NAME>
-                  <BILLCREDITPERIOD>90</BILLCREDITPERIOD>
-                  <BILLTYPE>New Ref</BILLTYPE>
-                  <AMOUNT>39318.00</AMOUNT>
-                </BILLALLOCATIONS_LIST>
-              </ALLLEDGERENTRIES_LIST>
-              <ALLLEDGERENTRIES_LIST>
-                <LEDGERNAME>Sales</LEDGERNAME>
-                <GSTCLASS/>
-                <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-                <AMOUNT>33320.00</AMOUNT>
-              </ALLLEDGERENTRIES_LIST>
-              <ALLLEDGERENTRIES_LIST>
-                <LEDGERNAME>Round Off</LEDGERNAME>
-                <GSTCLASS/>
-                <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-                <AMOUNT>0.40</AMOUNT>
-              </ALLLEDGERENTRIES_LIST>
-            </VOUCHER>
-          </TALLYMESSAGE>
-        </ImportData>
-      </Body>
-    </ENVELOPE>`;
     const tallyServerUrl = "http://localhost:9000"; // Replace with your actual Tally server URL
-    const tallyResponse = await axios.post(tallyServerUrl, xmlFile, {
+    const tallyResponse = await axios.post(tallyServerUrl, xmlData, {
       headers: {
         "Content-Type": "application/xml",
       },
     });
 
     console.log("next step33", tallyResponse.data);
+    const guidArray = [];
+
     const createdValue = parseInt(
       tallyResponse.data.match(/<CREATED>(\d+)<\/CREATED>/)[1]
+    );
+
+    const alteredvalue = parseInt(
+      tallyResponse.data.match(/<ALTERED>(\d+)<\/ALTERED>/)[1]
+    );
+
+    const exceptionsValue = parseInt(
+      tallyResponse.data.match(/<EXCEPTIONS>(\d+)<\/EXCEPTIONS>/)[1]
+    );
+    console.log(
+      "print response ,",
+      createdValue,
+      alteredvalue,
+      exceptionsValue
     );
     if (createdValue === 1) {
       // If createdValue is 1, indicating success
@@ -594,7 +461,21 @@ tally_Export.post("/exporttally", async (req, res) => {
       //     message: 'File uploaded and created in Tally successfully',
       //     tallyData: tallyResponse.data // Send the Tally response data to the frontend
       // });
-      console.log("not exception");
+      console.log(" created export successfuly");
+    } else if (alteredvalue === 1) {
+      console.log("alterd already exist");
+      const guidMatch = xmlFile.match(/<GUID>(\d+)<\/GUID>/);
+      // console.log("guid ", guidMatch);
+      if (guidMatch) {
+        const guid = guidMatch[1];
+        guidArray.push(guid);
+        console.log(
+          `GUID ${guid} was not exported to Tally due to an exception`
+        );
+        res.json({ guids: guidArray });
+      }
+    } else if (exceptionsValue === 1) {
+      console.log("exceptions ===1");
     } else {
       console.log(" exception");
       res.status(200).json({
@@ -602,18 +483,6 @@ tally_Export.post("/exporttally", async (req, res) => {
         // Send the Tally response data to the frontend
       });
     }
-
-    // if (tallyResponse.status === 200) {
-
-    //     // Tally server responded with a success status
-    //    // console.log('tally response ', tallyResponse.data);
-    //     res.status(200).send('File uploaded and sent to Tally successfully');
-    // }
-    // else {
-    //     // Tally server responded with an error status
-    //     console.error('Error from Tally server:', tallyResponse.statusText);
-    //     res.status(500).send('Error communicating with Tally server');
-    // }
   } catch (error) {
     console.error("Error handling file upload:", error);
     res.status(500).send("Internal Server Error");
@@ -621,60 +490,63 @@ tally_Export.post("/exporttally", async (req, res) => {
 });
 
 //get company from magod database
-// tally_Export.post('/getCompanyGuid', (req, res) => {
-//     const { selectedUnitName } = req.body;
-//  //console.log("unit name for company", selectedUnitName);
-//     const sql = `SELECT  Tally_account_Name, CurrentTallyAcctGUID FROM magod_setup.magodlaser_units where
-//     UnitName='${selectedUnitName}'`
-// //console.log("query",sql);
-//     setupQueryMod(sql, (err, result) => {
-// //console.log("112123");
-//         if (err) {
-//             console.log("error", err);
-//             return res.json({ Error: " error in sql" })
-//         }
-//         else {
-//            // console.log("invoice", result);
-//             return res.json({ Status: 'Success', Result: result })
-//         }
-//     })
-
-// })
+tally_Export.post("/getCompanyGuid", (req, res) => {
+  const { selectedUnitName } = req.body;
+  console.log("unit name for company", selectedUnitName);
+  // const sql = `SELECT  Tally_account_Name, CurrentTallyAcctGUID FROM magod_setup.magodlaser_units where
+  //   UnitName='${selectedUnitName}'`;
+  const sql = `SELECT  Tally_account_Name FROM magod_setup.magodlaser_units where
+    UnitName='${selectedUnitName}'`;
+  //console.log("query",sql);
+  setupQueryMod(sql, (err, result) => {
+    //console.log("112123");
+    if (err) {
+      console.log("error", err);
+      return res.json({ Error: " error in sql" });
+    } else {
+      //console.log(" company name and guid", result);
+      return res.json({ Status: "Success", Result: result });
+    }
+  });
+});
 
 //get compnies from the tally software
 
-// tally_Export.get('/getCompanyFromTally', async (req, res) => {
-//         const tallyUrl = 'http://localhost:9000';
+tally_Export.post("/getCompanyFromTally", async (req, res) => {
+  const tallyUrl = "http://localhost:9000";
 
-//     // Fetch company Names
-//     console.log("get compny from tally");
+  // const cm = req.body.cmp;
+  const cm = "MLMPL_Jigani_2023_24";
+  console.log("cmp name separte", cm);
 
-//     try {
-//         const response = await axios.post(tallyUrl, {
-//             xmlRequest: '<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>All Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>'
-//         });
+  // Fetch company Names
+  console.log("get compny from tally");
 
-//         const xmlData = response.data;
-
-//         parseString(xmlData, (err, result) => {
-//             if (err) {
-//                 console.error('Error parsing XML:');
-//                 return;
-//             }
-
-//             const companyElements =  result.ENVELOPE.BODY[0].IMPORTDATA[0].REQUESTDESC[0].STATICVARIABLES[0].SVCURRENTCOMPANY[0];
-//             const companyNames = companyElements.map(company => company.NAME[0]);
-
-//             if (companyNames.length > 0) {
-//                 console.log('Company Names:');
-//                 companyNames.forEach(name => console.log(name));
-//             } else {
-//                 console.log('No companies found in the XML data.');
-//             }
-//         });
-//     } catch (error) {
-//        // console.error('Error fetching companies from Tally:', error);
-//     }
-// })
+  try {
+    const response = await axios.post(tallyUrl, {
+      body: "<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>",
+    });
+    parseString(response.data, (err, result) => {
+      if (err) {
+        console.error("Error parsing XML:", err);
+        return;
+      }
+      const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
+      const companyNames = cmpny.map((company) => company.$.NAME);
+      console.log("Company Names:", companyNames);
+      const matchingCompanies = companyNames.filter((name) => name === cm);
+      console.log("matched compnay", matchingCompanies);
+      if (matchingCompanies.length === 0) {
+        res.json({ company: "companyNot" });
+        console.log("Match not found! .");
+      } else {
+        res.json({ company: "companyExist" });
+        console.log("Match found! Sending message to frontend...");
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching company names:", error);
+  }
+});
 
 module.exports = tally_Export;
