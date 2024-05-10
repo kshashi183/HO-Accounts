@@ -11,7 +11,7 @@ const upload = multer({ storage: storage });
 tally_Export.get("/getInvoiceData", (req, res) => {
   const date = req.query.date;
   const unit = req.query.selectedUnitName;
-  //console.log("unit", unit.UnitName);
+  console.log("unit", unit.UnitName);
   const sql = `SELECT u.*, t.voucher_type, t.PreFix, t.LedgerName
   FROM magod_hq_mis.tally_voucher_ref t
   JOIN magod_hq_mis.unit_invoices_list u
@@ -19,7 +19,7 @@ tally_Export.get("/getInvoiceData", (req, res) => {
   WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
   ORDER BY t.voucher_type, u.Inv_no;`;
 
-  //   const sql = ` SELECT u.BillType,u.DC_InvType, u.Inv_No, u.Cust_Name, u.GrandTotal,u.PO_No,u.TallyRef,u.Cust_Code,u.DC_No,u.Inv_Date,
+  // const sql = ` SELECT u.BillType,u.DC_InvType, u.Inv_No, u.Cust_Name, u.GrandTotal,u.PO_No,u.TallyRef,u.Cust_Code,u.DC_No,u.Inv_Date,
   //  u.Cust_place,u.Net_Total,u.Cust_state,u.PIN_Code, u.AssessableValue, u.Cust_address,u.TaxAmount,u.InvTotal,u.Round_Off,
   //   u.DC_Inv_No,u.OrderNo,
   //   t.voucher_type, t.PreFix, t.LedgerName
@@ -29,13 +29,16 @@ tally_Export.get("/getInvoiceData", (req, res) => {
   //   WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
   //   ORDER BY t.voucher_type, u.Inv_no;`;
 
+  // if (!date || !isValidDateFormat(date)) {
+  //   console.log("Please provide a valid date in the format YYYY-MM-DD.");
+  // }
+
   setupQueryMod(sql, (err, result) => {
-    // console.log("hiii");
     if (err) {
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      //console.log("invoiceee", result);
+      console.log("invoiceee", result.length);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -56,7 +59,7 @@ tally_Export.get("/getInvoiceTaxDetails", (req, res) => {
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      console.log("invoice", result);
+      // console.log("invoice", result);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -96,13 +99,13 @@ WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PV_Date = '${date}';
 tally_Export.get("/getPayment", (req, res) => {
   const Recd_PVNo = req.query.Recd_PVNo;
   const unit = req.query.selectedUnitName;
-  console.log("recd pvno", Recd_PVNo);
+  // console.log("recd pvno", Recd_PVNo);
 
   const sql = `SELECT   p1.*, t.voucher_type, t.PreFix, t.LedgerName,p.Recd_PVNo
     FROM magod_hq_mis.unit_payment_recd_voucher_register p
     JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID
     JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
-    WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PVNo='${Recd_PVNo}' `;
+    WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PVNo='${Recd_PVNo}' AND p1.Unitname = '${unit.UnitName}' `;
 
   setupQueryMod(sql, (err, result) => {
     if (err) {
@@ -307,7 +310,7 @@ tally_Export.post("/exporttally", async (req, res) => {
   const cleanedXml = req.body.xml.replace(/\n/g, "");
 
   const xmlData = req.body.xml;
-  console.log("xml daata", xmlData, "----------------");
+  // console.log("xml daata", xmlData, "----------------");
   const tallyUrl = "http://localhost:9000";
 
   //check company is exist or not
@@ -337,41 +340,37 @@ tally_Export.post("/exporttally", async (req, res) => {
   //   console.error("Error fetching company names:", error);
   // }
 
-  const xml11 = `</ENVELOPE>
-  <HEADER>
-    <TALLYREQUEST>Import Data</TALLYREQUEST>
-  </HEADER>
+  const xml11 = ` <ENVELOPE>
+  <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
   <BODY>
     <IMPORTDATA>
       <REQUESTDESC>
         <REPORTNAME>Vouchers</REPORTNAME>
-        <STATICVARIABLES>
-          <SVCURRENTCOMPANY>MLMPL_Jigani_08_09</SVCURRENTCOMPANY>
-        </STATICVARIABLES>
+        <STATICVARIABLES><SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY> </STATICVARIABLES>
       </REQUESTDESC>
-      <TALLYMESSAGE xmlns:UDF="TallyUDF">
-        <VOUCHER REMOTEID="SL2147325631" VCHTYPE="Sales" ACTION="Create">
-          <DATE>20180302</DATE>
-          <GUID>2147325631</GUID>
-          <NARRATION>Our WO No: 181107 Packing Note No: 08298/ 17/18</NARRATION>
+      <TALLYMESSAGE xmlns:UDF='TallyUDF'>
+        <VOUCHER REMOTEID='SL2147323822' VCHTYPE='Sales' ACTION='Create'>
+          <DATE>20240402</DATE>
+          <GUID>2147323822</GUID>
+          <NARRATION>Our WO No: 176870 Packing Note No: 06777/ 23/24</NARRATION>
           <VOUCHERTYPENAME>Sales</VOUCHERTYPENAME>
-          <VOUCHERNUMBER>SL /JG0760 / 17/18</VOUCHERNUMBER>
-          <REFERENCE>SAMPLE</REFERENCE>
-          <PARTYLEDGERNAME>KAVIA ENGINEERING PRIVATE LIMITED</PARTYLEDGERNAME>
+          <VOUCHERNUMBER>SL /JG0475 / 24/25</VOUCHERNUMBER>
+          <REFERENCE>17/01306 DT-09/04/2024</REFERENCE>
+          <PARTYLEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</PARTYLEDGERNAME>
           <CSTFORMISSUETYPE/>
           <CSTFORMRECVTYPE/>
           <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
-          <VCHGSTCLASS/>
+          <VCHGSTCLASS />
           <DIFFACTUALQTY>No</DIFFACTUALQTY>
           <AUDITED>No</AUDITED>
           <FORJOBCOSTING>No</FORJOBCOSTING>
           <ISOPTIONAL>No</ISOPTIONAL>
-          <EFFECTIVEDATE>20180302</EFFECTIVEDATE>
+          <EFFECTIVEDATE>20240402</EFFECTIVEDATE>
           <USEFORINTEREST>No</USEFORINTEREST>
           <USEFORGAINLOSS>No</USEFORGAINLOSS>
           <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
           <USEFORCOMPOUND>No</USEFORCOMPOUND>
-          <ALTERID>1</ALTERID>
+          <ALTERID>2</ALTERID>
           <EXCISEOPENING>No</EXCISEOPENING>
           <ISCANCELLED>No</ISCANCELLED>
           <HASCASHFLOW>No</HASCASHFLOW>
@@ -384,35 +383,56 @@ tally_Export.post("/exporttally", async (req, res) => {
           <ISDELETED>No</ISDELETED>
           <ASORIGINAL>No</ASORIGINAL>
           <ALLLEDGERENTRIES.LIST>
-            <LEDGERNAME>KAVIA ENGINEERING PRIVATE LIMITED</LEDGERNAME>
-            <GSTCLASS/>
+            <LEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</LEDGERNAME>
+            <GSTCLASS />
+            <ISDEEMEDPOSITIVE>YES</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>-336317.00</AMOUNT>
+            <BILLALLOCATIONS.LIST>
+              <NAME>SL /JG0475 / 24/25</NAME>
+              <BILLCREDITPERIOD>60</BILLCREDITPERIOD>
+              <BILLTYPE>New Ref</BILLTYPE>
+              <AMOUNT>-336317.00</AMOUNT>
+            </BILLALLOCATIONS.LIST>
+          </ALLLEDGERENTRIES.LIST>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>SALES</LEDGERNAME>
+            <GSTCLASS />
+            <ISDEEMEDPOSITIVE>NO</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>285014.50</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>SGST @ 9%</LEDGERNAME>
+            <GSTCLASS />
+            <ISDEEMEDPOSITIVE>NO</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>25651.30</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>CGST @ 9%</LEDGERNAME>
+            <GSTCLASS />
+            <ISDEEMEDPOSITIVE>NO</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>25651.30</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>Round Off</LEDGERNAME>
+            <GSTCLASS />
             <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
             <LEDGERFROMITEM>No</LEDGERFROMITEM>
             <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
             <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-            <AMOUNT>-1121</AMOUNT>
+            <AMOUNT>-0.10</AMOUNT>
           </ALLLEDGERENTRIES.LIST>
-          <ALLLEDGERENTRIES.LIST>
-            <LEDGERNAME>SALES</LEDGERNAME>
-            <GSTCLASS/>
-            <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-            <LEDGERFROMITEM>No</LEDGERFROMITEM>
-            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
-            <AMOUNT>950.00</AMOUNT>
-          </ALLLEDGERENTRIES.LIST>
-          <BILLALLOCATIONS.LIST>
-            <NAME>SL /JG0760 / 17/18</NAME>
-            <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
-            <BILLTYPE>New Ref</BILLTYPE>
-            <AMOUNT>1121</AMOUNT>
-          </BILLALLOCATIONS.LIST>
-          <BILLALLOCATIONS.LIST>
-            <NAME>SL /JG0760 / 17/18</NAME>
-            <BILLCREDITPERIOD>30</BILLCREDITPERIOD>
-            <BILLTYPE>New Ref</BILLTYPE>
-            <AMOUNT>-950</AMOUNT>
-          </BILLALLOCATIONS.LIST>
         </VOUCHER>
       </TALLYMESSAGE>
     </IMPORTDATA>
@@ -429,7 +449,7 @@ tally_Export.post("/exporttally", async (req, res) => {
 
   try {
     const tallyServerUrl = "http://localhost:9000"; // Replace with your actual Tally server URL
-    const tallyResponse = await axios.post(tallyServerUrl, xmlData, {
+    const tallyResponse = await axios.post(tallyServerUrl, xml11, {
       headers: {
         "Content-Type": "application/xml",
       },
@@ -464,7 +484,7 @@ tally_Export.post("/exporttally", async (req, res) => {
       console.log(" created export successfuly");
     } else if (alteredvalue === 1) {
       console.log("alterd already exist");
-      const guidMatch = xmlFile.match(/<GUID>(\d+)<\/GUID>/);
+      const guidMatch = xml11.match(/<GUID>(\d+)<\/GUID>/);
       // console.log("guid ", guidMatch);
       if (guidMatch) {
         const guid = guidMatch[1];
@@ -548,5 +568,236 @@ tally_Export.post("/getCompanyFromTally", async (req, res) => {
     console.error("Error fetching company names:", error);
   }
 });
+
+//teally export for payment receipts
+
+tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
+  console.log("payment xml data to exportr");
+  const xmlData = req.body.xml;
+  //console.log("xml payment to tally", xmlData);
+
+  const tallyUrl = "http://localhost:9000";
+
+  const paymentReceiptXML = `<ENVELOPE>
+  <HEADER>
+    <TALLYREQUEST>Import Data</TALLYREQUEST>
+  </HEADER>
+  <BODY>
+    <IMPORTDATA>
+      <REQUESTDESC>
+        <REPORTNAME>Vouchers</REPORTNAME>
+        <STATICVARIABLES>
+          <SVCURRENTCOMPANY>MLMPL_Jigani_2023_24</SVCURRENTCOMPANY>
+        </STATICVARIABLES>
+      </REQUESTDESC>
+      <TALLYMESSAGE xmlns:UDF="TallyUDF">
+        <VOUCHER REMOTEID="RV51393" VCHTYPE="PAYMENT RECEIPT" ACTION="Create">
+          <DATE>20240201</DATE>
+          <GUID>51393</GUID>
+          <NARRATION>RTGS Payment DTD: 25/11/2023 (Recd Dt: 27/11/2023)</NARRATION>
+          <VOUCHERTYPENAME>PAYMENT RECEIPT</VOUCHERTYPENAME>
+          <VOUCHERNUMBER>23/24 / 3937</VOUCHERNUMBER>
+          <PARTYLEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</PARTYLEDGERNAME>
+          <CSTFORMISSUETYPE/>
+          <CSTFORMRECVTYPE/>
+          <FBTPAYMENTTYPE>Default</FBTPAYMENTTYPE>
+          <DIFFACTUALQTY>No</DIFFACTUALQTY>
+          <AUDITED>No</AUDITED>
+          <FORJOBCOSTING>No</FORJOBCOSTING>
+          <ISOPTIONAL>No</ISOPTIONAL>
+          <EFFECTIVEDATE>20240201</EFFECTIVEDATE>
+          <USEFORINTEREST>No</USEFORINTEREST>
+          <USEFORGAINLOSS>No</USEFORGAINLOSS>
+          <USEFORGODOWNTRANSFER>No</USEFORGODOWNTRANSFER>
+          <USEFORCOMPOUND>No</USEFORCOMPOUND>
+          <ALTERID>51393</ALTERID>
+          <EXCISEOPENING>No</EXCISEOPENING>
+          <ISCANCELLED>No</ISCANCELLED>
+          <HASCASHFLOW>No</HASCASHFLOW>
+          <ISPOSTDATED>No</ISPOSTDATED>
+          <USETRACKINGNUMBER>No</USETRACKINGNUMBER>
+          <ISINVOICE>No</ISINVOICE>
+          <MFGJOURNAL>No</MFGJOURNAL>
+          <HASDISCOUNTS>No</HASDISCOUNTS>
+          <ASPAYSLIP>No</ASPAYSLIP>
+          <ISDELETED>No</ISDELETED>
+          <ASORIGINAL>No</ASORIGINAL>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>SULAX TECHNOLOGIES PRIVATE LIMITED</LEDGERNAME>
+            <GSTCLASS/>
+            <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>118789.00</AMOUNT>
+            <BILLALLOCATIONS.LIST>
+              <NAME>SR / JS3991 / 23/24</NAME>
+              <BILLTYPE>Agst Ref</BILLTYPE>
+              <AMOUNT>15301.00</AMOUNT>
+            </BILLALLOCATIONS.LIST>
+            <BILLALLOCATIONS.LIST>
+              <NAME>SR / JS4028 / 23/24</NAME>
+              <BILLTYPE>Agst Ref</BILLTYPE>
+              <AMOUNT>23667.00</AMOUNT>
+            </BILLALLOCATIONS.LIST>
+            <BILLALLOCATIONS.LIST>
+              <NAME>SR / JS4071 / 23/24</NAME>
+              <BILLTYPE>Agst Ref</BILLTYPE>
+              <AMOUNT>20262.00</AMOUNT>
+            </BILLALLOCATIONS.LIST>
+            <BILLALLOCATIONS.LIST>
+              <NAME>SR / JS4097 / 23/24</NAME>
+              <BILLTYPE>Agst Ref</BILLTYPE>
+              <AMOUNT>14514.00</AMOUNT>
+            </BILLALLOCATIONS.LIST>
+            <BILLALLOCATIONS.LIST>
+              <NAME>SR / JS4140 / 23/24</NAME>
+              <BILLTYPE>Agst Ref</BILLTYPE>
+              <AMOUNT>45045.00</AMOUNT>
+            </BILLALLOCATIONS.LIST>
+          </ALLLEDGERENTRIES.LIST>
+          <ALLLEDGERENTRIES.LIST>
+            <LEDGERNAME>Bank</LEDGERNAME>
+            <GSTCLASS/>
+            <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+            <LEDGERFROMITEM>No</LEDGERFROMITEM>
+            <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+            <ISPARTYLEDGER>Yes</ISPARTYLEDGER>
+            <AMOUNT>-118789</AMOUNT>
+          </ALLLEDGERENTRIES.LIST>
+        </VOUCHER>
+      </TALLYMESSAGE>
+      </IMPORTDATA>
+</BODY>
+</ENVELOPE>`;
+
+  try {
+    const tallyServerUrl = "http://localhost:9000"; // Replace with your actual Tally server URL
+    const tallyResponse = await axios.post(tallyServerUrl, paymentReceiptXML, {
+      headers: {
+        "Content-Type": "application/xml",
+      },
+    });
+
+    console.log("next step33", tallyResponse.data);
+    const guidArray = [];
+
+    const createdValue = parseInt(
+      tallyResponse.data.match(/<CREATED>(\d+)<\/CREATED>/)[1]
+    );
+
+    const alteredvalue = parseInt(
+      tallyResponse.data.match(/<ALTERED>(\d+)<\/ALTERED>/)[1]
+    );
+
+    const exceptionsValue = parseInt(
+      tallyResponse.data.match(/<EXCEPTIONS>(\d+)<\/EXCEPTIONS>/)[1]
+    );
+    console.log(
+      "print response ,",
+      createdValue,
+      alteredvalue,
+      exceptionsValue
+    );
+    if (createdValue === 1) {
+      // If createdValue is 1, indicating success
+      // res.status(200).json({
+      //     message: 'File uploaded and created in Tally successfully',
+      //     tallyData: tallyResponse.data // Send the Tally response data to the frontend
+      // });
+      console.log(" created export successfuly");
+    } else if (exceptionsValue === 1) {
+      console.log("alterd already exist");
+      const guidMatch = paymentReceiptXML.match(/<GUID>(\d+)<\/GUID>/);
+      // console.log("guid ", guidMatch);
+      if (guidMatch) {
+        const guid = guidMatch[1];
+        guidArray.push(guid);
+        console.log(
+          `GUID ${guid} was not exported to Tally due to an exception`
+        );
+        res.json({ guids: guidArray });
+      }
+    } else if (alteredvalue === 1) {
+      console.log("exceptions ===1");
+    } else {
+      console.log(" exception");
+      res.status(200).json({
+        message: "Exception",
+        // Send the Tally response data to the frontend
+      });
+    }
+  } catch (error) {
+    console.error("Error handling file upload:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
+//   console.log("payment xml data to exportr");
+//   let xmlResults = req.body.xml; // Assuming xmlResults is an array of XML strings
+//   xmlResults = xmlResults.map((xml) => xml.replace(/\n/g, ""));
+//   console.log("xml data payment recipt", xmlResults);
+
+//   const tallyServerUrl = "http://localhost:9000"; // Replace with your actual Tally server URL
+//   const guidArray = [];
+
+//   try {
+//     for (let i = 0; i < xmlResults.length; i++) {
+//       const xmlData = xmlResults[i];
+
+//       const tallyResponse = await axios.post(tallyServerUrl, xmlData, {
+//         headers: {
+//           "Content-Type": "application/xml",
+//         },
+//       });
+
+//       console.log("Response from Tally:", tallyResponse.data);
+
+//       const createdValue = parseInt(
+//         tallyResponse.data.match(/<CREATED>(\d+)<\/CREATED>/)[1]
+//       );
+
+//       const alteredValue = parseInt(
+//         tallyResponse.data.match(/<ALTERED>(\d+)<\/ALTERED>/)[1]
+//       );
+
+//       const exceptionsValue = parseInt(
+//         tallyResponse.data.match(/<EXCEPTIONS>(\d+)<\/EXCEPTIONS>/)[1]
+//       );
+
+//       console.log(
+//         "Print response:",
+//         createdValue,
+//         alteredValue,
+//         exceptionsValue
+//       );
+
+//       if (createdValue === 1) {
+//         console.log("Created successfully");
+//         // Add handling logic if necessary
+//       } else if (exceptionsValue === 1) {
+//         console.log("Exception: Already exists");
+//         const guidMatch = xmlData.match(/<GUID>(\d+)<\/GUID>/);
+//         if (guidMatch) {
+//           const guid = guidMatch[1];
+//           guidArray.push(guid);
+//           console.log(
+//             `GUID ${guid} was not exported to Tally due to an exception`
+//           );
+//         }
+//       } else if (alteredValue === 1) {
+//         console.log("Exception: Altered");
+//       } else {
+//         console.log("Unknown exception");
+//       }
+//     }
+
+//     res.status(200).json({ guids: guidArray });
+//   } catch (error) {
+//     console.error("Error handling file upload:", error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
 
 module.exports = tally_Export;
