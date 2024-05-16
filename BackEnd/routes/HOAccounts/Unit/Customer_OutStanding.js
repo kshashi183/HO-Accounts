@@ -93,11 +93,8 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
   const selectedDCType = req.query.selectedDCType;
   const invoiceFor = req.query.flag;
   const unitname = req.query.unitname;
-  console.log("custcode, ", custcode);
-  console.log("dctype", selectedDCType);
-  console.log("invoiceFor, ", invoiceFor);
 
-  console.log("unitnmmaee", req.query.unitname);
+  console.log("dctype", selectedDCType, "invoiceFor", invoiceFor);
 
   const sql1 = `SELECT 
     u.PO_No,
@@ -195,14 +192,15 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
         }
       });
     } else {
-      setupQueryMod(sql2, (err, result) => {
+      setupQueryMod(sql3, (err, result) => {
         if (err) {
           console.log("err in query", err);
         } else {
           if (result.length === 0) {
+            console.log("result length", result.length);
             return res.json({ Result: "select dc type" });
           } else {
-            //  console.log("cust code result2222", result);
+            console.log("cust code result2222");
             return res.json({ Result: result });
           }
         }
@@ -237,7 +235,7 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
           if (result.length === 0) {
             return res.json({ Result: "error in invoice for" });
           } else {
-            // console.log("cust code result4444", selectedDCType, );
+            console.log("cust code result4444");
             return res.json({ Result: result });
           }
         }
