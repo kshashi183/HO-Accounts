@@ -572,7 +572,6 @@ tally_Export.post("/getCompanyFromTally", async (req, res) => {
 //teally export for payment receipts
 
 tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
-  console.log("payment xml data to exportr");
   const xmlData = req.body.xml;
   //console.log("xml payment to tally", xmlData);
 
