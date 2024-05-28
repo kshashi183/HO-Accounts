@@ -51,7 +51,7 @@ customerOutstanding.get("/unitOutstandingData", (req, res) => {
 });
 
 customerOutstanding.get("/getCustomers", (req, res) => {
-  const sql = `SELECT DISTINCT Cust_Code, Cust_name FROM magodmis.cust_data `;
+  const sql = `SELECT DISTINCT Cust_Code, Cust_name FROM magod_hq_mis.unit_cust_data `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
@@ -145,6 +145,22 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
     WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType='${selectedDCType}'  AND  u.UnitName='${unitname}' AND
     InvoiceFor='${invoiceFor}'`;
 
+  const salesAndJobWork_Without_InvoiceFor = `SELECT 
+    u.PO_No,
+    u.Inv_No,
+  
+    u.GrandTotal - u.PymtAmtRecd AS Balance,
+    DATEDIFF(CURRENT_DATE(), u.Inv_Date) AS duedays,
+    u.InvoiceFor,  
+    u.DCStatus, 
+    u.DC_InvType,
+    u.Inv_Date, 
+    u.GrandTotal,
+    u.Cust_Name,
+    u.PymtAmtRecd,u.PIN_Code,u.DC_Inv_No
+    FROM magod_hq_mis.unit_invoices_list u
+    WHERE  u.Cust_Code = '${custcode}' AND   u.DC_InvType IN ('Sales', 'Job work')  AND  u.UnitName='${unitname}'`;
+
   const salesANDjobwork = `SELECT 
     u.PO_No,
     u.Inv_No,
@@ -182,12 +198,33 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
   // })
 
   if (selectedDCType !== "" && invoiceFor === "") {
-    if (selectedDCType === "ALL") {
+    if (selectedDCType !== "ALL" && selectedDCType !== "Sales & Jobwork") {
+      setupQueryMod(sql2, (err, result) => {
+        if (err) {
+          console.log("err in query", err);
+        } else {
+          console.log("unitname, dc type, cust code");
+          return res.json({ Result: result });
+        }
+      });
+    } else if (selectedDCType === "ALL") {
       setupQueryMod(sql1, (err, result) => {
         if (err) {
           console.log("err in query", err);
         } else {
-          console.log("cust code result1111111 no data for this unit");
+          console.log("cust code for ALL", result.length);
+          return res.json({ Result: result });
+        }
+      });
+    } else if (selectedDCType === "Sales & Jobwork") {
+      setupQueryMod(salesAndJobWork_Without_InvoiceFor, (err, result) => {
+        if (err) {
+          console.log("err in query", err);
+        } else {
+          console.log(
+            "cust code result1111111 no data for this unit",
+            result.length
+          );
           return res.json({ Result: result });
         }
       });
@@ -198,7 +235,7 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
         } else {
           if (result.length === 0) {
             console.log("result length", result.length);
-            return res.json({ Result: "select dc type" });
+            return res.json({ Result: "error in invoice for" });
           } else {
             console.log("cust code result2222");
             return res.json({ Result: result });
@@ -222,7 +259,7 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
             );
             return res.json({ Result: "error in invoice for" });
           } else {
-            console.log("cust code 4 sales and jobwork", result);
+            // console.log("cust code 4 sales and jobwork", result);
             return res.json({ Result: result });
           }
         }
@@ -262,7 +299,7 @@ customerOutstanding.get("/getDataTable2", (req, res) => {
     if (err) {
       console.log("err in query", err);
     } else {
-      // console.log("DC_Inv_no result", result);
+      console.log("DC_Inv_no result", result.length);
       return res.json({ Result: result });
     }
   });
@@ -275,6 +312,21 @@ customerOutstanding.get("/getDCTypes", (req, res) => {
       console.log("err in query", err);
     } else {
       //  console.log("DC_Inv_type", result);
+      return res.json({ Result: result });
+    }
+  });
+});
+
+customerOutstanding.post("/getAddress", (req, res) => {
+  const unit = req.body.unit;
+  console.log("backend adresssssss", req.body);
+
+  const sql = `SELECT   Unit_Address , RegistredOfficeAddress FROM magod_setup.magodlaser_units where UnitName='${unit}' `;
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("err in query", err);
+    } else {
+      // console.log(" unit adresssssss", result);
       return res.json({ Result: result });
     }
   });

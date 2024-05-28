@@ -162,7 +162,7 @@ showSyncRouter.get(
   "/getUnitOpenInvAndReceipts/:getName",
   async (req, res, next) => {
     const getName = req.params.getName;
-    console.log("getUnitOpenInvAndReceipts333", getName);
+    // console.log("getUnitOpenInvAndReceipts333", getName);
 
     const responseData = [];
     try {
