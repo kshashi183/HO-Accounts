@@ -4,7 +4,7 @@ const unitReceiptList = require("express").Router();
 const { setupQueryMod, misQuery } = require("../../../../helpers/dbconn");
 
 unitReceiptList.get("/getcustomerdata", (req, res) => {
-  const sql = "SELECT Cust_Code, Cust_name FROM magodmis.cust_data";
+  const sql = "SELECT Cust_Code, Cust_name FROM magod_hq_mis.unit_cust_data";
   setupQueryMod(sql, (err, result) => {
     if (err) {
       console.log("error", err);

@@ -200,4 +200,17 @@ unitlist.put("/updateData/:ID", (req, res) => {
   });
 });
 
+unitlist.put("/logo", (req, res) => {
+  const { base64String } = req.body;
+
+  const query = `UPDATE magod_setup.magodlaser_units  SET Logo ='${base64String}' WHERE ID = 1;`;
+  setupQueryMod(query, (er, result) => {
+    if (er) {
+      console.log(" err in logo", er);
+    } else {
+      console.log(" logo insert successfully");
+    }
+  });
+});
+
 module.exports = unitlist;
