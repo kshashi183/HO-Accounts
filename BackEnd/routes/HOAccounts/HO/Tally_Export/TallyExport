@@ -38,7 +38,7 @@ tally_Export.get("/getInvoiceData", (req, res) => {
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      console.log("invoiceee", result.length);
+      // console.log(" payment receipt 2 tab", result.length);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -59,7 +59,27 @@ tally_Export.get("/getInvoiceTaxDetails", (req, res) => {
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      // console.log("invoice", result);
+      return res.json({ Status: "Success", Result: result });
+    }
+  });
+});
+
+tally_Export.get("/getInvoiceTaxDetailsForXML", (req, res) => {
+  const unit = req.query.selectedUnitName;
+  const date = req.query.selectedDate;
+  // console.log("dc no", dcNo);
+  const sql = `SELECT m2.*, m2.Unit_Uid AS dc_invTaxId
+    FROM magod_hq_mis.unit_invoices_list m1
+    JOIN magod_hq_mis.unit_inv_taxtable m2
+    ON m1.DC_inv_no = m2.DC_inv_no AND m1.UnitName = m2.UnitName
+    WHERE m1.UnitName = '${unit.UnitName}'  AND m1.Inv_Date='${date}' `;
+
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("error", err);
+      return res.json({ Error: " error in sql" });
+    } else {
+      //  console.log(" TAX DATA invoice  FOR XML ", result.length);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -68,14 +88,6 @@ tally_Export.get("/getInvoiceTaxDetails", (req, res) => {
 tally_Export.get("/getPaymentReceipntData", (req, res) => {
   const date = req.query.date;
   const unit = req.query.selectedUnitName;
-
-  // const sql1 = `SELECT  DISTINCT p.Recd_PVNo, p.*, t.voucher_type, t.PreFix, t.LedgerName
-  //     FROM magod_hq_mis.unit_payment_recd_voucher_register p
-  //     JOIN magod_hq_mis.unit_payment_recd_voucher_details p1 ON p1.RecdPVID = p.RecdPVID AND
-  //     p1.UnitName = p.UnitName
-  //     JOIN magod_hq_mis.tally_voucher_ref t ON t.inv_type = p1.Inv_Type
-  //     WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PV_Date = '${date}';
-  //     `;
 
   const sql1 = `  SELECT  DISTINCT (p.Recd_PVNo), p.*
       FROM magod_hq_mis.unit_payment_recd_voucher_register p 
@@ -90,7 +102,7 @@ WHERE p.Unitname = '${unit.UnitName}' AND p.Recd_PV_Date = '${date}';
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      //  console.log("paymnettttt", result);
+      console.log("paymnet recepts 2 tab", result.length);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -532,6 +544,44 @@ tally_Export.post("/getCompanyGuid", (req, res) => {
 
 //get compnies from the tally software
 
+// tally_Export.post("/getCompanyFromTally", async (req, res) => {
+//   const tallyUrl = "http://localhost:9000";
+
+//   //const cm = req.body.cmp;
+//   const cm = "MLMPL_Jigani_2023_24";
+//   console.log("cmp name separte", cm);
+
+//   // Fetch company Names
+//   console.log("get compny from tally");
+
+//   try {
+//     const response = await axios.post(tallyUrl, {
+//       body: "<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>",
+//     });
+//     parseString(response.data, (err, result) => {
+//       if (err) {
+//         console.error("Error parsing XML:", err);
+//         return;
+//       }
+//       const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
+//       const companyNames = cmpny.map((company) => company.$.NAME);
+//       console.log("Company Names:", companyNames);
+//       const matchingCompanies = companyNames.filter((name) => name === cm);
+//       console.log("matched compnay", matchingCompanies);
+//       if (matchingCompanies.length === 0) {
+//         res.json({ company: "companyNot" });
+//         console.log("Match not found! .");
+//       } else {
+//         res.json({ company: "companyExist" });
+//         console.log("Match found! Sending message to frontend...");
+//       }
+//     });
+//   } catch (error) {
+//     console.error("Error fetching company names:", error);
+//   }
+// });
+
+// try to getting GUID from tally
 tally_Export.post("/getCompanyFromTally", async (req, res) => {
   const tallyUrl = "http://localhost:9000";
 
@@ -551,25 +601,47 @@ tally_Export.post("/getCompanyFromTally", async (req, res) => {
         console.error("Error parsing XML:", err);
         return;
       }
+
       const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
-      const companyNames = cmpny.map((company) => company.$.NAME);
-      console.log("Company Names:", companyNames);
-      const matchingCompanies = companyNames.filter((name) => name === cm);
-      console.log("matched compnay", matchingCompanies);
-      if (matchingCompanies.length === 0) {
-        res.json({ company: "companyNot" });
-        console.log("Match not found! .");
+      // const cmpny =
+      //   result.ENVELOPE.BODY[0].IMPORTDATA[0].REQUESTDATA[0].TALLYMESSAGE[0]
+      //     .VOUCHER[0].ALLLEDGERENTRIES[1].BANKALLOCATIONS[0].NAME[0];
+      console.log("resultttttttttt", result);
+
+      // const guid2 =
+      // resGUID.ENVELOPE.BODY[0].IMPORTDATA[0].REQUESTDATA[0].TALLYMESSAGE[0]
+      //   .VOUCHER[0].ALLLEDGERENTRIES[1].BANKALLOCATIONS[0].NAME[0];
+      const companies = cmpny.map((company) => ({
+        name: company.$.NAME,
+        guid: company.$.GUID,
+      }));
+      console.log("Companies:", cmpny);
+      const matchingCompany = companies.find((company) => company.name === cm);
+      if (!matchingCompany) {
+        // res.json({ company: "companyNot" });
+        console.log("Match not found!");
       } else {
-        res.json({ company: "companyExist" });
+        // res.json({ company: "companyExist", guid: matchingCompany.guid });
         console.log("Match found! Sending message to frontend...");
+
+        //get GUID based on company name
+        axios
+          .get(`${tallyUrl}/$Company:${matchingCompany.name}`)
+          .then((response) => {
+            console.log("GUID:", response.data);
+          })
+          .catch((error) => {
+            console.error("Error:", error.response.data);
+          });
       }
     });
   } catch (error) {
     console.error("Error fetching company names:", error);
   }
+  //get guid from tally
 });
 
-//teally export for payment receipts
+//tally export for payment receipts
 
 tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
   const xmlData = req.body.xml;

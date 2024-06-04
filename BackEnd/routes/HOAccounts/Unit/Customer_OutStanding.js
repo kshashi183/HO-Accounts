@@ -272,7 +272,7 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
           if (result.length === 0) {
             return res.json({ Result: "error in invoice for" });
           } else {
-            console.log("cust code result4444");
+            console.log("cust code result4444", result.length);
             return res.json({ Result: result });
           }
         }
