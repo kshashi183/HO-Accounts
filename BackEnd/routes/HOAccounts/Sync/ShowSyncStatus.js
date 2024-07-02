@@ -157,14 +157,154 @@ showSyncRouter.get(
   }
 );
 
-//getUnitOpenInvAndReceipts
+//getUnitOpenInvAndReceipts   for peenya
+// showSyncRouter.get(
+//   "/getUnitOpenInvAndReceipts/:getName",
+//   async (req, res, next) => {
+//     const getName = req.params.getName;
+//     console.log("getUnitOpenInvAndReceipts333", getName);
+//     const responseData = [];
+//     if (getName === "Jigani") {
+//       try {
+//         const cmdInvList = await hqQuery(
+//           `SELECT '${getName}' AS unitName,d.*, d.Dc_Inv_No AS Unit_Uid FROM magodmis.draft_dc_inv_register d
+//           WHERE d.Inv_No IS NOT NULL  AND NOT (d.DCStatus='Closed' OR d.DCStatus='Cancelled') AND NOT d.IsDC  ;`
+//         );
+
+//         const cmdInvPaymentVrList = await hqQuery(
+//           `SELECT
+//             '${getName}' AS unitName,
+//             d.dc_inv_no,
+//             p.Receive_Now,
+//             p1.Recd_PVNo AS VoucherNo,
+//             p1.ReceiptStatus AS VoucherStatus,
+//             TxnType
+//         FROM
+//             magodmis.draft_dc_inv_register d
+//         JOIN
+//             magodmis.payment_recd_voucher_details p ON p.Dc_Inv_no = d.dc_Inv_no
+//         JOIN
+//             magodmis.payment_recd_voucher_register p1 ON p1.RecdPVID = p.RecdPVID
+//         WHERE
+//             d.Inv_No IS NOT NULL
+//             AND NOT (d.DCStatus = 'Closed' OR d.DCStatus = 'Cancelled')
+//             AND NOT d.IsDC
+//             AND p1.ReceiptStatus <> 'Draft'
+
+//         UNION ALL
+
+//         SELECT
+//             '${getName}' AS unitName,
+//             d.dc_inv_no,
+//             p.Receive_Now,
+//             p1.HORef AS VoucherNo,
+//             p1.Status AS VoucherStatus,
+//             TxnType
+//         FROM
+//             magodmis.draft_dc_inv_register d
+//         JOIN
+//             magodmis.ho_paymentrv_details p ON p.Dc_Inv_no = d.dc_Inv_no
+//         JOIN
+//             magodmis.ho_paymentrv_register p1 ON p1.Id = p.UnitID
+//         WHERE
+//             d.Inv_No IS NOT NULL
+//             AND NOT (d.DCStatus = 'Closed' OR d.DCStatus = 'Cancelled')
+//             AND NOT d.IsDC;`
+//         );
+
+//         responseData.push({
+//           cmdInvList: cmdInvList,
+//           cmdInvPaymentVrList: cmdInvPaymentVrList,
+//         });
+
+//         for (let i = 0; i < responseData.length; i++) {
+//           const cmdInvList1 = responseData[i].cmdInvList;
+//           //  console.log("cmdInvPaymentVrList:", cmdInvList1);
+//         }
+
+//         // console.log("respond data show sync", responseData.cmdInvList);
+
+//         res.send(responseData);
+//       } catch (error) {
+//         next(error);
+//       }
+//     } else if (getName === "Peenya") {
+//       try {
+//         const cmdInvList = await hqQuery(
+//           `SELECT d.*, d.Dc_Inv_No AS Unit_Uid FROM magodmis.draft_dc_inv_details d
+//           WHERE d.Inv_No IS NOT NULL  AND NOT (d.DCStatus='Closed' OR d.DCStatus='Cancelled')
+//            AND NOT d.IsDC AND UnitName='${getName}'  ;`
+//         );
+
+//         const cmdInvPaymentVrList = await hqQuery(
+//           `SELECT
+//             '${getName}' AS unitName,
+//             d.dc_inv_no,
+//             p.Receive_Now,
+//             p1.Recd_PVNo AS VoucherNo,
+//             p1.ReceiptStatus AS VoucherStatus,
+//             TxnType
+//         FROM
+//             magodmis.draft_dc_inv_details d
+//         JOIN
+//             magodmis.payment_recd_voucher_details p ON p.Dc_Inv_no = d.dc_Inv_no
+//         JOIN
+//             magodmis.payment_recd_voucher_register p1 ON p1.RecdPVID = p.RecdPVID
+//         WHERE
+//             d.Inv_No IS NOT NULL
+//             AND NOT (d.DCStatus = 'Closed' OR d.DCStatus = 'Cancelled')
+//             AND NOT d.IsDC
+//             AND p1.ReceiptStatus <> 'Draft'
+//             AND d.UnitName='${getName}'
+
+//         UNION ALL
+
+//         SELECT
+//             '${getName}' AS unitName,
+//             d.dc_inv_no,
+//             p.Receive_Now,
+//             p1.HORef AS VoucherNo,
+//             p1.Status AS VoucherStatus,
+//             TxnType
+//         FROM
+//             magodmis.draft_dc_inv_details d
+//         JOIN
+//             magodmis.ho_paymentrv_details p ON p.Dc_Inv_no = d.dc_Inv_no
+//         JOIN
+//             magodmis.ho_paymentrv_register p1 ON p1.Id = p.UnitID
+//         WHERE
+//             d.Inv_No IS NOT NULL
+//             AND NOT (d.DCStatus = 'Closed' OR d.DCStatus = 'Cancelled')
+//             AND NOT d.IsDC    AND d.UnitName='${getName}';`
+//         );
+
+//         responseData.push({
+//           cmdInvList: cmdInvList,
+//           cmdInvPaymentVrList: cmdInvPaymentVrList,
+//         });
+
+//         for (let i = 0; i < responseData.length; i++) {
+//           const cmdInvList1 = responseData[i].cmdInvList;
+//           //  console.log("cmdInvPaymentVrList:", cmdInvList1);
+//         }
+
+//         // console.log("respond data show sync", responseData.cmdInvList);
+
+//         res.send(responseData);
+//       } catch (error) {
+//         next(error);
+//       }
+//     }
+//   }
+// );
+
 showSyncRouter.get(
   "/getUnitOpenInvAndReceipts/:getName",
   async (req, res, next) => {
     const getName = req.params.getName;
-    // console.log("getUnitOpenInvAndReceipts333", getName);
-
+    console.log("getUnitOpenInvAndReceipts333", getName);
     const responseData = [];
+
     try {
       const cmdInvList = await hqQuery(
         `SELECT '${getName}' AS unitName,d.*, d.Dc_Inv_No AS Unit_Uid FROM magodmis.draft_dc_inv_register d
@@ -190,9 +330,9 @@ showSyncRouter.get(
             AND NOT (d.DCStatus = 'Closed' OR d.DCStatus = 'Cancelled')
             AND NOT d.IsDC
             AND p1.ReceiptStatus <> 'Draft'
-        
+
         UNION ALL
-        
+
         SELECT
             '${getName}' AS unitName,
             d.dc_inv_no,
