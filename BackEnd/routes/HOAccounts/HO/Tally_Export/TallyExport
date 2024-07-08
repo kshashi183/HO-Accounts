@@ -544,79 +544,79 @@ tally_Export.post("/getCompanyGuid", (req, res) => {
 
 //get compnies from the tally software
 
-// tally_Export.post("/getCompanyFromTally", async (req, res) => {
-//   const tallyUrl = "http://localhost:9000";
-
-//   //const cm = req.body.cmp;
-//   const cm = "MLMPL_Jigani_2023_24";
-//   console.log("cmp name separte", cm);
-
-//   // Fetch company Names
-//   console.log("get compny from tally");
-
-//   try {
-//     const response = await axios.post(tallyUrl, {
-//       body: "<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>",
-//     });
-//     parseString(response.data, (err, result) => {
-//       if (err) {
-//         console.error("Error parsing XML:", err);
-//         return;
-//       }
-//       const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
-//       const companyNames = cmpny.map((company) => company.$.NAME);
-//       console.log("Company Names:", companyNames);
-//       const matchingCompanies = companyNames.filter((name) => name === cm);
-//       console.log("matched compnay", matchingCompanies);
-//       if (matchingCompanies.length === 0) {
-//         res.json({ company: "companyNot" });
-//         console.log("Match not found! .");
-//       } else {
-//         res.json({ company: "companyExist" });
-//         console.log("Match found! Sending message to frontend...");
-//       }
-//     });
-//   } catch (error) {
-//     console.error("Error fetching company names:", error);
-//   }
-// });
-
-// try to getting GUID from tally
 tally_Export.post("/getCompanyFromTally", async (req, res) => {
   const tallyUrl = "http://localhost:9000";
 
-  // const cm = req.body.cmp;
-  const cm = "MLMPL_Jigani_2023_24";
+  const cm = req.body.cmp;
+  //const cm = "MLMPL_Jigani_2023_24";
   console.log("cmp name separte", cm);
 
-  const response = await axios.post(tallyUrl, {
-    body: `<ENVELOPE>
-  <HEADER>
-    <VERSION>1</VERSION>
-    <TALLYREQUEST>EXPORT</TALLYREQUEST>
-    <TYPE>COLLECTION</TYPE>
-    <ID>List of Companies</ID>
-  </HEADER>
-  <BODY>
-    <DESC>
-      <STATICVARIABLES>
-        <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
-      </STATICVARIABLES>
-    </DESC>
-  </BODY>
-</ENVELOPE>`,
-  });
-  console.log("response from tally", response.data);
-  parseString(response.data, (err, result) => {
-    if (err) {
-      console.error("Error parsing XML:", err);
-      return;
-    }
-    const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
-    const companyNames = cmpny.map((company) => company.$.NAME);
-    console.log("Company Names:", companyNames);
-  });
+  // Fetch company Names
+  console.log("get compny from tally");
+
+  try {
+    const response = await axios.post(tallyUrl, {
+      body: "<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>",
+    });
+    parseString(response.data, (err, result) => {
+      if (err) {
+        console.error("Error parsing XML:", err);
+        return;
+      }
+      const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
+      const companyNames = cmpny.map((company) => company.$.NAME);
+      console.log("Company Names:", companyNames);
+      const matchingCompanies = companyNames.filter((name) => name === cm);
+      console.log("matched compnay", matchingCompanies);
+      if (matchingCompanies.length === 0) {
+        res.json({ company: "companyNot" });
+        console.log("Match not found! .");
+      } else {
+        res.json({ company: "companyExist" });
+        console.log("Match found! Sending message to frontend...");
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching company names:", error);
+  }
 });
+
+// try to getting GUID from tally
+// tally_Export.post("/getCompanyFromTally", async (req, res) => {
+//   const tallyUrl = "http://localhost:9000";
+
+//   // const cm = req.body.cmp;
+//   const cm = "MLMPL_Jigani_2023_24";
+//   console.log("cmp name separte", cm);
+
+//   const response = await axios.post(tallyUrl, {
+//     body: `<ENVELOPE>
+//   <HEADER>
+//     <VERSION>1</VERSION>
+//     <TALLYREQUEST>EXPORT</TALLYREQUEST>
+//     <TYPE>COLLECTION</TYPE>
+//     <ID>List of Companies</ID>
+//   </HEADER>
+//   <BODY>
+//     <DESC>
+//       <STATICVARIABLES>
+//         <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+//       </STATICVARIABLES>
+//     </DESC>
+//   </BODY>
+// </ENVELOPE>`,
+//   });
+//   console.log("response from tally", response.data);
+//   parseString(response.data, (err, result) => {
+//     if (err) {
+//       console.error("Error parsing XML:", err);
+//       return;
+//     }
+//     const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
+//     const companyNames = cmpny.map((company) => company.$.NAME);
+//     console.log("Company Names:", companyNames);
+//   });
+// });
 
 //tally export for payment receipts
 
