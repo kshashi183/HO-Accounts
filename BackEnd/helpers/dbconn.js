@@ -2,7 +2,6 @@ var mysql = require("mysql2");
 
 require("dotenv").config();
 
-
 const dbHost = process.env.DB_HOST;
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;
@@ -12,14 +11,13 @@ const dbDatabase3 = process.env.DB_DATABASE_3;
 const dbDatabase4 = process.env.DB_DATABASE_4;
 const dbDatabase5 = process.env.DB_DATABASE_5;
 const dbDatabase6 = process.env.DB_DATABASE_6;
-const dbDatabase7 = process.env.DB_DATABASE_7
-
+const dbDatabase7 = process.env.DB_DATABASE_7;
 
 var dailyReport = mysql.createConnection({
   host: dbHost,
   user: dbUser,
   password: dbPassword,
-  database:dbDatabase1,
+  database: dbDatabase1,
 });
 
 var setupConn = mysql.createConnection({
@@ -218,23 +216,20 @@ const misConn = mysql.createConnection({
 
 const setupQueryMod = async (q, values, callback) => {
   try {
-  
     misConn.connect();
 
     misConn.query(q, values, (err, res, fields) => {
-      
       if (err) {
         console.log("err", err);
 
         callback(err, null);
       } else {
-      console.log("result call back", res);
+        console.log("result call back", res);
 
-       callback(null, res);
+        callback(null, res);
       }
     });
   } catch (error) {
-    
     callback(error, null);
   }
 };
