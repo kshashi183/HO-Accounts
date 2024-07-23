@@ -545,7 +545,8 @@ tally_Export.post("/getCompanyGuid", (req, res) => {
 //get compnies from the tally software
 
 tally_Export.post("/getCompanyFromTally", async (req, res) => {
-  const tallyUrl = "http://localhost:9000";
+  // const tallyUrl = "http://localhost:9000";
+  const tallyUrl = "http://magodc01:9000";
 
   const cm = req.body.cmp;
   //const cm = "MLMPL_Jigani_2023_24";
