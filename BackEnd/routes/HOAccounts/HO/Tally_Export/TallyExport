@@ -16,7 +16,7 @@ tally_Export.get("/getInvoiceData", (req, res) => {
   FROM magod_hq_mis.tally_voucher_ref t
   JOIN magod_hq_mis.unit_invoices_list u
   ON t.inv_type = u.dc_invType
-  WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
+  WHERE u.UnitName='AHANA' AND u.Inv_Date = '${date}'
   ORDER BY t.voucher_type, u.Inv_no;`;
 
   // const sql = ` SELECT u.BillType,u.DC_InvType, u.Inv_No, u.Cust_Name, u.GrandTotal,u.PO_No,u.TallyRef,u.Cust_Code,u.DC_No,u.Inv_Date,
@@ -38,7 +38,7 @@ tally_Export.get("/getInvoiceData", (req, res) => {
       console.log("error", err);
       return res.json({ Error: " error in sql" });
     } else {
-      // console.log(" payment receipt 2 tab", result.length);
+      console.log(" INV ", result.length);
       return res.json({ Status: "Success", Result: result });
     }
   });
@@ -322,7 +322,7 @@ tally_Export.post("/exporttally", async (req, res) => {
   const cleanedXml = req.body.xml.replace(/\n/g, "");
 
   const xmlData = req.body.xml;
-  // console.log("xml daata", xmlData, "----------------");
+  //console.log("xml daata", xmlData, "----------------");
   const tallyUrl = "http://localhost:9000";
 
   //check company is exist or not

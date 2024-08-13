@@ -162,8 +162,10 @@ var hqConnection = mysql.createConnection({
 let dailyReportQuery = async (q, callback) => {
   dailyReport.connect();
   dailyReport.query(q, (err, res, fields) => {
-    if (err) callback(err, null);
-    else callback(null, res);
+    if (err) {
+      console.log("db connection err1");
+      callback(err, null);
+    } else callback(null, res);
   });
 };
 
@@ -171,6 +173,7 @@ let setupQuery = (q, callback) => {
   setupConn.connect();
   setupConn.query(q, (err, res, fields) => {
     if (err) {
+      console.log("db connection err2");
       callback(err, null); // Pass the error to the callback
     } else {
       callback(null, res); // Pass the result to the callback
@@ -190,6 +193,8 @@ const hqQuery = (query, values) => {
   return new Promise((resolve, reject) => {
     hqConnection.query(query, values, (err, results) => {
       if (err) {
+        console.log("db connection err3");
+
         reject(err);
       } else {
         resolve(results);
