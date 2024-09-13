@@ -11,12 +11,12 @@ const upload = multer({ storage: storage });
 tally_Export.get("/getInvoiceData", (req, res) => {
   const date = req.query.date;
   const unit = req.query.selectedUnitName;
-  console.log("unit", unit.UnitName);
+  console.log("unitttt", unit.UnitName);
   const sql = `SELECT u.*, t.voucher_type, t.PreFix, t.LedgerName
   FROM magod_hq_mis.tally_voucher_ref t
   JOIN magod_hq_mis.unit_invoices_list u
   ON t.inv_type = u.dc_invType
-  WHERE u.UnitName='AHANA' AND u.Inv_Date = '${date}'
+  WHERE u.UnitName='${unit.UnitName}' AND u.Inv_Date = '${date}'
   ORDER BY t.voucher_type, u.Inv_no;`;
 
   // const sql = ` SELECT u.BillType,u.DC_InvType, u.Inv_No, u.Cust_Name, u.GrandTotal,u.PO_No,u.TallyRef,u.Cust_Code,u.DC_No,u.Inv_Date,
@@ -32,6 +32,8 @@ tally_Export.get("/getInvoiceData", (req, res) => {
   // if (!date || !isValidDateFormat(date)) {
   //   console.log("Please provide a valid date in the format YYYY-MM-DD.");
   // }
+
+  console.log("sql query   ", sql);
 
   setupQueryMod(sql, (err, result) => {
     if (err) {
@@ -461,7 +463,7 @@ tally_Export.post("/exporttally", async (req, res) => {
 
   try {
     const tallyServerUrl = "http://localhost:9000"; // Replace with your actual Tally server URL
-    const tallyResponse = await axios.post(tallyServerUrl, xml11, {
+    const tallyResponse = await axios.post(tallyServerUrl, xmlData, {
       headers: {
         "Content-Type": "application/xml",
       },
