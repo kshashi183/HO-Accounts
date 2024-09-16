@@ -327,33 +327,6 @@ tally_Export.post("/exporttally", async (req, res) => {
   //console.log("xml daata", xmlData, "----------------");
   const tallyUrl = "http://localhost:9000";
 
-  //check company is exist or not
-  // try {
-  //   const response = await axios.post(tallyUrl, {
-  //     body: "<ENVELOPE><HEADER><VERSION>1</VERSION><TALLYREQUEST>EXPORT</TALLYREQUEST><TYPE>COLLECTION</TYPE><ID>List of Companies</ID></HEADER><BODY><DESC><STATICVARIABLES><SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT></STATICVARIABLES></DESC></BODY></ENVELOPE>",
-  //   });
-  //   parseString(response.data, (err, result) => {
-  //     if (err) {
-  //       console.error("Error parsing XML:", err);
-  //       return;
-  //     }
-  //     const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
-  //     const companyNames = cmpny.map((company) => company.$.NAME);
-  //     console.log("Company Names:", companyNames);
-
-  //     const matchingCompanies = companyNames.filter((name) => name === cmpname);
-  //     console.log("matched compnay", matchingCompanies);
-  //     if (matchingCompanies.length === 0) {
-  //       res.json({ company: "companyNot" });
-  //       console.log("Match not found! .");
-  //     } else {
-  //       console.log("Match found! Sending message to frontend...");
-  //     }
-  //   });
-  // } catch (error) {
-  //   console.error("Error fetching company names:", error);
-  // }
-
   const xml11 = ` <ENVELOPE>
   <HEADER><TALLYREQUEST>Import Data</TALLYREQUEST></HEADER>
   <BODY>
@@ -453,14 +426,6 @@ tally_Export.post("/exporttally", async (req, res) => {
   </BODY>
 </ENVELOPE>`;
 
-  //sending the .xml file to tally not xml format
-
-  // Write the XML data to a file
-  // fs.writeFileSync("exportedData.xml", xmlData);
-
-  // Read the XML file
-  //const xmlFileToTally = fs.readFileSync("exportedData.xml");
-
   try {
     const tallyServerUrl = "http://localhost:9000"; // Replace with your actual Tally server URL
     const tallyResponse = await axios.post(tallyServerUrl, xmlData, {
@@ -518,8 +483,19 @@ tally_Export.post("/exporttally", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error handling file upload:", error);
-    res.status(500).send("Internal Server Error");
+    if (error.code === "ECONNREFUSED") {
+      // Tally server is not running or unavailable
+
+      res.status(503).json({
+        message: "Tally server is offline.",
+      });
+    } else {
+      // Handle other errors
+      console.error("Error exporting to Tally:", error);
+      res.status(500).json({
+        message: "An error occurred while exporting to Tally.",
+      });
+    }
   }
 });
 
@@ -580,7 +556,10 @@ tally_Export.post("/getCompanyFromTally", async (req, res) => {
       }
     });
   } catch (error) {
-    console.error("Error fetching company names:", error);
+    console.error("Error fetching company names:");
+    res.status(500).json({
+      message: "Tally_server_off",
+    });
   }
 });
 
