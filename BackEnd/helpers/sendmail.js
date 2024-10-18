@@ -1,15 +1,14 @@
-
 const nodemailer = require("nodemailer");
 var html_to_pdf = require("html-pdf-node");
 // const { merge } = require("merge-pdf-buffers");
 const { PDFDocument } = require("pdf-lib");
- 
+
 const {
   quotationStartPage,
   quotationDetails,
   dueReportStartPage,
 } = require("./mailtemplate");
- 
+
 const genPdf = (content, callback) => {
   html_to_pdf
     .generatePdf(
@@ -28,10 +27,10 @@ const genPdf = (content, callback) => {
       callback(pdfBuffer);
     });
 };
- 
+
 const mergePdfBuffers = async (pdfBuffers) => {
   const mergedPdf = await PDFDocument.create();
- 
+
   for (const pdfBuffer of pdfBuffers) {
     const pdfDoc = await PDFDocument.load(pdfBuffer);
     const copiedPages = await mergedPdf.copyPages(
@@ -40,18 +39,16 @@ const mergePdfBuffers = async (pdfBuffers) => {
     );
     copiedPages.forEach((page) => mergedPdf.addPage(page));
   }
- 
+
   const mergedPdfBytes = await mergedPdf.save();
   return mergedPdfBytes;
 };
- 
+
 const sendQuotation = async (customer, qtnDetails, qtnTC, callback) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
     auth: {
-      //   user: "pranav13100@gmail.com",
-      //   pass: "lgukawauauccnihf",
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
@@ -95,7 +92,7 @@ const sendQuotation = async (customer, qtnDetails, qtnTC, callback) => {
     });
   });
 };
- 
+
 const sendDueList = async (customer, duesdata, duedata, callback) => {
   console.log("Send Due List");
   const transporter = nodemailer.createTransport({
@@ -109,7 +106,7 @@ const sendDueList = async (customer, duesdata, duedata, callback) => {
     },
   });
   let emailcontent = await dueReportStartPage(customer, duesdata, duedata);
- 
+
   let emailTextContent = `
         Dear Sir,<br/><br/>
    
@@ -130,7 +127,7 @@ const sendDueList = async (customer, duesdata, duedata, callback) => {
       //   from: '"Magod Laser" <magodlaser3@gmail.com>', // sender address
       from: process.env.From_EMAIL, // sender address
       to: "vkbedasur@@gmail.com", // list of receivers
- 
+
       //   to: "vkbedasur@gmail.com", // list of receivers
       subject: `List of Invoices Due for Payment as on ${Date()}`, // Subject line
       text: emailTextContent.replaceAll("<br/>", "\n"), // plain text body
@@ -150,7 +147,7 @@ const sendDueList = async (customer, duesdata, duedata, callback) => {
     // });
   });
 };
- 
+
 const sendAttachmails = async (
   from,
   to,
@@ -158,44 +155,53 @@ const sendAttachmails = async (
   mailsubject,
   mailbody,
   file,
-  
+
   callback
 ) => {
-  console.log("in send mail backend file",mailsubject);
+  console.log("in send mail backend file", mailsubject);
 
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
+    // host: "smtp.gmail.com",
+    // port: 587,
+    host: "mail.magodlaser.in",
+    port: 465,
     auth: {
-        user: "magodlaser3@gmail.com",
-        
-        pass: "nisxnacwozjtuplp",
-     // user: process.env.MAIL_USER,
-     // pass: process.env.MAIL_PASS,
+      // user: "magodlaser3@gmail.com",
+
+      // pass: "nisxnacwozjtuplp",
+      user: process.env.MAIL_USER,
+      pass: process.env.MAIL_PASS,
     },
   });
+  // let info = await transporter.sendMail({
+  //   from: `"${from}" <magodlaser3@gmail.com>`,
+  //   to: to,
+  //   cc: cc,
+  //   subject: mailsubject,
+  //   text: mailbody,
+  //   html: mailbody.replaceAll("\n", "<br/>"),
+  //   attachments: [file],
+  // });
   let info = await transporter.sendMail({
-    // from: '"Magod Laser" <magodlaser3@gmail.com>', // sender address
-   // from: process.env.From_EMAIL, // sender address
-    from: `"${from}" <magodlaser3@gmail.com>`,
-    to: to, // list of receivers
+    from: from ? `"${from}"` : `<${process.env.MAIL_USER}>`,
+    to: to,
     cc: cc,
-    subject: mailsubject, // Subject line
+    subject: mailsubject,
     text: mailbody,
-    html: mailbody.replaceAll("\n", "<br/>"), // plain text body
+    html: mailbody.replace(/\n/g, "<br/>"),
     attachments: [file],
   });
   if (info.messageId) {
-    console.log("11");
+   
+
     callback(null, info.messageId);
   } else {
-    console.log("22");
+    
     callback("Error in sending mail", null);
   }
 };
- 
+
 module.exports = { sendQuotation, sendDueList, sendAttachmails };
- 
+
 // Account : pranav13100@gmail.com
 // Password : lgukawauauccnihf
- 

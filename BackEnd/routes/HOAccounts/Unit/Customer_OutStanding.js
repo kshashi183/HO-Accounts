@@ -8,23 +8,6 @@ customerOutstanding.get("/unitOutstandingData", (req, res) => {
   const unitname = req.query.unitname;
   console.log("unit nameeeeeeeeeeee", unitname);
 
-  const sqlQ = `
-        SELECT @UnitName AS UnitName, u.*, a.OutStandingInvoiceCount, a.OutStandingAmount
-        FROM magodmis.cust_data u
-        INNER JOIN (
-            SELECT
-                COUNT(u.\`Cust_Code\`) AS OutStandingInvoiceCount,
-                SUM(u.\`GrandTotal\` - u.\`PymtAmtRecd\`) AS OutStandingAmount,
-                u.\`Cust_Code\`
-            FROM magodmis.draft_Dc_Inv_Register u
-            WHERE u.\`GrandTotal\` - u.\`PymtAmtRecd\` > 0
-                AND u.\`DCStatus\` NOT LIKE 'Closed'
-                AND u.\`Inv_No\` IS NOT NULL 
-                AND u.\`Inv_Date\` <'2018-02-04'    
-            GROUP BY u.\`Cust_Code\`
-        ) AS a ON a.\`Cust_Code\` = u.\`Cust_Code\` ;
-    `;
-
   // Both queries are same i make some changes based on my requriment
 
   const UnitNameQuery = `
@@ -52,8 +35,7 @@ customerOutstanding.get("/unitOutstandingData", (req, res) => {
 
 customerOutstanding.get("/getCustomers", (req, res) => {
   const sql = `SELECT DISTINCT Cust_Code, Cust_name FROM magod_hq_mis.unit_cust_data `;
-  //  const sql=`
-  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+
   setupQueryMod(sql, (err, result) => {
     if (err) {
       console.log("err in query", err);
@@ -63,30 +45,6 @@ customerOutstanding.get("/getCustomers", (req, res) => {
     }
   });
 });
-
-// customerOutstanding.get('/getDataBasedOnCustomer', (req,res)=>{
-//     const custcode=req.query.selectedCustCode;
-//    // console.log("cust_code backend 33333333333 ", custcode);
-//     const sql=`     SELECT *,
-//     GrandTotal-  PymtAmtRecd AS Balance, DATEDIFF(CURRENT_DATE(),inv_date) AS duedays,
-//     IF(LENGTH(DC_Date) = 8, DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DC_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DC_Date,
-//       IF(LENGTH(Inv_Date) = 8, DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(Inv_Date, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_Inv_Date,
-//         IF(LENGTH(DespatchDate) = 8, DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y'), DATE_FORMAT(STR_TO_DATE(DespatchDate, '%Y-%m-%d'), '%d-%m-%Y')) AS Formatted_DespatchDate,
-//     IF(TIME(OrderDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(OrderDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_OrderDate,
-//       IF(TIME(PaymentDate) = '00:00:00', DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s'), DATE_FORMAT(STR_TO_DATE(PaymentDate, '%Y-%m-%d %H:%i:%s'), '%d-%m-%Y %H:%i:%s')) AS Formatted_PaymentDate
-// FROM magod_hq_mis.unit_invoices_list
-// WHERE UnitName = 'Jigani' AND Cust_Code = '${custcode}';`;
-
-//     setupQueryMod(sql, (err, result)=>{
-//         if(err){
-//             console.log("err in query", err);
-//         }
-//         else{
-//         // console.log("cust code result", result);
-//             return res.json({Result:result});
-//         }
-//     })
-//     })
 
 customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
   const custcode = req.query.selectedCustCode;
