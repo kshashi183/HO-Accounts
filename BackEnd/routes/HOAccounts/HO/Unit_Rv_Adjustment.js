@@ -62,7 +62,7 @@ u.PRV_Status = 'Created' AND Unitname='${unit}'  ;`;
 unitRV_Adjustment.get("/getCustomers", (req, res) => {
   const sql = `SELECT DISTINCT Cust_Code, Cust_name FROM magod_hq_mis.unit_cust_data `;
   //  const sql=`
-  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+  // SELECT DISTINCT Cust_Code , Cust_Name FROM .draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
       console.log("err in query", err);
@@ -87,7 +87,7 @@ unitRV_Adjustment.get("/openInvoices", (req, res) => {
       AND ABS(GrandTotal - PymtAmtRecd) > 0
       AND DCStatus <> 'Closed'; `;
   //  const sql=`
-  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+  // SELECT DISTINCT Cust_Code , Cust_Name FROM .draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
       console.log("err in query", err);

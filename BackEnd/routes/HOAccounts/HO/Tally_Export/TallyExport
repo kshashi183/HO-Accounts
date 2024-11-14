@@ -347,9 +347,22 @@ tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
       exceptionsValue
     );
     if (createdValue !== 0) {
+      const guidArray = [];
+      const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+      if (guidMatches) {
+        // If GUIDs were altered, we push them
+        guidMatches.forEach((guidMatch) => {
+          const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+          guidArray.push(guid); // Push all GUIDs
+        });
+      }
+
+      // Send the altered GUIDs to the frontend
+      console.log("created GUIDs:", guidArray);
+      res.json({ guids: guidArray, message: "create" });
       console.log(" created export successfuly");
     } else if (alteredvalue > 0) {
-      // Extract GUIDs from the request XML
       const guidArray = [];
       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
 
@@ -363,14 +376,22 @@ tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
 
       // Send the altered GUIDs to the frontend
       console.log("Altered GUIDs:", guidArray);
-      res.json({ guids: guidArray });
+      res.json({ guids: guidArray, message: "alter" });
     } else if (exceptionsValue > 0) {
-      // Handle exceptions case
-      console.log("Exceptions found in response");
-      res.status(200).json({
-        message: "Exceptions found",
-        exceptions: exceptionsValue,
-      });
+      const guidArray = [];
+      const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+      if (guidMatches) {
+        // If GUIDs were altered, we push them
+        guidMatches.forEach((guidMatch) => {
+          const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+          guidArray.push(guid); // Push all GUIDs
+        });
+      }
+
+      // Send the altered GUIDs to the frontend
+      console.log("Exception GUIDs:", guidArray);
+      res.json({ guids: guidArray, message: "Exception" });
     } else {
       // Handle cases where no GUIDs are altered
       console.log("No GUIDs altered");

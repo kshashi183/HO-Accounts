@@ -155,33 +155,20 @@ const sendAttachmails = async (
   mailsubject,
   mailbody,
   file,
-
   callback
 ) => {
   console.log("in send mail backend file", mailsubject);
 
   const transporter = nodemailer.createTransport({
-    // host: "smtp.gmail.com",
-    // port: 587,
     host: "mail.magodlaser.in",
     port: 465,
+    secure: true,
     auth: {
-      // user: "magodlaser3@gmail.com",
-
-      // pass: "nisxnacwozjtuplp",
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASS,
     },
   });
-  // let info = await transporter.sendMail({
-  //   from: `"${from}" <magodlaser3@gmail.com>`,
-  //   to: to,
-  //   cc: cc,
-  //   subject: mailsubject,
-  //   text: mailbody,
-  //   html: mailbody.replaceAll("\n", "<br/>"),
-  //   attachments: [file],
-  // });
+
   let info = await transporter.sendMail({
     from: from ? `"${from}"` : `<${process.env.MAIL_USER}>`,
     to: to,
@@ -191,12 +178,11 @@ const sendAttachmails = async (
     html: mailbody.replace(/\n/g, "<br/>"),
     attachments: [file],
   });
-  if (info.messageId) {
-   
+  console.log("infop0000000000000000 ", info);
 
+  if (info.messageId) {
     callback(null, info.messageId);
   } else {
-    
     callback("Error in sending mail", null);
   }
 };
