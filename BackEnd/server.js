@@ -14,7 +14,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
-  res.send("hello");
+  res.send("hello hi ho accounts");
 });
 
 app.use((err, req, res, next) => {
