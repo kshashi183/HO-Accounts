@@ -67,6 +67,26 @@ WHERE Unitname = 'Jigani' AND RecdPVID = '${RecdPVID}';
 unitReceiptList.get("/getOpenInvoices", (req, res) => {
   const Cust_code = req.query.Cust_code;
   console.log("CUSTCODE", Cust_code);
+  //   const sql = `SELECT
+  //     'Jigani' as UnitName,
+  //     d.DC_Inv_No,
+  //     d.DC_InvType,
+  //     d.Inv_No,
+  //     DATE_FORMAT(d.Inv_Date, '%d-%m-%Y') as Formatted_Inv_Date,
+  //     d.Cust_Code,
+  //     d.Cust_Name,
+  //     d.GrandTotal,
+  //     d.PymtAmtRecd,
+  //     d.GrandTotal - d.PymtAmtRecd as Balance,
+  //     d.Inv_Fin_Year
+  // FROM
+  //     magodmis.draft_dc_inv_register d
+  // WHERE
+  //     d.Cust_Code ='${Cust_code}'
+  //     AND d.DCStatus = 'Despatched'
+  //     AND d.GrandTotal <> d.PymtAmtRecd;
+  // `;
+
   const sql = `SELECT 
     'Jigani' as UnitName,
     d.DC_Inv_No, 
@@ -80,7 +100,7 @@ unitReceiptList.get("/getOpenInvoices", (req, res) => {
     d.GrandTotal - d.PymtAmtRecd as Balance,
     d.Inv_Fin_Year 
 FROM 
-    magodmis.draft_dc_inv_register d 
+    magod_hq_mis.unit_invoices_list d 
 WHERE 
     d.Cust_Code ='${Cust_code}'
     AND d.DCStatus = 'Despatched' 

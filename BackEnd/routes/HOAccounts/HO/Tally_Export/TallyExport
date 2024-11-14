@@ -155,7 +155,7 @@ tally_Export.post("/exporttally", async (req, res) => {
       },
     });
 
-    console.log("Tally response data:", tallyResponse.data);
+    // console.log("Tally response data:", tallyResponse.data);
 
     // Extract values from Tally response
     const createdValue = parseInt(
@@ -169,16 +169,30 @@ tally_Export.post("/exporttally", async (req, res) => {
       tallyResponse.data.match(/<EXCEPTIONS>(\d+)<\/EXCEPTIONS>/)?.[1] || "0"
     );
 
-    console.log(
-      "Response Values:",
-      "Altered:",
-      alteredValue,
-      "Exceptions:",
-      exceptionValue,
-      "createdValue",
-      createdValue
-    );
-    if (createdValue !== 0) {
+    // console.log(
+    //   "Response Values:",
+    //   "Altered:",
+    //   alteredValue,
+    //   "Exceptions:",
+    //   exceptionValue,
+    //   "createdValue",
+    //   createdValue
+    // );
+    if (createdValue > 0) {
+      const guidArray = [];
+      const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+      if (guidMatches) {
+        // If GUIDs were altered, we push them
+        guidMatches.forEach((guidMatch) => {
+          const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+          guidArray.push(guid); // Push all GUIDs
+        });
+      }
+
+      // Send the altered GUIDs to the frontend
+      console.log("created GUIDs:", guidArray);
+      res.json({ guids: guidArray, message: "create" });
       console.log(" created export successfuly");
     } else if (alteredValue > 0) {
       // Extract GUIDs from the request XML
@@ -195,14 +209,22 @@ tally_Export.post("/exporttally", async (req, res) => {
 
       // Send the altered GUIDs to the frontend
       console.log("Altered GUIDs:", guidArray);
-      res.json({ guids: guidArray });
+      res.json({ guids: guidArray, message: "alter" });
     } else if (exceptionValue > 0) {
-      // Handle exceptions case
-      console.log("Exceptions found in response");
-      res.status(200).json({
-        message: "Exceptions found",
-        exceptions: exceptionValue,
-      });
+      const guidArray = [];
+      const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+      if (guidMatches) {
+        // If GUIDs were altered, we push them
+        guidMatches.forEach((guidMatch) => {
+          const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+          guidArray.push(guid); // Push all GUIDs
+        });
+      }
+
+      // Send the altered GUIDs to the frontend
+      console.log("Exception GUIDs:", guidArray);
+      res.json({ guids: guidArray, message: "Exception" });
     } else {
       // Handle cases where no GUIDs are altered
       console.log("No GUIDs altered");
@@ -252,9 +274,9 @@ tally_Export.post("/getCompanyGuid", (req, res) => {
 tally_Export.post("/getCompanyFromTally", async (req, res) => {
   const tallyUrl = "http://localhost:9000";
   // const tallyUrl = "https://magodc01:9000";
-
-  // const cm = req.body.cmp;
-  const cm = "MLMPL_Jigani_2023_24";
+  console.log("cmp req body", req.body);
+  const cm = req.body.cmp;
+  //  const cm = "MLMPL_Jigani_2023_24";
   //console.log("cmp name separte", cm);
 
   // Fetch company Names
@@ -271,7 +293,7 @@ tally_Export.post("/getCompanyFromTally", async (req, res) => {
       }
       const cmpny = result.ENVELOPE.BODY[0].DATA[0].COLLECTION[0].COMPANY;
       const companyNames = cmpny.map((company) => company.$.NAME);
-      console.log("Company Names:", companyNames);
+      console.log("Company Name from tally:", companyNames);
       const matchingCompanies = companyNames.filter((name) => name === cm);
       console.log("matched compnay", matchingCompanies);
       if (matchingCompanies.length === 0) {
@@ -325,9 +347,22 @@ tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
       exceptionsValue
     );
     if (createdValue !== 0) {
+      const guidArray = [];
+      const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+      if (guidMatches) {
+        // If GUIDs were altered, we push them
+        guidMatches.forEach((guidMatch) => {
+          const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+          guidArray.push(guid); // Push all GUIDs
+        });
+      }
+
+      // Send the altered GUIDs to the frontend
+      console.log("created GUIDs:", guidArray);
+      res.json({ guids: guidArray, message: "create" });
       console.log(" created export successfuly");
     } else if (alteredvalue > 0) {
-      // Extract GUIDs from the request XML
       const guidArray = [];
       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
 
@@ -341,14 +376,22 @@ tally_Export.post("/exporttallyForPaymentReceipts", async (req, res) => {
 
       // Send the altered GUIDs to the frontend
       console.log("Altered GUIDs:", guidArray);
-      res.json({ guids: guidArray });
+      res.json({ guids: guidArray, message: "alter" });
     } else if (exceptionsValue > 0) {
-      // Handle exceptions case
-      console.log("Exceptions found in response");
-      res.status(200).json({
-        message: "Exceptions found",
-        exceptions: exceptionsValue,
-      });
+      const guidArray = [];
+      const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+      if (guidMatches) {
+        // If GUIDs were altered, we push them
+        guidMatches.forEach((guidMatch) => {
+          const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+          guidArray.push(guid); // Push all GUIDs
+        });
+      }
+
+      // Send the altered GUIDs to the frontend
+      console.log("Exception GUIDs:", guidArray);
+      res.json({ guids: guidArray, message: "Exception" });
     } else {
       // Handle cases where no GUIDs are altered
       console.log("No GUIDs altered");
