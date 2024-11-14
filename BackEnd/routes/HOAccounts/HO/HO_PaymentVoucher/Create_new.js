@@ -1,20 +1,26 @@
 const createnew = require("express").Router();
 
-const { setupQueryMod, misQuery,setupQuery } = require("../../../../helpers/dbconn")
+const { setupQueryMod, misQuery,setupQuery } = require("../../../../helpers/dbconn");
+const { logger } = require("../../../../helpers/logger");
 
 
 
 
 createnew.get('/ho_openInvoices', (req, res) => {
   const custcode = req.query.customercode;
-  console.log("HO INV custcodeeeee", custcode);
-  const sql = `SELECT *,
-      DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
-      FROM magod_hq_mis.unit_invoices_list
-      WHERE UnitName = 'Jigani'
-        AND Cust_Code='${custcode}'
-        AND ABS(GrandTotal - PymtAmtRecd) > 0
-        AND DCStatus <> 'Closed'; `;
+ 
+ const unitname = req.query.unitname;
+  
+  console.log("HO INV custcodeeeee", custcode,unitname);
+  
+
+  const sql = `SELECT *
+  
+  FROM magod_hq_mis.unit_invoices_list
+  WHERE UnitName = '${unitname}'
+    AND Cust_Code='${custcode}'
+    AND ABS(GrandTotal - PymtAmtRecd) > 0
+    AND DCStatus <> 'Closed'; `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
@@ -22,7 +28,43 @@ createnew.get('/ho_openInvoices', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      //  console.log("HO open invoice", result);
+    // console.log("HO open invoice", result);
+      // return res.json({ Result: result });
+      res.send(result)
+    }
+  })
+})
+
+
+createnew.get('/ho_openInvoicesADJUST', (req, res) => {
+  const custcode = req.query.customercode;
+ 
+ 
+  
+  console.log("HO INV custcodeeeee", custcode);
+  // const sql = `SELECT *,
+  //     DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
+  //     FROM magod_hq_mis.unit_invoices_list
+  //     WHERE UnitName = 'Jigani'
+  //       AND Cust_Code='${custcode}'
+  //       AND ABS(GrandTotal - PymtAmtRecd) > 0
+  //       AND DCStatus <> 'Closed'; `;
+
+  const sql = `SELECT *
+  
+  FROM magod_hq_mis.unit_invoices_list
+  WHERE 
+  Cust_Code='${custcode}'
+    AND ABS(GrandTotal - PymtAmtRecd) > 0
+    AND DCStatus <> 'Closed'; `;
+  //  const sql=`
+  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("err in query", err);
+    }
+    else {
+       console.log("HO open adjustment invoice", result);
       return res.json({ Result: result });
     }
   })
@@ -41,7 +83,7 @@ createnew.post('/getFormData', (req, res) => {
   console.log("receipt_id  hoprvid form", req.body)
   //const receipt_id = 245);
   // const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' `;
-  const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' AND Cust_code='${custCode}' `;
+  const sql = `SELECT * from magod_hq_mis.ho_paymentrv_register  WHERE HOPrvId='${receipt_id}' AND Cust_code='${custCode}' AND Unit_RecdPVid=0 `;
   //  const sql=`
   // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
@@ -49,7 +91,7 @@ createnew.post('/getFormData', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      console.log("form data", result);
+     console.log("form data", result);
       return res.json({ Result: result });
     }
   })
@@ -59,6 +101,7 @@ createnew.post('/getFormData', (req, res) => {
 createnew.post('/getleftTable', (req, res) => {
   const { receipt_id } = req.body
   // const receipt_id=1
+  console.log("left table dataaaaaaaaaaaaaaaaaaaaaaaa");
   
   const unit='Jigani'
   console.log(" left table data", receipt_id, unit);
@@ -158,28 +201,51 @@ createnew.post('/insertToparentForm', (req, res) => {
 createnew.delete("/deleteleft", (req, res) => {
   const ho = req.body.hoid
   // console.log("delete", req.params, typeof (uid));
-  console.log("deleyte ", req.body.onacc);
+  console.log("deleyte ", req.body.receipt_details);
 
 
   //update on account value after delete the form 
 
 
   const update = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
-SET u.On_account =u.On_account+'${req.body.onacc}'
+SET u.On_account =u.On_account +'${req.body.onacc}'
    
 WHERE u.Id = '${req.body.id}';
  `;
 
-  setupQueryMod(update, (err, result) => {
+
+ const receiptdetailsISNull=`UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
+ SET u.On_account ='${req.body.onacc}'
+    
+ WHERE u.Id = '${req.body.id}';
+  `;
+
+if(req.body.receipt_details.length===0){
+  setupQueryMod(receiptdetailsISNull, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      //console.log("err in query", err);
     }
     else {
-      console.log("update onaccount after result", result);
+     // console.log("update onaccount after result", result);
 
 
     }
   })
+}
+ else{
+  setupQueryMod(update, (err, result) => {
+    if (err) {
+      //console.log("err in query", err);
+    }
+    else {
+     // console.log("update onaccount after result", result);
+
+
+    }
+  })
+ }
+
+  
 
 
 
@@ -189,19 +255,19 @@ WHERE u.Id = '${req.body.id}';
     `DELETE FROM magod_hq_mis.ho_paymentrv_details  WHERE HOPrvId ='${ho}'`;
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("fail to delete", err);
+     // console.log("fail to delete", err);
       return res.json({ Error: " err in sql" });
     }
     else {
-      console.log("result delete", result);
+    //  console.log("result delete", result);
 
       const sql2 = `DELETE FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId ='${ho}'`;
       setupQueryMod(sql2, (err2, result2) => {
         if (err2) {
-          console.log("Failed to delete from ho_paymentrv_register", err2);
+        //  console.log("Failed to delete from ho_paymentrv_register", err2);
           return res.status(500).json({ Error: "Error in SQL query for ho_paymentrv_register" });
         } else {
-          console.log("Deleted from ho_paymentrv_register:", result2);
+        //  console.log("Deleted from ho_paymentrv_register:", result2);
           return res.json({ Status: "Success" });
         }
       });
@@ -215,7 +281,7 @@ WHERE u.Id = '${req.body.id}';
 
 createnew.put('/updateReceiveNowAmount', (req, res) => {
   const recept = req.body.receipt_details
-  console.log("recept update", req.body);
+ // console.log("recept update", req.body);
 
   recept.forEach(item => {
     const { Dc_inv_no, Receive_Now, HOPrvId } = item;
@@ -251,7 +317,7 @@ createnew.put('/updateReceiveNowAmount', (req, res) => {
 
 createnew.post('/cancelUpdate', async (req, res) => {
   const { HO_PrvId, custName, totalReceiveNow, id } = req.body;
-  console.log("req body cancel ", HO_PrvId, custName, req.body);
+ // console.log("req body cancel ", HO_PrvId, custName, req.body);
 
 
 
@@ -265,7 +331,7 @@ createnew.post('/cancelUpdate', async (req, res) => {
   setupQueryMod(rightTable, (rightErr, rightRes) => {
     if (rightErr) {
       // Handle error if needed
-      console.log("right table error after cancel", rightErr);
+     // console.log("right table error after cancel", rightErr);
     } else {
 
 
@@ -332,7 +398,7 @@ createnew.post('/cancelUpdate', async (req, res) => {
 
 
       const adjustmentForm = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register 
-      SET On_account=On_account+${totalReceiveNow} where Id='${id}'`
+      SET On_account=On_account+${totalReceiveNow}, fixedOnaccount=fixedOnaccount+${totalReceiveNow}  where Id='${id}'`
 
       console.log("adjustmentForm query", adjustmentForm, totalReceiveNow);
       setupQueryMod(adjustmentForm, (adjustmentFormErr, adjustmentFormRes) => {
@@ -354,7 +420,7 @@ createnew.post('/cancelUpdate', async (req, res) => {
 createnew.put('/updateOnaccountValue', (req, res) => {
   const { on_account, id } = req.body
   // const receipt_id=1
-  console.log("on account ", on_account, id);
+ // console.log("on account ", on_account, id);
   const sql = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
   SET u.On_account = '${on_account}'
      
@@ -374,6 +440,91 @@ createnew.put('/updateOnaccountValue', (req, res) => {
 
 
 
+
+
+
+
+// createnew.post("/getDCNo", async (req, res, next) => {
+//   // const { unit, srlType, ResetPeriod, ResetValue, VoucherNoLength, prefix } =
+//   //   req.body;
+//   const { unit, srlType, ResetPeriod, ResetValue, VoucherNoLength } =
+//     req.body;
+//   console.log("UNIT NAME=", unit, srlType);
+
+//   const prefix = 'JG';
+
+//   const unitName = `${unit}`;
+//   const date = new Date();
+//   // const date = new Date("2024-04-01");
+//   const year = date.getFullYear();
+//   const startYear = date.getMonth() >= 3 ? year : year - 1;
+//   const endYear = startYear + 1;
+
+//   console.log("startYear", startYear);
+//   console.log("endYear", endYear);
+
+//   const firstLetter = unitName.charAt(0).toUpperCase();
+//   const financialYearStartDate = new Date(`${startYear}-04-01`);
+//   const financialYearEndDate = new Date(`${endYear}-04-01`);
+
+//   const formattedStartDate = financialYearStartDate.toISOString().slice(0, 10);
+//   const formattedEndDate = financialYearEndDate.toISOString().slice(0, 10);
+
+//   const getYear =
+//     date.getMonth() >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+//   const yearParts = getYear.split("-");
+//   const startYearShort = yearParts[0].slice(-2);
+//   const endYearShort = yearParts[1].slice(-2);
+//   const finYear = `${startYearShort}/${endYearShort}`;
+
+//   console.log("finYear", finYear);
+
+//   try {
+//     const selectQuery = `
+//     SELECT COUNT(Id) FROM magod_setup.magod_runningno  WHERE SrlType='${srlType}'
+//     AND UnitName='${unit}' AND Period='${finYear}'
+//     `;
+
+//     setupQueryMod(selectQuery, (selectError, selectResult) => {
+//       if (selectError) {
+//         logger.error(selectError);
+//         return next(selectResult);
+//       }
+
+//       const count = selectResult[0]["COUNT(Id)"];
+//      // console.log("counttttttttttt", count);
+
+//       if (count === 0) {
+//         // If count is 0, execute the INSERT query
+//         const insertQuery = `
+//           INSERT INTO magod_setup.magod_runningno
+//           (UnitName, SrlType, ResetPeriod, ResetValue, EffectiveFrom_date, Reset_date, Running_No, Prefix, Length, Period, Running_EffectiveDate)
+//           VALUES ('${unit}', '${srlType}', '${ResetPeriod}', ${ResetValue}, '${formattedStartDate}', '${formattedEndDate}',${ResetValue}, '${prefix}', ${VoucherNoLength}, '${finYear}', CurDate());
+//         `;
+
+//         // Execute the INSERT query
+//         setupQueryMod(insertQuery, (insertError, insertResult) => {
+//           if (insertError) {
+//             logger.error(insertError);
+//         //    console.log("error in insert fro running no", insertError);
+//             return next(insertResult);
+//           }
+//           else {
+
+//             res.json({ message: "Record inserted successfully." });
+//           }
+//         });
+//       }
+
+//       else {
+//         res.json({ message: "Record already existsssssssssss." });
+//       }
+//     });
+//   } catch (error) {
+//     //console.error("An error occurred:", error);
+//     next(error);
+//   }
+// });
 
 
 
@@ -426,21 +577,39 @@ createnew.post("/getDCNo", async (req, res, next) => {
       }
 
       const count = selectResult[0]["COUNT(Id)"];
-      console.log("counttttttttttt", count);
+     // console.log("counttttttttttt", count);
 
       if (count === 0) {
+
+
+        const selectPrefixQuery = `
+        SELECT * FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}'
+        AND UnitName='${unit}'
+        `;
+
+        setupQueryMod(selectPrefixQuery, (prefixError, prefixResult) => {
+          if (prefixError) {
+            logger.error(prefixError);
+            return next(prefixError);
+          }
+ 
+          const prefix = prefixResult[0]?.Prefix!== null ? prefixResult[0]?.Prefix : "";
+          const suffix =  prefixResult[0]?.Suffix !== null ? prefixResult[0]?.Suffix : "";
+ 
+          console.log("Prefix Suffix", prefix, suffix);
+
         // If count is 0, execute the INSERT query
         const insertQuery = `
           INSERT INTO magod_setup.magod_runningno
-          (UnitName, SrlType, ResetPeriod, ResetValue, EffectiveFrom_date, Reset_date, Running_No, Prefix, Length, Period, Running_EffectiveDate)
-          VALUES ('${unit}', '${srlType}', '${ResetPeriod}', ${ResetValue}, '${formattedStartDate}', '${formattedEndDate}',${ResetValue}, '${prefix}', ${VoucherNoLength}, '${finYear}', CurDate());
+          (UnitName, SrlType, ResetPeriod, ResetValue, EffectiveFrom_date, Reset_date, Running_No, Prefix, Suffix, Length, Period, Running_EffectiveDate)
+          VALUES ('${unit}', '${srlType}', '${ResetPeriod}', ${ResetValue}, '${formattedStartDate}', '${formattedEndDate}',${ResetValue}, '${prefix}','${suffix}', ${VoucherNoLength}, '${finYear}', CurDate());
         `;
 
         // Execute the INSERT query
         setupQueryMod(insertQuery, (insertError, insertResult) => {
           if (insertError) {
             logger.error(insertError);
-            console.log("error in insert fro running no", insertError);
+        //    console.log("error in insert fro running no", insertError);
             return next(insertResult);
           }
           else {
@@ -448,6 +617,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
             res.json({ message: "Record inserted successfully." });
           }
         });
+      });
       }
 
       else {
@@ -455,12 +625,10 @@ createnew.post("/getDCNo", async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.error("An error occurred:", error);
+    //console.error("An error occurred:", error);
     next(error);
   }
 });
-
-
 
 //----------------------------------------------------------------------
 
@@ -468,7 +636,7 @@ createnew.post("/getDCNo", async (req, res, next) => {
 
 
 createnew.post("/saveReceipt", (req, res) => {
-   console.log("qqqqqqqqqq", req.body);
+ //  console.log("qqqqqqqqqq", req.body);
   if (req.body.HO_PrvId != "") {
     if (req.body.Amount == "") {
       amount = 0.0;
@@ -548,7 +716,7 @@ createnew.post("/saveReceipt", (req, res) => {
             return res.json({ status: "query", Error: "inside signup query" });
           } else {
             console.log("55");
-            console.log("result after insert", result);
+          //  console.log("result after insert", result);
             return res.json({ Status: "Success", result: result });
           }
         });
@@ -684,6 +852,137 @@ createnew.post('/leftTable', (req, res) => {
 
 
 //post data
+// createnew.post("/postInvoiceCreateNew", async (req, res, next) => {
+//   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
+// console.log("req body after post", req.body);
+//   const date = new Date();
+//   // const date = new Date("2024-04-01");
+//   const year = date.getFullYear();
+
+//   const getYear =
+//     date.getMonth() >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+//   const yearParts = getYear.split("-");
+//   const startYearShort = yearParts[0].slice(-2);
+//   const endYearShort = yearParts[1].slice(-2);
+//   const finYear = `${startYearShort}/${endYearShort}`;
+
+//   console.log("finYear", finYear);
+
+//   try {
+
+
+
+    
+//     const selectQuery = `
+//     SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
+//     `;
+
+//     setupQueryMod(selectQuery, async (selectError, selectResult) => {
+//       if (selectError) {
+//         logger.error(selectError);
+//         return next(selectResult);
+//       }
+
+//       let newHrefNo = "";
+
+//       console.log("select result",selectResult);
+//       if (selectResult && selectResult.length > 0) {
+//         const lastRunNo = selectResult[0].Running_No;
+//         const numericPart = parseInt(lastRunNo) + 1;
+
+//         const paddedNumericPart = numericPart.toString().padStart(4, "0");
+
+//         newHrefNo = `HO RV/ ${paddedNumericPart}`;
+//         console.log("New HrefNo:", newHrefNo);
+
+//         // Update Running_No in magod_setup.magod_runningno
+//         const updateRunningNoQuery = `
+//           UPDATE magod_setup.magod_runningno
+//           SET Running_No = ${numericPart}
+//           WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
+//         `;
+
+//         setupQueryMod(updateRunningNoQuery, (updateError, updateResult) => {
+//           if (updateError) {
+//             logger.error(updateError);
+//             return next(updateResult);
+//           }
+//         });
+//       }
+
+
+
+
+//       //update open invoice table(right side table)
+
+
+//       if (receipt_details.length > 0) {
+
+//         receipt_details.forEach((item, index) => {
+
+
+//           const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
+//           SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
+//               u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
+//           WHERE u.UnitName = 'Jigani' AND u.DC_Inv_No = ${item.Dc_inv_no};
+//           `
+
+//           setupQueryMod(updateRightTable, (rightError, rightResult) => {
+//             if (rightError) {
+//               console.log("righterror", rightError);
+//             }
+
+//             else {
+
+//               console.log("update right table successfully");
+//             }
+//           })
+
+//         })
+
+
+
+//       }
+
+
+
+//       // Your existing update query
+//       setupQueryMod(
+//         `UPDATE magod_Hq_Mis.ho_paymentrv_register
+//         SET HoRefDate = curdate(), Unitname='${unit}',
+//         HORef = '${newHrefNo}',
+        
+//         Status = 'Pending'
+//         WHERE HOPrvId = '${HO_PrvId}'`,
+//         async (updateError, updateResult) => {
+//           if (updateError) {
+//             logger.error(updateError);
+//             return next(updateResult);
+//           }
+
+//           // Your existing select query after update
+//           const postUpdateSelectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId = ${HO_PrvId}`;
+//           setupQueryMod(
+//             postUpdateSelectQuery,
+//             (postUpdateSelectError, postUpdateSelectResult) => {
+//               if (postUpdateSelectError) {
+//                 logger.error(postUpdateSelectError);
+//                 return next(postUpdateSelectResult);
+//               }
+
+//               res.json(postUpdateSelectResult);
+//             }
+//           );
+//         }
+//       );
+//     });
+//   } catch (error) {
+//     console.error("An error occurred:", error);
+//     next(error);
+//   }
+// });
+
+
 createnew.post("/postInvoiceCreateNew", async (req, res, next) => {
   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
 console.log("req body after post", req.body);
@@ -701,6 +1000,25 @@ console.log("req body after post", req.body);
   console.log("finYear", finYear);
 
   try {
+
+
+
+    const prefixQuery = `
+    SELECT Prefix, Suffix FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}' AND UnitName='${unit}';
+    `;
+ 
+    setupQueryMod(prefixQuery, async (prefixError, prefixResult) => {
+      if (prefixError) {
+        logger.error(prefixError);
+        return next(prefixError);
+      }
+      console.log("PREFIX RESULT",prefixResult);
+ 
+      const prefix = prefixResult[0]?.Prefix!== null ? prefixResult[0]?.Prefix : "";
+      const suffix =
+        prefixResult[0]?.Suffix !== null ? prefixResult[0]?.Suffix : "";
+
+
     const selectQuery = `
     SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
     `;
@@ -726,13 +1044,15 @@ console.log("req body after post", req.body);
         // Update Running_No in magod_setup.magod_runningno
         const updateRunningNoQuery = `
           UPDATE magod_setup.magod_runningno
-          SET Running_No = ${numericPart}
+          SET Running_No = ${numericPart},
+          Prefix = '${prefix}',
+          Suffix = '${suffix}'
           WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
         `;
 
         setupQueryMod(updateRunningNoQuery, (updateError, updateResult) => {
           if (updateError) {
-            logger.error(updateError);
+           // logger.error(updateError);
             return next(updateResult);
           }
         });
@@ -784,7 +1104,7 @@ console.log("req body after post", req.body);
         WHERE HOPrvId = '${HO_PrvId}'`,
         async (updateError, updateResult) => {
           if (updateError) {
-            logger.error(updateError);
+           // logger.error(updateError);
             return next(updateResult);
           }
 
@@ -804,12 +1124,12 @@ console.log("req body after post", req.body);
         }
       );
     });
+  });
   } catch (error) {
     console.error("An error occurred:", error);
     next(error);
   }
 });
-
 
 //get details from  rowData through drfts
 
@@ -825,7 +1145,7 @@ createnew.get('/getFormByRowData', (req, res) => {
       console.log("err in query", err);
     }
     else {
-      console.log("result row data", result);
+    //  console.log("result row data", result);
       return res.json({ Result: result });
     }
   })
@@ -915,6 +1235,7 @@ createnew.post('/cancelCreateNewScreen', (req, res) => {
 
         }
         else {
+          res.send({ StatusCancel: "Cancelled" })
           console.log("update form after cancell");
         }
 

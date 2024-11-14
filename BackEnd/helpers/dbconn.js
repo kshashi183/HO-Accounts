@@ -2,7 +2,6 @@ var mysql = require("mysql2");
 
 require("dotenv").config();
 
-
 const dbHost = process.env.DB_HOST;
 const dbUser = process.env.DB_USER;
 const dbPassword = process.env.DB_PASSWORD;
@@ -12,14 +11,13 @@ const dbDatabase3 = process.env.DB_DATABASE_3;
 const dbDatabase4 = process.env.DB_DATABASE_4;
 const dbDatabase5 = process.env.DB_DATABASE_5;
 const dbDatabase6 = process.env.DB_DATABASE_6;
-const dbDatabase7 = process.env.DB_DATABASE_7
-
+const dbDatabase7 = process.env.DB_DATABASE_7;
 
 var dailyReport = mysql.createConnection({
   host: dbHost,
   user: dbUser,
   password: dbPassword,
-  database:dbDatabase1,
+  database: dbDatabase1,
 });
 
 var setupConn = mysql.createConnection({
@@ -164,8 +162,10 @@ var hqConnection = mysql.createConnection({
 let dailyReportQuery = async (q, callback) => {
   dailyReport.connect();
   dailyReport.query(q, (err, res, fields) => {
-    if (err) callback(err, null);
-    else callback(null, res);
+    if (err) {
+      console.log("db connection err1");
+      callback(err, null);
+    } else callback(null, res);
   });
 };
 
@@ -173,6 +173,7 @@ let setupQuery = (q, callback) => {
   setupConn.connect();
   setupConn.query(q, (err, res, fields) => {
     if (err) {
+      console.log("db connection err2");
       callback(err, null); // Pass the error to the callback
     } else {
       callback(null, res); // Pass the result to the callback
@@ -192,6 +193,8 @@ const hqQuery = (query, values) => {
   return new Promise((resolve, reject) => {
     hqConnection.query(query, values, (err, results) => {
       if (err) {
+        console.log("db connection err3");
+
         reject(err);
       } else {
         resolve(results);
@@ -218,23 +221,20 @@ const misConn = mysql.createConnection({
 
 const setupQueryMod = async (q, values, callback) => {
   try {
-  
     misConn.connect();
 
     misConn.query(q, values, (err, res, fields) => {
-      
       if (err) {
         console.log("err", err);
 
         callback(err, null);
       } else {
-      console.log("result call back", res);
+        console.log("result call back", res);
 
-       callback(null, res);
+        callback(null, res);
       }
     });
   } catch (error) {
-    
     callback(error, null);
   }
 };
