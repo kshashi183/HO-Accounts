@@ -626,10 +626,15 @@ createnew.post("/postInvoiceCreateNew", async (req, res, next) => {
           UPDATE magod_setup.magod_runningno
           SET Running_No = ${numericPart},
           Prefix = '${prefix}',
-          Suffix = '${suffix}'
-          WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
+          Suffix = '${suffix}',
+          Running_EffectiveDate = CURDATE()
+          WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}'  ;
         `;
-
+          console.log(
+            "unit name update  updateRunningNoQuery running number ",
+            unit,
+            updateRunningNoQuery
+          );
           setupQueryMod(updateRunningNoQuery, (updateError, updateResult) => {
             if (updateError) {
               // logger.error(updateError);
