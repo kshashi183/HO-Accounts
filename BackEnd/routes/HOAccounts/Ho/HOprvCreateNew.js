@@ -400,20 +400,33 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
           newHrefNo = `HO RV/ ${paddedNumericPart}`;
           console.log("New HrefNo:", newHrefNo);
+          console.log(
+            "numeric part ",
+            numericPart,
+            "and paddedNumericPart",
+            paddedNumericPart
+          );
 
           // Update Running_No in magod_setup.magod_runningno
           const updateRunningNoQuery = `
           UPDATE magod_setup.magod_runningno
           SET Running_No = ${numericPart},
           Prefix = '${prefix}',
-          Suffix = '${suffix}'
-          WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}' AND Running_EffectiveDate = CURDATE();
+          Suffix = '${suffix}',
+           Running_EffectiveDate = CURDATE()
+          WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}';
         `;
+
+          // AND Running_EffectiveDate = CURDATE()
+          console.log("update running number ", updateRunningNoQuery);
 
           setupQuery(updateRunningNoQuery, (updateError, updateResult) => {
             if (updateError) {
+              console.log(" updateError", updateError);
               logger.error(updateError);
               return next(updateResult);
+            } else {
+              console.log("runing no  updated");
             }
           });
         }

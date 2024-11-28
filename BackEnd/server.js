@@ -91,3 +91,7 @@ app.use("/hoCreateNew", createNewRouter);
 
 const mailRouter = require("./routes/HOAccounts/mailer");
 app.use("/mailer", mailRouter);
+
+const savePDF = require("./routes/HOAccounts/savePDFServer/savePDFServer");
+
+app.use("/PDF", savePDF);

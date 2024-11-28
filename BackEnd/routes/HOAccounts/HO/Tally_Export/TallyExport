@@ -142,6 +142,112 @@ const { parseString } = require("xml2js");
 
 const fs = require("fs");
 
+// tally_Export.post("/exporttally", async (req, res) => {
+//   const xmlData = req.body.xml;
+
+//   const tallyUrl = "http://localhost:9000";
+
+//   try {
+//     // Send XML data to Tally server
+//     const tallyResponse = await axios.post(tallyUrl, xmlData, {
+//       headers: {
+//         "Content-Type": "application/xml",
+//       },
+//     });
+
+//     // console.log("Tally response data:", tallyResponse.data);
+
+//     // Extract values from Tally response
+//     const createdValue = parseInt(
+//       tallyResponse.data.match(/<CREATED>(\d+)<\/CREATED>/)?.[1] || "0"
+//     );
+//     const alteredValue = parseInt(
+//       tallyResponse.data.match(/<ALTERED>(\d+)<\/ALTERED>/)?.[1] || "0"
+//     );
+
+//     const exceptionValue = parseInt(
+//       tallyResponse.data.match(/<EXCEPTIONS>(\d+)<\/EXCEPTIONS>/)?.[1] || "0"
+//     );
+
+//     // console.log(
+//     //   "Response Values:",
+//     //   "Altered:",
+//     //   alteredValue,
+//     //   "Exceptions:",
+//     //   exceptionValue,
+//     //   "createdValue",
+//     //   createdValue
+//     // );
+//     if (createdValue > 0) {
+//       const guidArray = [];
+//       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+//       if (guidMatches) {
+//         // If GUIDs were altered, we push them
+//         guidMatches.forEach((guidMatch) => {
+//           const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+//           guidArray.push(guid); // Push all GUIDs
+//         });
+//       }
+
+//       // Send the altered GUIDs to the frontend
+//       console.log("created GUIDs:", guidArray);
+//       res.json({ guids: guidArray, message: "create" });
+//       console.log(" created export successfuly");
+//     } else if (alteredValue > 0) {
+//       // Extract GUIDs from the request XML
+//       const guidArray = [];
+//       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+//       if (guidMatches) {
+//         // If GUIDs were altered, we push them
+//         guidMatches.forEach((guidMatch) => {
+//           const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+//           guidArray.push(guid); // Push all GUIDs
+//         });
+//       }
+
+//       // Send the altered GUIDs to the frontend
+//       console.log("Altered GUIDs:", guidArray);
+//       res.json({ guids: guidArray, message: "alter" });
+//     } else if (exceptionValue > 0) {
+//       const guidArray = [];
+//       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
+
+//       if (guidMatches) {
+//         // If GUIDs were altered, we push them
+//         guidMatches.forEach((guidMatch) => {
+//           const guid = guidMatch.match(/<GUID>(\d+)<\/GUID>/)[1]; // Extract GUID value
+//           guidArray.push(guid); // Push all GUIDs
+//         });
+//       }
+
+//       // Send the altered GUIDs to the frontend
+//       console.log("Exception GUIDs:", guidArray);
+//       res.json({ guids: guidArray, message: "Exception" });
+//     } else {
+//       // Handle cases where no GUIDs are altered
+//       console.log("No GUIDs altered");
+//       res.status(200).json({
+//         message: "No GUIDs altered",
+//       });
+//     }
+//   } catch (error) {
+//     if (error.code === "ECONNREFUSED") {
+//       // Tally server is not running or unavailable
+//       res.status(503).json({
+//         message: "Tally server is offline.",
+//       });
+//     } else {
+//       // Handle other errors
+//       console.error("Error exporting to Tally:", error);
+//       res.status(500).json({
+//         message: "An error occurred while exporting to Tally.",
+//       });
+//     }
+//   }
+// });
+
 tally_Export.post("/exporttally", async (req, res) => {
   const xmlData = req.body.xml;
 
@@ -178,7 +284,7 @@ tally_Export.post("/exporttally", async (req, res) => {
     //   "createdValue",
     //   createdValue
     // );
-    if (createdValue > 0) {
+    if (createdValue > 0 && alteredValue === 0 && exceptionValue === 0) {
       const guidArray = [];
       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
 
@@ -194,7 +300,7 @@ tally_Export.post("/exporttally", async (req, res) => {
       console.log("created GUIDs:", guidArray);
       res.json({ guids: guidArray, message: "create" });
       console.log(" created export successfuly");
-    } else if (alteredValue > 0) {
+    } else if (alteredValue > 0 && createdValue === 0 && exceptionValue === 0) {
       // Extract GUIDs from the request XML
       const guidArray = [];
       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
@@ -210,7 +316,7 @@ tally_Export.post("/exporttally", async (req, res) => {
       // Send the altered GUIDs to the frontend
       console.log("Altered GUIDs:", guidArray);
       res.json({ guids: guidArray, message: "alter" });
-    } else if (exceptionValue > 0) {
+    } else if (exceptionValue > 0 && createdValue === 0 && alteredValue === 0) {
       const guidArray = [];
       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
 
@@ -274,10 +380,10 @@ tally_Export.post("/getCompanyGuid", (req, res) => {
 tally_Export.post("/getCompanyFromTally", async (req, res) => {
   const tallyUrl = "http://localhost:9000";
   // const tallyUrl = "https://magodc01:9000";
-  console.log("cmp req body", req.body);
-  const cm = req.body.cmp;
-  //  const cm = "MLMPL_Jigani_2023_24";
-  //console.log("cmp name separte", cm);
+  // console.log("cmp req body", req.body);
+  //const cm = req.body.cmp;
+  const cm = "MLMPL_Jigani_2023_24";
+  console.log("cmp name separte", cm);
 
   // Fetch company Names
   console.log("get compny from tally");
