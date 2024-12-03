@@ -1,53 +1,133 @@
-const path = require("path");
-const fs = require("fs");
-const PDFDocument = require("pdfkit");
-const moment = require("moment");
-require("dotenv").config(); // Load .env variables
-const multer = require("multer");
+//const express = require("express");
+// const multer = require("multer");
+// const path = require("path");
+// const fs = require("fs");
 
-const savePDF = require("express").Router();
+// let name = "";
+// const savePDF = express.Router();
 
-// savePDF.post("/savePDF", (req, res) => {
-//   const fileName = "Duelist_Of_${ason}.pdf";
-//   const filePath = path.join(process.env.FILE_SERVER_PDF_PATH, fileName);
-//   console.log("filepath ", filePath);
+// // Middleware to parse form data before multer handles the request
+// savePDF.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
+
+// // Ensure upload directory exists
+// const uploadFolder =
+//   process.env.FILE_SERVER_PDF_PATH || path.join(__dirname, "uploads");
+// if (!fs.existsSync(uploadFolder)) {
+//   fs.mkdirSync(uploadFolder, { recursive: true });
+// }
+
+// // Function to format the current date and time
+// const getFormattedDateTime = () => {
+//   const now = new Date();
+//   const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
+//   const time = now.toTimeString().split(" ")[0].replace(/:/g, "-"); // HH-MM-SS
+//   return `${date}_${time}`;
+// };
+
+// // Configure multer storage
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, uploadFolder); // Save files in the uploads directory
+//   },
+//   filename: (req, file, cb) => {
+//     // Access req.body.adjustment after express.urlencoded has parsed it
+//     console.log("Adjustment Name in storage :", name);
+//     const adjustment = name || "Default_Name"; // Default if not provided
+//     const dateTime = getFormattedDateTime(); // Get current date and time
+//     const ext = path.extname(file.originalname); // Retain the original file extension
+//     cb(null, `${adjustment}_${dateTime}${ext}`); // Generate the file name
+//   },
 // });
 
-const uploadFolder = path.join(__dirname, "uploads");
+// const upload = multer({ storage });
+
+// // API endpoint to save the PDF
+// savePDF.post("/save-pdf", upload.single("file"), (req, res) => {
+//   name = req.body.adjustment;
+//   console.log("Adjustment Name:", name); // Log the adjustment name
+
+//   if (!req.file) {
+//     return res.status(400).send("No file uploaded.");
+//   }
+
+//   console.log(`File saved to: ${req.file.path}`); // Log the file path
+//   res.status(200).send({
+//     message: "PDF saved successfully!",
+//     filePath: req.file.path,
+//   });
+// });
+
+// module.exports = savePDF;
+
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const savePDF = express.Router();
+
+// Middleware to parse form data before multer handles the request
+savePDF.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
+
+// Ensure upload directory exists
+const uploadFolder =
+  process.env.FILE_SERVER_PDF_PATH || path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadFolder)) {
-  fs.mkdirSync(uploadFolder); // Create folder if it doesn't exist
+  fs.mkdirSync(uploadFolder, { recursive: true });
 }
 
+// Function to format the current date and time
 const getFormattedDateTime = () => {
   const now = new Date();
   const date = now.toISOString().split("T")[0]; // YYYY-MM-DD
   const time = now.toTimeString().split(" ")[0].replace(/:/g, "-"); // HH-MM-SS
   return `${date}_${time}`;
 };
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, process.env.FILE_SERVER_PDF_PATH); // Use the environment variable
-  },
-  //   filename: (req, file, cb) => {
-  //     cb(null, file.originalname); // Save the file with its original name
-  //   },
-  filename: (req, file, cb) => {
-    const dateTime = getFormattedDateTime(); // Get the current date and time
-    const ext = path.extname(file.originalname); // Get file extension
-    const baseName = "invoice_details"; // Use your desired fixed file name
-    cb(null, `${baseName}_${dateTime}${ext}`); // Save the file with the date-time appended
-  },
-});
-
-const upload = multer({ storage });
 
 // API endpoint to save the PDF
-savePDF.post("/save-pdf", upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("No file uploaded.");
+savePDF.post(
+  "/save-pdf",
+  (req, res, next) => {
+    // Dynamically configure storage
+    console.log("Adjustment Name11111999999999:", req.body.adjustment);
+    const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, uploadFolder); // Save files in the uploads directory
+      },
+      filename: (req, file, cb) => {
+        const adjustment = req.body.adjustment || "Default_Name"; // Use req.body.adjustment
+        const dateTime = getFormattedDateTime(); // Get current date and time
+        const ext = path.extname(file.originalname); // Retain the original file extension
+        cb(null, `${adjustment}_${dateTime}${ext}`); // Generate the file name
+      },
+    });
+
+    // Configure upload with dynamic storage
+    const upload = multer({ storage }).single("file");
+
+    // Execute upload middleware
+    upload(req, res, (err) => {
+      if (err) {
+        return res
+          .status(500)
+          .send({ message: "File upload failed", error: err });
+      }
+      next(); // Proceed to the next middleware
+    });
+  },
+  (req, res) => {
+    if (!req.file) {
+      return res.status(400).send("No file uploaded.");
+    }
+
+    console.log("Adjustment Name11111:", req.body.adjustment); // Log the adjustment name
+    console.log(`File saved to: ${req.file.path}`); // Log the file path
+
+    res.status(200).send({
+      message: "PDF saved successfully!",
+      filePath: req.file.path,
+    });
   }
-  console.log(`File saved to: ${req.file.path}`);
-  res.status(200).send("PDF saved successfully!");
-});
+);
 
 module.exports = savePDF;

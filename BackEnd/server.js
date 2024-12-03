@@ -33,8 +33,6 @@ app.listen(process.env.PORT, () => {
   //    logger.info('listening on port ' + process.env.PORT);
 });
 
-// const unitlist = require('./routes/unitAccounts/SetUp/UnitList');
-
 const unitlist = require("./routes/HOAccounts/SetUp/UnitList");
 app.use("/unitlist", unitlist);
 
