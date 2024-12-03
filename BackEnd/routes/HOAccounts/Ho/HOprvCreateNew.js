@@ -346,9 +346,168 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
   }
 });
 
+// createNewRouter.post("/postInvoice", async (req, res, next) => {
+//   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
+//   console.log("req body after post", unit, srlType);
+
+//   const date = new Date();
+//   // const date = new Date("2024-04-01");
+//   const year = date.getFullYear();
+
+//   const getYear =
+//     date.getMonth() >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+//   const yearParts = getYear.split("-");
+//   const startYearShort = yearParts[0].slice(-2);
+//   const endYearShort = yearParts[1].slice(-2);
+//   const finYear = `${startYearShort}/${endYearShort}`;
+
+//   console.log("finYear", finYear);
+
+//   try {
+//     const prefixQuery = `
+//     SELECT Prefix, Suffix FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}' AND UnitName='${unit}';
+//     `;
+
+//     setupQuery(prefixQuery, async (prefixError, prefixResult) => {
+//       if (prefixError) {
+//         logger.error(prefixError);
+//         return next(prefixError);
+//       }
+//       console.log("PREFIX RESULT", prefixResult);
+
+//       const prefix =
+//         prefixResult[0]?.Prefix !== null ? prefixResult[0]?.Prefix : "";
+//       const suffix =
+//         prefixResult[0]?.Suffix !== null ? prefixResult[0]?.Suffix : "";
+
+//       const selectQuery = `
+//     SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
+//     `;
+
+//       setupQuery(selectQuery, async (selectError, selectResult) => {
+//         if (selectError) {
+//           logger.error(selectError);
+//           return next(selectResult);
+//         }
+
+//         let newHrefNo = "";
+
+//         console.log("select result", selectResult);
+//         if (selectResult && selectResult.length > 0) {
+//           const lastRunNo = selectResult[0].Running_No;
+//           const numericPart = parseInt(lastRunNo) + 1;
+
+//           const paddedNumericPart = numericPart.toString().padStart(4, "0");
+
+//           newHrefNo = `HO RV/ ${paddedNumericPart}`;
+//           console.log("New HrefNo:", newHrefNo);
+//           console.log(
+//             "numeric part ",
+//             numericPart,
+//             "and paddedNumericPart",
+//             paddedNumericPart
+//           );
+
+//           // Update Running_No in magod_setup.magod_runningno
+//           const updateRunningNoQuery = `
+//           UPDATE magod_setup.magod_runningno
+//           SET Running_No = ${numericPart},
+//           Prefix = '${prefix}',
+//           Suffix = '${suffix}',
+//            Running_EffectiveDate = CURDATE()
+//           WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}';
+//         `;
+
+//           // AND Running_EffectiveDate = CURDATE()
+//           console.log("update running number ", updateRunningNoQuery);
+
+//           setupQuery(updateRunningNoQuery, (updateError, updateResult) => {
+//             if (updateError) {
+//               console.log(" updateError", updateError);
+//               logger.error(updateError);
+//               return next(updateResult);
+//             } else {
+//               console.log("runing no  updated");
+//             }
+//           });
+//         }
+
+//         //update open invoice table(right side table)
+
+//         if (receipt_details.length > 0) {
+//           receipt_details.forEach((item, index) => {
+//             const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
+//           SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
+//               u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
+//           WHERE u.UnitName = 'Jigani' AND u.DC_Inv_No = ${item.Dc_inv_no};
+//           `;
+
+//             hqQuery(updateRightTable, (rightError, rightResult) => {
+//               if (rightError) {
+//                 console.log("righterror", rightError);
+//               } else {
+//                 console.log("update right table successfully");
+//               }
+//             });
+//           });
+//         }
+
+//         //update the  magod_hq_mis.unit_payment_recd_voucher_register
+
+//         const updateAdjustmentTable = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register u
+//           SET u.On_account = '${onacc}', u.fixedOnaccount='${onacc}',
+//               u.PRV_Status = IF('${onacc}' = 0, 'Closed', 'Created')
+//           WHERE u.Id = '${id}';`;
+
+//         hqQuery(updateAdjustmentTable, (errTable, resTable) => {
+//           if (errTable) {
+//             console.log("error ", errTable);
+//           } else {
+//             // console.log("update onaccount value after POST");
+//           }
+//         });
+
+//         // Your existing update query
+//         hqQuery(
+//           `UPDATE magod_Hq_Mis.ho_paymentrv_register
+//         SET HoRefDate = curdate(), Unitname='${unit}',
+//         HORef = '${newHrefNo}',
+
+//         Status = 'Pending'
+//         WHERE HOPrvId = '${HO_PrvId}'`,
+//           async (updateError, updateResult) => {
+//             if (updateError) {
+//               logger.error(updateError);
+//               return next(updateResult);
+//             }
+
+//             // Your existing select query after update
+//             const postUpdateSelectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId = ${HO_PrvId}`;
+//             hqQuery(
+//               postUpdateSelectQuery,
+//               (postUpdateSelectError, postUpdateSelectResult) => {
+//                 if (postUpdateSelectError) {
+//                   logger.error(postUpdateSelectError);
+//                   return next(postUpdateSelectResult);
+//                 }
+
+//                 res.json(postUpdateSelectResult);
+//               }
+//             );
+//           }
+//         );
+//       });
+//     });
+//   } catch (error) {
+//     console.error("An error occurred:", error);
+//     next(error);
+//   }
+// });
+
 createNewRouter.post("/postInvoice", async (req, res, next) => {
   const { HO_PrvId, unit, srlType, onacc, receipt_details, id } = req.body;
-  console.log("req body after post", unit, srlType);
+  console.log("req body after post unit name", unit, srlType);
+  const HQUnitName = "HQ";
   const date = new Date();
   // const date = new Date("2024-04-01");
   const year = date.getFullYear();
@@ -364,7 +523,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
   try {
     const prefixQuery = `
-    SELECT Prefix, Suffix FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}' AND UnitName='${unit}';
+    SELECT Prefix, Suffix FROM magod_setup.year_prefix_suffix WHERE SrlType='${srlType}' AND UnitName='${HQUnitName}';
     `;
 
     setupQuery(prefixQuery, async (prefixError, prefixResult) => {
@@ -380,7 +539,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
         prefixResult[0]?.Suffix !== null ? prefixResult[0]?.Suffix : "";
 
       const selectQuery = `
-    SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${unit}' ORDER BY Id DESC LIMIT 1;
+    SELECT * FROM magod_setup.magod_runningno WHERE SrlType='${srlType}' AND UnitName='${HQUnitName}' ORDER BY Id DESC LIMIT 1;
     `;
 
       setupQuery(selectQuery, async (selectError, selectResult) => {
@@ -414,7 +573,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
           Prefix = '${prefix}',
           Suffix = '${suffix}',
            Running_EffectiveDate = CURDATE()
-          WHERE SrlType='${srlType}' AND UnitName='${unit}' AND Period='${finYear}';
+          WHERE SrlType='${srlType}' AND UnitName='${HQUnitName}' AND Period='${finYear}';
         `;
 
           // AND Running_EffectiveDate = CURDATE()
@@ -435,19 +594,29 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
         if (receipt_details.length > 0) {
           receipt_details.forEach((item, index) => {
-            const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
-          SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
-              u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
-          WHERE u.UnitName = 'Jigani' AND u.DC_Inv_No = ${item.Dc_inv_no};
-          `;
+            //   const updateRightTable = `UPDATE magod_hq_mis.unit_invoices_list u
+            // SET u.PymtAmtRecd = u.PymtAmtRecd+${item.Receive_Now},
+            //     u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
+            // WHERE u.UnitName = ${unit} AND u.DC_Inv_No = ${item.Dc_inv_no};
+            // `;
+            const updateRightTable = `
+  UPDATE magod_hq_mis.unit_invoices_list u
+  SET u.PymtAmtRecd = u.PymtAmtRecd + ?,
+      u.DCStatus = IF(u.GrandTotal = u.PymtAmtRecd, 'Closed', 'Despatched')
+  WHERE u.UnitName = ? AND u.DC_Inv_No = ?;
+`;
 
-            hqQuery(updateRightTable, (rightError, rightResult) => {
-              if (rightError) {
-                console.log("righterror", rightError);
-              } else {
-                console.log("update right table successfully");
+            hqQuery(
+              updateRightTable,
+              [item.Receive_Now, unit, item.Dc_inv_no],
+              (rightError, rightResult) => {
+                if (rightError) {
+                  console.log("righterror22", rightError);
+                } else {
+                  console.log("update right table successfully");
+                }
               }
-            });
+            );
           });
         }
 
@@ -502,7 +671,6 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
     next(error);
   }
 });
-
 createNewRouter.put("/updateReceptDetails", async (req, res, next) => {
   try {
     const { receiptdetails, HO_PrvId } = req.body;
