@@ -6,7 +6,6 @@ var bodyParser = require("body-parser");
 
 customerOutstanding.get("/unitOutstandingData", (req, res) => {
   const unitname = req.query.unitname;
-  console.log("unit nameeeeeeeeeeee", unitname);
 
   // Both queries are same i make some changes based on my requriment
 
@@ -25,7 +24,9 @@ customerOutstanding.get("/unitOutstandingData", (req, res) => {
 
   setupQueryMod(UnitNameQuery, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      logger.error(
+        "Unable to fetch unitoutstanding data  due to Wrong SQL query"
+      );
     } else {
       // console.log("success", result);
       return res.json({ Result: result });
@@ -38,9 +39,10 @@ customerOutstanding.get("/getCustomers", (req, res) => {
 
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      logger.error(
+        "Unable to fetch cutomers, customer code FROM magod_hq_mis.unit_cust_data  due to Wrong SQL query"
+      );
     } else {
-      // console.log("cust sql query 500 change", result);
       return res.json({ Result: result });
     }
   });
@@ -159,6 +161,9 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
     if (selectedDCType !== "ALL" && selectedDCType !== "Sales & Jobwork") {
       setupQueryMod(sql2, (err, result) => {
         if (err) {
+          logger.error(
+            "Unable to fetch outstanding data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+          );
           console.log("err in query", err);
         } else {
           console.log("unitname, dc type, cust code");
@@ -168,7 +173,9 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
     } else if (selectedDCType === "ALL") {
       setupQueryMod(sql1, (err, result) => {
         if (err) {
-          console.log("err in query", err);
+          logger.error(
+            "Unable to fetch outstanding data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+          );
         } else {
           console.log("cust code for ALL", result.length);
           return res.json({ Result: result });
@@ -177,7 +184,9 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
     } else if (selectedDCType === "Sales & Jobwork") {
       setupQueryMod(salesAndJobWork_Without_InvoiceFor, (err, result) => {
         if (err) {
-          console.log("err in query", err);
+          logger.error(
+            "Unable to fetch outstanding data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+          );
         } else {
           console.log(
             "cust code result1111111 no data for this unit",
@@ -189,7 +198,9 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
     } else {
       setupQueryMod(sql3, (err, result) => {
         if (err) {
-          console.log("err in query", err);
+          logger.error(
+            "Unable to fetch outstanding data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+          );
         } else {
           if (result.length === 0) {
             console.log("result length", result.length);
@@ -207,8 +218,9 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
 
       setupQueryMod(salesANDjobwork, (err, result) => {
         if (err) {
-          console.log("sales nad jobwork error ", err);
-          console.log("err in query", err);
+          logger.error(
+            "Unable to fetch outstanding data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+          );
         } else {
           if (result.length === 0) {
             console.log(
@@ -225,7 +237,9 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
     } else {
       setupQueryMod(sql3, (err, result) => {
         if (err) {
-          console.log("err in query", err);
+          logger.error(
+            "Unable to fetch outstanding data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+          );
         } else {
           if (result.length === 0) {
             return res.json({ Result: "error in invoice for" });
@@ -255,7 +269,7 @@ customerOutstanding.get("/getDataTable2", (req, res) => {
 
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      logger.error("Unable to fetch data  due to Wrong SQL query");
     } else {
       console.log("DC_Inv_no result", result.length);
       return res.json({ Result: result });
@@ -267,7 +281,9 @@ customerOutstanding.get("/getDCTypes", (req, res) => {
   const sql = `SELECT  DISTINCT DC_InvType FROM magod_hq_mis.unit_invoices_list `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      logger.error(
+        "Unable to fetch DC_InvType from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+      );
     } else {
       //  console.log("DC_Inv_type", result);
       return res.json({ Result: result });
@@ -277,14 +293,14 @@ customerOutstanding.get("/getDCTypes", (req, res) => {
 
 customerOutstanding.post("/getAddress", (req, res) => {
   const unit = req.body.unit;
-  console.log("backend adresssssss", req.body);
 
   const sql = `SELECT   Unit_Address , RegistredOfficeAddress FROM magod_setup.magodlaser_units where UnitName='${unit}' `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      logger.error(
+        "Unable to fetch Unit_Address , RegistredOfficeAddress from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+      );
     } else {
-      // console.log(" unit adresssssss", result);
       return res.json({ Result: result });
     }
   });

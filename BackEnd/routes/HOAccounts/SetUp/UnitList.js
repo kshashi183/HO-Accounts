@@ -3,11 +3,15 @@ const unitlist = require("express").Router();
 // const { dbco, dbco1, dbgetData, deleteUnitData, updateUnitData } = require("../../../helpers/dbconn")
 const { setupQueryMod } = require("../../../helpers/dbconn");
 var bodyParser = require("body-parser");
+const { logger } = require("../../../helpers/logger");
 
 unitlist.get("/getUnitData", (req, res, next) => {
   try {
     setupQueryMod(`SELECT * FROM magod_setup.magodlaser_units`, (err, data) => {
       if (err) {
+        logger.error(
+          "Unable to fetch data from magod_setup.magodlaser_units table  due to wrong SQL query"
+        );
         console.log("err in query", err);
       } else {
         //  console.log("data", data);
@@ -15,7 +19,10 @@ unitlist.get("/getUnitData", (req, res, next) => {
       }
     });
   } catch (error) {
-    console.log("error", error);
+    logger.error(
+      "Unable to fetch data from magod_setup.magodlaser_units table"
+    );
+
     next(error);
   }
 });
@@ -26,14 +33,18 @@ unitlist.get("/getStates", (req, res) => {
   try {
     setupQueryMod(q, (err, data) => {
       if (err) {
+        logger.error(
+          "Unable to fetch state and state code from magod_setup.state_codelist table due to wrong SQL query"
+        );
         console.log("err in query", err);
       } else {
-        // console.log("data", data);
         return res.json({ Status: "Success", Result: data });
       }
     });
   } catch (error) {
-    console.log("error", error);
+    logger.error(
+      "Unable to fetch state and state code from magod_setup.state_codelist table "
+    );
     next(error);
   }
 });
@@ -49,7 +60,9 @@ unitlist.post("/postUnitDetails", (req, res) => {
   const q = `SELECT StateCode ,State FROM magod_setup.state_codelist WHERE State='${req.body.State}'`;
   setupQueryMod(q, (err, re) => {
     if (err) {
-      console.log("errrrrrrr", err);
+      logger.error(
+        "Unable to fetch data from magod_setup.magodlaser_units table due to Wrong SQL query"
+      );
     }
 
     for (let i = 0; i < re.length; i++) {
@@ -65,22 +78,11 @@ unitlist.post("/postUnitDetails", (req, res) => {
   const sqlquery = `SELECT  UnitID, UnitName, UnitIntial FROM magod_setup.magodlaser_units 
     where UnitID='${req.body.UnitID}' OR UnitName='${req.body.UnitName}' `;
 
-  console.log("query print ", sqlquery);
   setupQueryMod(sqlquery, (err, results) => {
-    // for (let i = 0; i < results.length; i++) {
-    //     console.log("hi");
-
-    //     if (results[i].UnitID === req.body.UnitID  ||results[i].UnitName === req.body.UnitName || req.body.UnitIntial===results[i].UnitIntial ) {
-    //         console.log("database", results[i].UnitID, results[i].UnitName);
-    //         console.log("req body", req.body.UnitID, req.body.UnitName);
-
-    //         store++;
-    //     }
-
-    // }
-
     if (results.length !== 0) {
-      console.log(" eroor no result");
+      logger.error(
+        "Unable to fetch Unit data from magod_setup.magodlaser_units table due to Wrong SQL query"
+      );
       return res.json({
         status: "fail",
         message: "Data already exists in the database.",
@@ -113,8 +115,9 @@ unitlist.post("/postUnitDetails", (req, res) => {
 
       setupQueryMod(sqlpost, (err, result) => {
         if (err) {
-          console.log("33");
-          console.log(err);
+          logger.error(
+            "Unable to post data to magod_setup.magodlaser_units table"
+          );
           return res.json({ status: "query", Error: "inside signup query" });
         } else {
           console.log("4");
@@ -128,12 +131,16 @@ unitlist.post("/postUnitDetails", (req, res) => {
 
 unitlist.delete("/deleteUnit/:UnitID", (req, res) => {
   const uid = req.params.UnitID;
-  console.log("delete", uid);
 
   const sql = `DELETE FROM magod_setup.magodlaser_units WHERE ID='${uid}'`;
 
   setupQueryMod(sql, (err, result) => {
-    if (err) return res.json({ Error: " err in sql" });
+    if (err) {
+      logger.error(
+        "Unable to delete data in magod_setup.magodlaser_units table due to Wrong SQL Query"
+      );
+      return res.json({ Error: " err in sql" });
+    }
 
     return res.json({ Status: "Success" });
   });
@@ -147,7 +154,9 @@ unitlist.put("/updateData/:ID", (req, res) => {
   const q = `SELECT StateCode ,State FROM magod_setup.state_codelist WHERE State='${req.body.State}'`;
   setupQueryMod(q, (err, re) => {
     if (err) {
-      // console.log("errrrrrrr", err);
+      logger.error(
+        "Unable to update data in magod_setup.magodlaser_units table due to Wrong SQL Query"
+      );
     }
 
     for (let i = 0; i < re.length; i++) {
@@ -165,7 +174,9 @@ unitlist.put("/updateData/:ID", (req, res) => {
 
   setupQueryMod(up, (e, r) => {
     if (e) {
-      // console.log("errin update query", e);
+      logger.error(
+        "Unable to fetch data in magod_setup.magodlaser_units table due to Wrong SQL Query"
+      );
     } else if (r.length === 0) {
       const updatequery = `UPDATE magod_setup.magodlaser_units SET UnitID='${req.body.UnitID}', UnitName='${req.body.UnitName}', Unit_Address='${req.body.Unit_Address}', City='${req.body.City}',PIN_Code='${req.body.PIN_Code}',State='${req.body.State}', 
             Country='${req.body.Country}',Unit_contactDetails='${req.body.Unit_contactDetails}',GST_No='${req.body.GST_No}',Tally_account_Name='${req.body.Tally_account_Name}', Gm_Mail_Id='${req.body.Gm_Mail_Id}',UnitIntial='${req.body.UnitIntial}',  State_Id='${StateId}',Current='${req.body.Current}'  WHERE UnitID='${req.body.UnitID}'`;
@@ -186,11 +197,12 @@ unitlist.put("/updateData/:ID", (req, res) => {
         req.body.Gm_Mail_Id,
         req.body.UnitIntial,
       ];
-      console.log("updt values", values);
 
       setupQueryMod(updatequery, values, (err, result) => {
         if (err) {
-          // console.log("err in update query", err);
+          logger.error(
+            "Unable to update data in magod_setup.magodlaser_units table due to Wrong SQL Query"
+          );
         } else return res.json({ status: "success" });
       });
     } else if (r.length !== 0) {
