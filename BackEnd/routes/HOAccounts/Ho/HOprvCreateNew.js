@@ -13,10 +13,12 @@ createNewRouter.get("/unitNames", async (req, res, next) => {
     setupQuery(
       `SELECT DISTINCT UnitName FROM magod_hq_mis.unit_cust_data;`,
       (err, data) => {
+        logger.error(err);
         res.send(data);
       }
     );
   } catch (error) {
+    logger.error(error);
     next(error);
   }
 });
@@ -27,10 +29,12 @@ createNewRouter.get("/customerNames", async (req, res, next) => {
     setupQuery(
       `SELECT DISTINCT Cust_Code, Cust_Name FROM magod_hq_mis.unit_cust_data;`,
       (err, data) => {
+        logger.error(err);
         res.send(data);
       }
     );
   } catch (error) {
+    logger.error(error);
     next(error);
   }
 });
@@ -48,7 +52,7 @@ createNewRouter.post("/getInvoices", async (req, res, next) => {
       AND u.DCStatus <>  'Closed'`,
       (err, data) => {
         if (err) {
-          console.log("err in open invoices");
+          logger.error(err);
         } else {
           console.log("open inv ", data);
 
@@ -57,6 +61,7 @@ createNewRouter.post("/getInvoices", async (req, res, next) => {
       }
     );
   } catch (error) {
+    logger.error(error);
     next(error);
   }
 });
@@ -71,7 +76,7 @@ createNewRouter.post("/getHOPrvId", async (req, res, next) => {
       `,
       (err, data) => {
         if (err) {
-          console.log("err", err);
+          logger.error(err);
         } else {
           //  console.log("dattttttttttt", data);
           res.send(data);
@@ -92,7 +97,7 @@ createNewRouter.post("/saveData", async (req, res, next) => {
       VALUES ('${unit}', '${custCode}', '${custName}', '${txnType}', ${Amount}, '${description}', CURDATE());`,
       (err, data) => {
         if (err) {
-          console.error(err);
+          logger.error(err);
           res.status(500).send({ success: false, error: err.message });
         } else {
           //  console.log("insert", data);
@@ -101,6 +106,7 @@ createNewRouter.post("/saveData", async (req, res, next) => {
       }
     );
   } catch (error) {
+    logger.error(error);
     next(error);
   }
 });
@@ -122,7 +128,7 @@ createNewRouter.post("/updateData", async (req, res, next) => {
        WHERE HOPrvId = '${HO_PrvId}';`,
       (err, data) => {
         if (err) {
-          console.error(err);
+          logger.error(err);
           res.status(500).send({ success: false, error: err.message });
         } else {
           console.log("sucess form upfate");
@@ -131,6 +137,7 @@ createNewRouter.post("/updateData", async (req, res, next) => {
       }
     );
   } catch (error) {
+    logger.error(error);
     next(error);
   }
 });
@@ -147,7 +154,7 @@ createNewRouter.post("/addInvoice", async (req, res, next) => {
     const checkRecdPvSrlData = await new Promise((resolve, reject) => {
       hqQuery(checkRecdPvSrlQuery, (err, data) => {
         if (err) {
-          console.log("error1", err);
+          logger.error(err);
           reject(err);
         } else {
           resolve(data);
@@ -162,6 +169,7 @@ createNewRouter.post("/addInvoice", async (req, res, next) => {
     const selectData = await new Promise((resolve, reject) => {
       hqQuery(selectQuery, (err, data) => {
         if (err) {
+          logger.error(err);
           reject(err);
         } else {
           resolve(data);
@@ -221,7 +229,7 @@ VALUES (
         await new Promise((resolve, reject) => {
           hqQuery(insertQuery, (err, data) => {
             if (err) {
-              console.log("err in insert", err);
+              logger.error(err);
               insertResults.push({
                 id: DC_Inv_No,
                 error: "Insert failed.",
@@ -249,6 +257,7 @@ VALUES (
     const finalSelectData = await new Promise((resolve, reject) => {
       hqQuery(finalSelectQuery, (err, data) => {
         if (err) {
+          logger.error(err);
           reject(err);
         } else {
           resolve(data);
@@ -260,7 +269,7 @@ VALUES (
 
     res.json(finalSelectData);
   } catch (error) {
-    console.log("Error:", error.message);
+    logger.error(error);
     next(error);
   }
 });
@@ -284,7 +293,7 @@ createNewRouter.post("/updateAmount", async (req, res, next) => {
         // Execute the SQL query
         hqQuery(sql, (err, result) => {
           if (err) {
-            console.error("Failed to update Receive_Now:", err);
+            logger.error(err);
           } else {
             console.log("update receipt details");
           }
@@ -298,6 +307,7 @@ createNewRouter.post("/updateAmount", async (req, res, next) => {
     WHERE HOPrvId = '${HO_PrvId}'`;
     hqQuery(updateQuery, (updateErr) => {
       if (updateErr) {
+        logger.error(updateErr);
         console.log("Update error", updateErr);
       }
 
@@ -305,6 +315,7 @@ createNewRouter.post("/updateAmount", async (req, res, next) => {
       const selectQuery = `SELECT Amount FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId = '${HO_PrvId}'`;
       hqQuery(selectQuery, (selectErr, selectResult) => {
         if (selectErr) {
+          logger.error(selectErr);
           console.log("Select error", selectErr);
           return res.json({
             Error: "Error in SELECT query after deletion",
@@ -319,7 +330,7 @@ createNewRouter.post("/updateAmount", async (req, res, next) => {
       });
     });
   } catch (error) {
-    console.log("Error:", error.message);
+    logger.error(error);
     next(error);
   }
 });
@@ -341,7 +352,7 @@ createNewRouter.post("/removeInvoice", async (req, res, next) => {
     // Send the updated data after successful DELETE and SELECT
     res.json(selectResult);
   } catch (error) {
-    console.error("Error in removeInvoice:", error);
+    logger.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -611,6 +622,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
               [item.Receive_Now, unit, item.Dc_inv_no],
               (rightError, rightResult) => {
                 if (rightError) {
+                  logger.error(rightError);
                   console.log("righterror22", rightError);
                 } else {
                   console.log("update right table successfully");
@@ -629,6 +641,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
         hqQuery(updateAdjustmentTable, (errTable, resTable) => {
           if (errTable) {
+            logger.error(errTable);
             console.log("error ", errTable);
           } else {
             // console.log("update onaccount value after POST");
@@ -688,6 +701,7 @@ createNewRouter.put("/updateReceptDetails", async (req, res, next) => {
         // Execute the SQL query
         hqQuery(sql, (err, result) => {
           if (err) {
+            logger.error(err);
             console.error("Failed to update Receive_Now:", err);
           } else {
             // console.log("update receipt details");
@@ -697,7 +711,7 @@ createNewRouter.put("/updateReceptDetails", async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error("Error in removeInvoice:", error);
+    logger.error(error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
