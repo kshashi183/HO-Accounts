@@ -1,0 +1,15 @@
+2024-12-23T06:30:02.545Z [test] error: null
+2024-12-23T06:30:02.585Z [test] error: null
+2024-12-23T06:30:09.506Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T06:30:09.963Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363692 AND HOPrvId='2422'' at line 3
+2024-12-23T06:30:24.179Z [test] error: null
+2024-12-23T06:30:24.216Z [test] error: null
+2024-12-23T06:30:43.606Z [test] error: null
+2024-12-23T06:30:43.643Z [test] error: null
+2024-12-23T06:37:14.935Z [test] error: null
+2024-12-23T06:37:14.977Z [test] error: null
+2024-12-23T06:38:02.274Z [test] error: null
+2024-12-23T06:38:02.299Z [test] error: null
+2024-12-23T06:38:50.492Z [test] error: null
+2024-12-23T06:38:50.521Z [test] error: null
+2024-12-23T06:44:15.202Z [test] error: Unable to update On_account  at magod_hq_mis.unit_payment_recd_voucher_register   due to Wrong SQL query

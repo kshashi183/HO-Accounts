@@ -1,0 +1,2 @@
+2024-12-20T18:04:44.598Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-20T18:05:46.893Z [test] error: Unable to post data to magod_setup.magodlaser_units table

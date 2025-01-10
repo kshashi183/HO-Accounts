@@ -1,0 +1,40 @@
+2024-12-23T04:31:28.729Z [test] info: Login Success - adminuser
+2024-12-23T04:32:02.469Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:32:40.560Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:32:49.469Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:36:34.596Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:37:05.871Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:37:41.587Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:38:08.250Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:39:29.361Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:40:13.120Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:40:17.344Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:40:43.144Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2024-12-23T04:48:42.291Z [test] error: null
+2024-12-23T04:48:42.342Z [test] error: null
+2024-12-23T04:48:54.631Z [test] error: Unable to update On_account  at magod_hq_mis.unit_payment_recd_voucher_register   due to Wrong SQL query
+2024-12-23T04:49:06.823Z [test] error: null
+2024-12-23T04:49:06.866Z [test] error: null
+2024-12-23T04:49:39.172Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T04:49:39.690Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363884 AND HOPrvId='2419'' at line 3
+2024-12-23T04:49:43.133Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T04:49:43.580Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363886 AND HOPrvId='2419'' at line 3
+2024-12-23T04:50:12.023Z [test] error: null
+2024-12-23T04:50:12.052Z [test] error: null
+2024-12-23T04:50:59.131Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T04:51:01.495Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363692 AND HOPrvId='2419'' at line 3
+2024-12-23T04:51:39.656Z [test] error: null
+2024-12-23T04:51:39.683Z [test] error: null
+2024-12-23T04:51:52.938Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T04:51:53.318Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363692 AND HOPrvId='2419'' at line 3
+2024-12-23T04:52:06.493Z [test] error: null
+2024-12-23T04:52:06.527Z [test] error: null
+2024-12-23T04:53:46.581Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T04:53:49.323Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363884 AND HOPrvId='2419'' at line 3
+2024-12-23T04:53:56.679Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T04:53:58.193Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363884 AND HOPrvId='2419'' at line 3
+2024-12-23T04:54:00.388Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2024-12-23T04:54:00.749Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147363884 AND HOPrvId='2419'' at line 3
+2024-12-23T04:54:12.192Z [test] error: null
+2024-12-23T04:54:12.223Z [test] error: null
+2024-12-23T05:02:46.168Z [test] error: null
