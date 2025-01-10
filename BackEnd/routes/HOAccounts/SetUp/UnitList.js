@@ -111,12 +111,12 @@ unitlist.post("/postUnitDetails", (req, res) => {
         GST_URL,
         req.body.Current,
       ];
-      //console.log("val", values);
+      console.log("query error", sqlpost);
 
       setupQueryMod(sqlpost, (err, result) => {
         if (err) {
           logger.error(
-            "Unable to post data to magod_setup.magodlaser_units table"
+            "Unable to post data to magod_setup.magodlaser_units table due to wrong sql query"
           );
           return res.json({ status: "query", Error: "inside signup query" });
         } else {
@@ -212,17 +212,17 @@ unitlist.put("/updateData/:ID", (req, res) => {
   });
 });
 
-unitlist.put("/logo", (req, res) => {
-  const { base64String } = req.body;
+// unitlist.put("/logo", (req, res) => {
+//   const { base64String } = req.body;
 
-  const query = `UPDATE magod_setup.magodlaser_units  SET Logo ='${base64String}' WHERE ID = 1;`;
-  setupQueryMod(query, (er, result) => {
-    if (er) {
-      console.log(" err in logo", er);
-    } else {
-      console.log(" logo insert successfully");
-    }
-  });
-});
+//   const query = `UPDATE magod_setup.magodlaser_units  SET Logo ='${base64String}' WHERE ID = 1;`;
+//   setupQueryMod(query, (er, result) => {
+//     if (er) {
+//       console.log(" err in logo", er);
+//     } else {
+//       console.log(" logo insert successfully");
+//     }
+//   });
+// });
 
 module.exports = unitlist;

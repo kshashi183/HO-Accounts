@@ -32,16 +32,10 @@ createnew.get("/ho_openInvoices", (req, res) => {
   });
 });
 
-createnew.get("/ho_openInvoicesADJUST", (req, res) => {
+createnew.get("/ho_openInvoicesAdjust", (req, res) => {
   const custcode = req.query.customercode;
 
-  // const sql = `SELECT *,
-  //     DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
-  //     FROM magod_hq_mis.unit_invoices_list
-  //     WHERE UnitName = 'Jigani'
-  //       AND Cust_Code='${custcode}'
-  //       AND ABS(GrandTotal - PymtAmtRecd) > 0
-  //       AND DCStatus <> 'Closed'; `;
+
 
   const sql = `SELECT *
   
@@ -83,9 +77,9 @@ createnew.post("/getFormData", (req, res) => {
 });
 
 createnew.post("/getleftTable", (req, res) => {
-  const { receipt_id } = req.body;
+  const { receipt_id,unit } = req.body;
 
-  const unit = "Jigani";
+  // const unit = "Jigani";
 
   const sql = `SELECT * FROM magod_hq_mis.ho_paymentrv_details   WHERE HOPrvId='${receipt_id}' AND UnitName='${unit}' `;
   //  const sql=`
@@ -264,13 +258,15 @@ createnew.put("/updateReceiveNowAmount", (req, res) => {
 });
 
 createnew.post("/cancelUpdate", async (req, res) => {
-  const { HO_PrvId, custName, totalReceiveNow, id } = req.body;
+  const { HO_PrvId, custName, totalReceiveNow, id,unitname } = req.body;
 
+  console.log("unit name cancell ", unitname);
+  
   const fetchLeft = `SELECT * FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId='${HO_PrvId}'`;
 
   const rightTable = `SELECT u.*
                       FROM magod_hq_mis.unit_invoices_list u
-                      WHERE u.UnitName = 'Jigani'
+                      WHERE u.UnitName = '${unitname}'
                         AND u.Cust_Name = '${custName}'`;
 
   setupQueryMod(rightTable, (rightErr, rightRes) => {
@@ -902,13 +898,13 @@ createnew.get("/getFormByRowData", (req, res) => {
 });
 
 createnew.post("/cancelCreateNewScreen", (req, res) => {
-  const { HO_PrvId, custName, totalReceiveNow } = req.body;
+  const { HO_PrvId, custName, totalReceiveNow ,unit} = req.body;
 
   const fetchLeft = `SELECT * FROM magod_hq_mis.ho_paymentrv_details WHERE HOPrvId='${HO_PrvId}'`;
 
   const rightTable = `SELECT u.*
                       FROM magod_hq_mis.unit_invoices_list u
-                      WHERE u.UnitName = 'Jigani'
+                      WHERE u.UnitName = '${unit}'
                         AND u.Cust_Name = '${custName}'`;
 
   setupQueryMod(rightTable, (rightErr, rightRes) => {
@@ -973,6 +969,21 @@ createnew.post("/cancelCreateNewScreen", (req, res) => {
           res.send({ StatusCancel: "Cancelled" });
         }
       });
+    }
+  });
+});
+
+createnew.get("/txnTypes", (req, res) => {
+  const sql = "SELECT TxnType FROM magod_setup.txndb";
+
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      console.log("err in txn types ", err);
+      logger.error(err);
+      return res.json({ Error: " error in sql" });
+    } else {
+      console.log("txn types result ", result);
+      return res.json({ Status: "Success", Result: result });
     }
   });
 });

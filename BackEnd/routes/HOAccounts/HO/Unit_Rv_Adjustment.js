@@ -25,6 +25,7 @@ magod_hq_mis.unit_payment_recd_voucher_register u
 WHERE
 u.PRV_Status = 'Created' AND Unitname='${unit}'  AND Cust_code='${custcode}';`;
 
+console.log("sql1", sql1);
   const sql2 = `SELECT
 u.Id,
 u.Unitname,
@@ -46,7 +47,7 @@ u.PRV_Status = 'Created' AND Unitname='${unit}'  ;`;
           "Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query"
         );
       } else {
-        //  console.log("res c", result);
+        console.log("unit rv adjustment ", result);
         return res.json({ Status: "Success", Result: result });
       }
     });
@@ -57,7 +58,7 @@ u.PRV_Status = 'Created' AND Unitname='${unit}'  ;`;
           "Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query"
         );
       } else {
-        //  console.log("res", result);
+        
         return res.json({ Status: "Success", Result: result });
       }
     });

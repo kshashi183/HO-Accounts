@@ -51,7 +51,7 @@ prvListdata.get("/getOnaccountList", (req, res) => {
   const unitn = req.query.unit;
   console.log("unittttttt", unitn);
 
-  const uni = "Jigani";
+ 
 
   const sql = `SELECT *
     FROM magod_hq_mis.unit_payment_recd_voucher_register u
