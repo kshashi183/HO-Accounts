@@ -1,0 +1,10 @@
+2025-01-10T05:03:01.296Z [test] error: null
+2025-01-10T05:04:03.478Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2025-01-10T05:04:04.152Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 15951 AND HOPrvId='2340'' at line 3
+2025-01-10T05:04:21.584Z [test] error: null
+2025-01-10T05:04:24.607Z [test] error: Out of range value for column 'Amount' at row 1
+2025-01-10T05:04:30.266Z [test] error: Out of range value for column 'Amount' at row 1
+2025-01-10T05:04:32.576Z [test] error: Out of range value for column 'Amount' at row 1
+2025-01-10T05:04:34.681Z [test] error: Out of range value for column 'Amount' at row 1
+2025-01-10T05:05:06.275Z [test] error: null
+2025-01-10T05:05:15.585Z [test] error: null

@@ -294,13 +294,16 @@ customerOutstanding.get("/getDCTypes", (req, res) => {
 customerOutstanding.post("/getAddress", (req, res) => {
   const unit = req.body.unit;
 
-  const sql = `SELECT   Unit_Address , RegistredOfficeAddress FROM magod_setup.magodlaser_units where UnitName='${unit}' `;
+  // const sql = `SELECT   Unit_Address , RegistredOfficeAddress FROM magod_setup.magodlaser_units where UnitName='${unit}' `;
+  const sql = `SELECT DISTINCT UnitName , RegistredOfficeAddress,PhonePrimary, PhoneSecondary,URL, GST_No, CIN_No,Unit_Address, Email FROM magod_setup.magodlaser_units where UnitName='${unit}';`;
   setupQueryMod(sql, (err, result) => {
     if (err) {
       logger.error(
         "Unable to fetch Unit_Address , RegistredOfficeAddress from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
       );
     } else {
+      console.log("unut address ", result.length);
+      
       return res.json({ Result: result });
     }
   });
