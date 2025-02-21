@@ -1,6 +1,7 @@
 const prvListdata = require("express").Router();
 
 const { setupQueryMod, misQuery } = require("../../../../helpers/dbconn");
+const { logger } = require("../../../../helpers/logger");
 
 prvListdata.get("/getPRVList", (req, res) => {
   // const sql = `SELECT *
@@ -15,6 +16,7 @@ prvListdata.get("/getPRVList", (req, res) => {
     `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
+      logger.error(err);
       console.log("errir", err);
     } else {
       // console.log("prv result",result);
@@ -36,6 +38,7 @@ prvListdata.get("/getDraftList", (req, res) => {
     `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
+      logger.error(err);
       console.log("errir", err);
     } else {
       // console.log("prv result",result);
@@ -48,7 +51,7 @@ prvListdata.get("/getOnaccountList", (req, res) => {
   const unitn = req.query.unit;
   console.log("unittttttt", unitn);
 
-  const uni = "Jigani";
+ 
 
   const sql = `SELECT *
     FROM magod_hq_mis.unit_payment_recd_voucher_register u
@@ -58,6 +61,7 @@ prvListdata.get("/getOnaccountList", (req, res) => {
     `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
+      logger.error(err);
       console.log("errir", err);
     } else {
       //  console.log("onaccount result",result);

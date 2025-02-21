@@ -1,0 +1,5 @@
+2024-12-23T07:32:10.547Z [test] error: null
+2024-12-23T07:32:10.564Z [test] error: null
+2024-12-23T07:32:31.890Z [test] error: Error during cancelUpdate process: leftResult is not iterable
+2024-12-23T07:45:11.083Z [test] error: null
+2024-12-23T07:45:11.123Z [test] error: null

@@ -2,6 +2,7 @@ const unitRV_Adjustment = require("express").Router();
 // const cors = require('cors');
 // const { dbco, dbco1, dbgetData, deleteUnitData, updateUnitData } = require("../../../helpers/dbconn")
 const { setupQueryMod, misQuery } = require("../../../helpers/dbconn");
+const { logger } = require("../../../helpers/logger");
 
 unitRV_Adjustment.get("/rvAdjustment", (req, res) => {
   const custcode = req.query.selectedCustCode;
@@ -24,6 +25,7 @@ magod_hq_mis.unit_payment_recd_voucher_register u
 WHERE
 u.PRV_Status = 'Created' AND Unitname='${unit}'  AND Cust_code='${custcode}';`;
 
+console.log("sql1", sql1);
   const sql2 = `SELECT
 u.Id,
 u.Unitname,
@@ -41,18 +43,22 @@ u.PRV_Status = 'Created' AND Unitname='${unit}'  ;`;
   if (custcode) {
     setupQueryMod(sql1, (err, result) => {
       if (err) {
-        console.log("errin query", err);
+        logger.error(
+          "Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query"
+        );
       } else {
-        //  console.log("res c", result);
+        console.log("unit rv adjustment ", result);
         return res.json({ Status: "Success", Result: result });
       }
     });
   } else {
     setupQueryMod(sql2, (err, result) => {
       if (err) {
-        console.log("errin query", err);
+        logger.error(
+          "Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query"
+        );
       } else {
-        //  console.log("res", result);
+        
         return res.json({ Status: "Success", Result: result });
       }
     });
@@ -62,10 +68,12 @@ u.PRV_Status = 'Created' AND Unitname='${unit}'  ;`;
 unitRV_Adjustment.get("/getCustomers", (req, res) => {
   const sql = `SELECT DISTINCT Cust_Code, Cust_name FROM magod_hq_mis.unit_cust_data `;
   //  const sql=`
-  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+  // SELECT DISTINCT Cust_Code , Cust_Name FROM .draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      logger.error(
+        "Unable to fetch  Cust_Code, Cust_name FROM magod_hq_mis.unit_cust_data due to Wrong SQL query"
+      );
     } else {
       console.log(
         "cust sql query 500 change  customerss in unit rv",
@@ -78,7 +86,7 @@ unitRV_Adjustment.get("/getCustomers", (req, res) => {
 
 unitRV_Adjustment.get("/openInvoices", (req, res) => {
   const custcode = req.query.selectedCustCode;
-  //console.log("custcodeeeee", custcode);
+
   const sql = `SELECT *,
     DATE_FORMAT(Inv_Date, '%d-%m-%Y') AS Formatted_Inv_Date
     FROM magod_hq_mis.unit_invoices_list
@@ -87,10 +95,12 @@ unitRV_Adjustment.get("/openInvoices", (req, res) => {
       AND ABS(GrandTotal - PymtAmtRecd) > 0
       AND DCStatus <> 'Closed'; `;
   //  const sql=`
-  // SELECT DISTINCT Cust_Code , Cust_Name FROM magodmis.draft_dc_inv_register `;
+  // SELECT DISTINCT Cust_Code , Cust_Name FROM .draft_dc_inv_register `;
   setupQueryMod(sql, (err, result) => {
     if (err) {
-      console.log("err in query", err);
+      logger.error(
+        "Unable to fetch data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
+      );
     } else {
       //console.log("cust sql query 500 change", result);
       return res.json({ Result: result });
