@@ -2,6 +2,26 @@ const fromUnitSyncRouter = require("express").Router();
 const { hqQuery, setupQuery } = require("../../../helpers/dbconn");
 var bodyParser = require("body-parser");
 
+const formatDateForDatabase = (isoDateString) => {
+  if (!isoDateString) return null; // Handle null or undefined input
+
+  const date = new Date(isoDateString);
+
+  if (isNaN(date.getTime())) {
+    throw new Error(`Invalid date value: ${isoDateString}`);
+  }
+
+  // Format as 'YYYY-MM-DD HH:MM:SS'
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
 //Save All Customer  sent by Units into CUst data
 
 fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
@@ -223,6 +243,24 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
     if (unit_inv_list.length > 0) {
       const invoicesResponseData = await Promise.all(
         unit_inv_list.map(async (invItem, i) => {
+          const correctedDate = formatDateForDatabase(invItem.OrderDate);
+          invItem.OrderDate = correctedDate;
+
+          const DcDate = formatDateForDatabase(invItem.DC_Date);
+          invItem.DC_Date = DcDate;
+
+          const InvDate = formatDateForDatabase(invItem.Inv_Date);
+          invItem.Inv_Date = InvDate;
+
+          const PaymentDate = formatDateForDatabase(invItem.PaymentDate);
+          invItem.PaymentDate = PaymentDate;
+
+          const DespatchDate = formatDateForDatabase(invItem.DespatchDate);
+          invItem.DespatchDate = DespatchDate;
+
+          const DespatchTime = formatDateForDatabase(invItem.DespatchTime);
+          invItem.DespatchTime = DespatchTime;
+
           try {
             const summaryInvoiceValue = invItem.SummaryInvoice ? 1 : 0;
             // const isForiegnValue = custItem.IsForiegn ? 1 : 0;
@@ -506,6 +544,9 @@ fromUnitSyncRouter.post("/saveCombInvDataIntoHoDB", async (req, res, next) => {
     if (unit_inv_list.length > 0) {
       const daCombinvDetailsResponseData = await Promise.all(
         unit_inv_list.map(async (invCombItem, i) => {
+          const correctedDate = formatDateForDatabase(invCombItem.Inv_Date);
+          invCombItem.Inv_Date = correctedDate;
+
           try {
             // const summaryInvoiceValue = invItem.SummaryInvoice ? 1 : 0;
             // const isForiegnValue = custItem.IsForiegn ? 1 : 0;
@@ -569,6 +610,11 @@ fromUnitSyncRouter.post(
       if (unit_receipt_register.length > 0) {
         const receiptRegisterResponseData = await Promise.all(
           unit_receipt_register.map(async (receiptItem, i) => {
+            const correctedDate = formatDateForDatabase(
+              receiptItem.Recd_PV_Date
+            );
+            receiptItem.Recd_PV_Date = correctedDate;
+
             try {
             //   const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
             //     (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
@@ -657,11 +703,16 @@ fromUnitSyncRouter.post(
     try {
       const detailsResponseData = [];
 
-      console.log(unit_receipt_adjusted_list.PvrId);
-
       if (unit_receipt_adjusted_list && unit_receipt_adjusted_list.length > 0) {
         const receptDetailsResponseData = await Promise.all(
           unit_receipt_adjusted_list.map(async (receiptItem, i) => {
+            const correctedDate = formatDateForDatabase(receiptItem.Inv_date);
+            receiptItem.Inv_date = correctedDate;
+
+            // console.log(
+            //   `Processing receiptItem: ${JSON.stringify(receiptItem)}`
+            // );
+
             try {
               const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_details
                 (Unitname, RecdPVID, RecdPvSrl, Dc_inv_no, Inv_No, Inv_Type, Inv_Amount,
@@ -670,7 +721,7 @@ fromUnitSyncRouter.post(
             ON DUPLICATE KEY UPDATE Unit_UId = ?;
               `;
 
-              const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId, Unitname, RecdPVID, Unit_UId, HoPvrId
+              const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId, Unitname, RecdPVID, Unit_UId, HoPrvId
                 FROM magod_hq_mis.unit_payment_recd_voucher_details u
                 WHERE u.Unitname = ? AND u.Unit_UId = ?;
                 `;
@@ -688,7 +739,7 @@ fromUnitSyncRouter.post(
                 receiptItem.Inv_date || "0000-00-00",
                 receiptItem.RefNo || "",
                 receiptItem.Unit_UId || 0,
-                receiptItem.PvrId || 0,
+                receiptItem.RecdPVID || 0,
                 // For the ON DUPLICATE KEY UPDATE part
                 receiptItem.Unit_UId || 0,
               ];
