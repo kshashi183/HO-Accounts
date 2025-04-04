@@ -108,4 +108,25 @@ unitRV_Adjustment.get("/openInvoices", (req, res) => {
   });
 });
 
+
+//update fixed on account value
+// unitRV_Adjustment.post("/updateFixedOnAccount", (req, res) => {
+//   console.log(" Successf  fixed onaccount")
+//   const sql = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register 
+//                SET fixedOnaccount = On_account`;
+
+//   setupQueryMod(sql, (err, result) => {
+//     if (err) {
+//       logger.error("❌ Error updating fixedOnaccount values:", err);
+//       return res.status(500).json({ Status: "Error", Message: "Failed to update records" });
+//     } else {
+//       console.log(`✅ Successfully updated ${result.affectedRows} rows.`);
+//       return res.json({ Status: "Success", Message: `Updated ${result.affectedRows} rows.` });
+//     }
+//   });
+// });
+
+
+
+
 module.exports = unitRV_Adjustment;

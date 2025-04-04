@@ -255,17 +255,20 @@ customerOutstanding.get("/getDataBasedOnCustomer", (req, res) => {
 
 customerOutstanding.get("/getDataTable2", (req, res) => {
   const DC_Inv_No = req.query.selectedDCInvNo;
-  console.log("DC_INV_NO", DC_Inv_No);
+  let unit=req.query.unitname
+  console.log("DC_INV_NO", DC_Inv_No, unit);
+  
+
 
   const sql = ` SELECT CONCAT('HO/', h1.HORef) AS VrRef, h.Receive_Now, h1.TxnType, h1.Status AS VrStatus
-        FROM magod_hq_mis.ho_paymentrv_details h
-        INNER JOIN magod_hq_mis.ho_paymentrv_register h1 ON h.HOPrvId = h1.HOPrvId
-        WHERE h.Unitname = @Unitname AND h.Dc_inv_no = '${DC_Inv_No}'
-        UNION
-        SELECT CONCAT(u.Unitname, ' /', u1.Recd_PVNo) AS VrRef, u.Receive_Now, u1.TxnType, u1.PRV_Status AS VrStatus
-        FROM magod_hq_mis.unit_payment_recd_voucher_details u
-        INNER JOIN magod_hq_mis.unit_payment_recd_voucher_register u1 ON u.PvrId = u1.Id
-        WHERE u.Unitname = @Unitname AND u.Dc_inv_no = '${DC_Inv_No}';`;
+  FROM magod_hq_mis.ho_paymentrv_details h
+  INNER JOIN magod_hq_mis.ho_paymentrv_register h1 ON h.HOPrvId = h1.HOPrvId
+  WHERE h.Unitname = '${unit}' AND h.Dc_inv_no = '${DC_Inv_No}'
+  UNION
+  SELECT CONCAT(u.Unitname, ' /', u1.Recd_PVNo) AS VrRef, u.Receive_Now, u1.TxnType, u1.PRV_Status AS VrStatus
+  FROM magod_hq_mis.unit_payment_recd_voucher_details u
+  INNER JOIN magod_hq_mis.unit_payment_recd_voucher_register u1 ON u.PvrId = u1.Id
+  WHERE u.Unitname = '${unit}' AND u.Dc_inv_no = '${DC_Inv_No}';`;
 
   setupQueryMod(sql, (err, result) => {
     if (err) {

@@ -19,17 +19,17 @@ unitReceiptList.get("/getcustomerdata", (req, res) => {
 
 unitReceiptList.get("/receiptBasedOnCustomer", (req, res) => {
   const custcode = req.query.selectedCustCode;
-  // const unit = req.query.selectedUnitName;
-  const unit = 'Peenya';
+   const unit = req.query.selectedUnitName;
+ // const unit = 'Peenya';
  
- 
+ console.log(" ------unit receipt list", custcode, unit);
   
   const sql = `SELECT * 
 FROM magod_hq_mis.unit_payment_recd_voucher_register u 
 WHERE u.Unitname = '${unit}'
   AND u.Cust_Code = '${custcode}'
 ORDER BY u.Recd_PV_Date DESC;`;
-// console.log(" ------unit receipt list", sql);
+ 
 
   setupQueryMod(sql, (err, result) => {
     if (err) {

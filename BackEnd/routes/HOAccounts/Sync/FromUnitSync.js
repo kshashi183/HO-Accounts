@@ -570,12 +570,19 @@ fromUnitSyncRouter.post(
         const receiptRegisterResponseData = await Promise.all(
           unit_receipt_register.map(async (receiptItem, i) => {
             try {
-              const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
-                (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
-                Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE Unit_UId = ?;
-            `;
+            //   const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
+            //     (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
+            //     Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId)
+            // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            // ON DUPLICATE KEY UPDATE Unit_UId = ?;
+            // `;
+
+            const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
+            (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
+            Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId, fixedOnaccount)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE Unit_UId = ?;
+        `;
 
               const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId, Unitname, RecdPVID, Unit_UId
               FROM magod_hq_mis.unit_payment_recd_voucher_register u
@@ -600,6 +607,7 @@ fromUnitSyncRouter.post(
                 receiptItem.Unit_UId || 0,
                 // For the ON DUPLICATE KEY UPDATE part
                 receiptItem.Unit_UId || 0,
+                receiptItem.On_account || 0,
               ];
 
               // Insert or update the data

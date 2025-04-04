@@ -1,0 +1,16 @@
+2025-03-06T05:30:45.492Z [test] info: Login Success - adminuser
+2025-03-06T05:31:02.380Z [test] error: null
+2025-03-06T05:50:52.954Z [test] error: null
+2025-03-06T05:50:52.985Z [test] error: null
+2025-03-06T05:51:06.561Z [test] error: null
+2025-03-06T05:51:06.599Z [test] error: null
+2025-03-06T05:51:09.098Z [test] error: null
+2025-03-06T05:51:09.123Z [test] error: null
+2025-03-06T05:51:43.414Z [test] error: null
+2025-03-06T05:51:43.447Z [test] error: null
+2025-03-06T05:53:38.893Z [test] error: Unable to update On_account  at magod_hq_mis.unit_payment_recd_voucher_register   due to Wrong SQL query
+2025-03-06T05:53:41.334Z [test] error: null
+2025-03-06T05:54:05.926Z [test] error: null
+2025-03-06T05:54:31.688Z [test] error: null
+2025-03-06T05:54:43.339Z [test] error: null
+2025-03-06T05:55:04.868Z [test] error: null

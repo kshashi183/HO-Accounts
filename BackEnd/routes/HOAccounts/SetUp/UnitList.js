@@ -93,6 +93,7 @@ unitlist.post("/postUnitDetails", (req, res) => {
       const sqlpost = `INSERT INTO magod_setup.magodlaser_units(UnitID, UnitName, Unit_Address, City, PIN_Code, State, Country,
                      Unit_contactDetails,GST_No, Tally_account_Name, Gm_Mail_Id, UnitIntial,State_Id,GST_URL,Current) VALUES ('${req.body.UnitID}','${req.body.UnitName}','${req.body.Unit_Address}','${req.body.City}','${req.body.PIN_Code}', '${req.body.State}','${req.body.Country}','${req.body.Unit_contactDetails}','${req.body.GST_No}','${req.body.Tally_account_Name}' ,'${req.body.Gm_Mail_Id}','${req.body.UnitIntial}','${StateId}','http://www.magodlaserWELD.in', '${req.body.Current}')`;
 
+                     
       // console.log(sqlpost)
       const values = [
         req.body.UnitID,
