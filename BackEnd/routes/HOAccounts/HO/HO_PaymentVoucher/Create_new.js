@@ -27,6 +27,9 @@ createnew.get("/ho_openInvoices", (req, res) => {
         "Unable to fetch data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
       );
     } else {
+     
+      console.log("result of open inv ", result.length)
+      
       res.send(result);
     }
   });
@@ -133,7 +136,9 @@ createnew.post("/insertToparentForm", (req, res) => {
           return res.status(500).json({ error: "Failed to insert record" });
         }
 
+       
         const sql2 = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE Unit_RecdPVid ='${rows.RecdPVID}'   AND Status NOT IN ('Pending', 'Cancelled')`;
+      
         setupQueryMod(sql2, (fetchingErr, fetchedData) => {
           if (fetchingErr) {
             logger.error(
@@ -160,6 +165,12 @@ createnew.post("/insertToparentForm", (req, res) => {
     }
   });
 });
+
+
+
+
+
+
 
 createnew.delete("/deleteleft", (req, res) => {
   const ho = req.body.hoid;
@@ -370,6 +381,7 @@ createnew.put("/updateOnaccountValue", (req, res) => {
   });
 });
 
+
 createnew.post("/getDCNo", async (req, res, next) => {
   // const { unit, srlType, ResetPeriod, ResetValue, VoucherNoLength, prefix } =
   //   req.body;
@@ -520,7 +532,8 @@ createnew.post("/saveReceipt", (req, res) => {
         }
         const sqlpost =
           "INSERT INTO magod_hq_mis.ho_paymentrv_register(Unitname,Recd_PV_Date, Cust_code, CustName, TxnType, Amount, Description, Status,On_account, HORefDate) VALUES (?   )";
-        const values = [
+      
+          const values = [
           req.body.Unitname,
           currentDate,
           req.body.Cust_code,
@@ -861,8 +874,10 @@ createnew.post("/postInvoiceCreateNew", async (req, res, next) => {
             }
 
             // Your existing select query after update
-            const postUpdateSelectQuery = `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId = ${HO_PrvId}`;
-            setupQueryMod(
+            const postUpdateSelectQuery =
+             `SELECT * FROM magod_hq_mis.ho_paymentrv_register WHERE HOPrvId = ${HO_PrvId}`;
+           
+             setupQueryMod(
               postUpdateSelectQuery,
               (postUpdateSelectError, postUpdateSelectResult) => {
                 if (postUpdateSelectError) {
@@ -994,7 +1009,9 @@ createnew.post("/getAddress", (req, res) => {
   const unit = req.body.adj_unitname;
 
   // const sql = `SELECT   Unit_Address , RegistredOfficeAddress FROM magod_setup.magodlaser_units where UnitName='${unit}' `;
+ 
   const sql = `SELECT DISTINCT UnitName , RegistredOfficeAddress,PhonePrimary, PhoneSecondary,URL, GST_No, CIN_No,Unit_Address, Email FROM magod_setup.magodlaser_units where UnitName='${unit}';`;
+ 
   setupQueryMod(sql, (err, result) => {
     if (err) {
       logger.error(
@@ -1007,5 +1024,13 @@ createnew.post("/getAddress", (req, res) => {
     }
   });
 });
+
+
+
+
+//new insertForm logic 
+
+
+
 
 module.exports = createnew;
