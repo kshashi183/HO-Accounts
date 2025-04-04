@@ -26,7 +26,7 @@ const formatDateForDatabase = (isoDateString) => {
 
 fromUnitSyncRouter.post("/saveCustDataIntoHoDB", async (req, res, next) => {
   const { unit_cust_data } = req.body;
-  console.log("custtttttt");
+  console.log("unit_cust_data", unit_cust_data.length);
   const CustData = "saveCustData";
   try {
     const insertedData = [];
@@ -238,6 +238,7 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
   const { unit_inv_list } = req.body;
   const unit_inv = "unit_inv";
   try {
+    console.log("unit_inv_list", unit_inv_list.length);
     const invResponseData = [];
 
     if (unit_inv_list.length > 0) {
@@ -387,6 +388,7 @@ fromUnitSyncRouter.post("/saveInvDataIntoHoDB", async (req, res, next) => {
 //Saving InvTaxes to HO Mysql DB, Ignore if already exists
 fromUnitSyncRouter.post("/saveInvTaxesDataIntoHoDB", async (req, res, next) => {
   const { unit_taxes_list } = req.body;
+  console.log("unit_taxes_list", unit_taxes_list.length);
   try {
     const taxResponseData = [];
 
@@ -457,6 +459,8 @@ fromUnitSyncRouter.post(
   "/saveInvSummaryDataIntoHoDB",
   async (req, res, next) => {
     const { unit_dc_summary } = req.body;
+
+    console.log("unit_dc_summary", unit_dc_summary.length);
     try {
       const dcResponseData = [];
 
@@ -538,6 +542,7 @@ fromUnitSyncRouter.post(
 //Saving Inv Summary, Da_comb_invDetails to HO Mysql DB, Ignore if already exists
 fromUnitSyncRouter.post("/saveCombInvDataIntoHoDB", async (req, res, next) => {
   const { unit_inv_list } = req.body;
+  console.log("unit_inv_list", unit_inv_list.length);
   try {
     const invDaCombResponseData = [];
 
@@ -604,6 +609,7 @@ fromUnitSyncRouter.post(
   "/saveReceiptRegisterDataIntoHoDB",
   async (req, res, next) => {
     const { unit_receipt_register, unit_receipt_adjusted_list } = req.body;
+    console.log("unit_receipt_register", unit_receipt_register.length);
     try {
       const receiptResponseData = [];
 
@@ -616,19 +622,27 @@ fromUnitSyncRouter.post(
             receiptItem.Recd_PV_Date = correctedDate;
 
             try {
-            //   const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
-            //     (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
-            //     Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId)
-            // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            // ON DUPLICATE KEY UPDATE Unit_UId = ?;
-            // `;
+              //   const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
+              //     (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
+              //     Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId)
+              // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              // ON DUPLICATE KEY UPDATE Unit_UId = ?;
+              // `;
 
-            const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
-            (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
-            Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId, fixedOnaccount)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE Unit_UId = ?;
-        `;
+              //     const sqlInvQuery = `INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
+              //     (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
+              //     Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId, fixedOnaccount)
+              // VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              // ON DUPLICATE KEY UPDATE Unit_UId = ?;
+              // `;
+              const sqlInvQuery = `
+  INSERT INTO magod_hq_mis.unit_payment_recd_voucher_register
+  (UnitName, RecdPVID, Recd_PVNo, Recd_PV_Date, Cust_code, CustName, TxnType,
+   Amount, DocuNo, DESCRIPTION, On_account, HORef, HOPrvId, Tally_Uid, Unit_UId, fixedOnaccount)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ON DUPLICATE KEY UPDATE fixedOnaccount = ?;
+`;
+
 
               const selectInvQuery = `SELECT u.Id, Id AS Sync_HOId, Unitname, RecdPVID, Unit_UId
               FROM magod_hq_mis.unit_payment_recd_voucher_register u
@@ -652,8 +666,9 @@ fromUnitSyncRouter.post(
                 receiptItem.Tally_Uid,
                 receiptItem.Unit_UId || 0,
                 // For the ON DUPLICATE KEY UPDATE part
-                receiptItem.Unit_UId || 0,
+
                 receiptItem.On_account || 0,
+                receiptItem.On_account || 0 
               ];
 
               // Insert or update the data
@@ -677,6 +692,8 @@ fromUnitSyncRouter.post(
                 Unitname: Sync_HOId && Sync_HOId.Unitname,
               });
             } catch (error) {
+              console.log("error to insert int to magod_hq_mis.unit_payment_recd_voucher_register");
+
               console.error(`Error in iteration ${i}: ${error.message}`);
               return { error: `Error in iteration ${i}: ${error.message}` };
             }
@@ -700,6 +717,7 @@ fromUnitSyncRouter.post(
   "/saveReceptDetailsDataIntoHoDB",
   async (req, res, next) => {
     const { unit_receipt_adjusted_list } = req.body;
+    console.log("unit_receipt_adjusted_list", unit_receipt_adjusted_list.length);
     try {
       const detailsResponseData = [];
 
@@ -787,6 +805,7 @@ fromUnitSyncRouter.post(
   "/saveCanceledVrListDataIntoHoDB",
   async (req, res, next) => {
     const { unit_cancelled_vr_list } = req.body;
+    console.log("unit_cancelled_vr_list", unit_cancelled_vr_list.length);
     try {
       const canceledResponseData = [];
 
