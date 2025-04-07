@@ -283,15 +283,15 @@ tally_Export.post("/exporttally", async (req, res) => {
       tallyResponse.data.match(/<EXCEPTIONS>(\d+)<\/EXCEPTIONS>/)?.[1] || "0"
     );
 
-    // console.log(
-    //   "Response Values:",
-    //   "Altered:",
-    //   alteredValue,
-    //   "Exceptions:",
-    //   exceptionValue,
-    //   "createdValue",
-    //   createdValue
-    // );
+    console.log(
+      "Response Values to export invoices tab:",
+      "Altered:",
+      alteredValue,
+      "Exceptions:",
+      exceptionValue,
+      "createdValue",
+      createdValue
+    );
     if (createdValue > 0 && alteredValue === 0 && exceptionValue === 0) {
       const guidArray = [];
       const guidMatches = xmlData.match(/<GUID>(\d+)<\/GUID>/g);
@@ -365,7 +365,7 @@ tally_Export.post("/exporttally", async (req, res) => {
 });
 
 //get company from magod database
-tally_Export.post("/getCompanyGuid", (req, res) => {
+tally_Export.post("/getCompanyName", (req, res) => {
   const { selectedUnitName } = req.body;
   console.log("unit name for company", selectedUnitName);
   // const sql = `SELECT  Tally_account_Name, CurrentTallyAcctGUID FROM magod_setup.magodlaser_units where
@@ -391,7 +391,8 @@ tally_Export.post("/getCompanyFromTally", async (req, res) => {
   // const tallyUrl = "https://magodc01:9000";
   // console.log("cmp req body", req.body);
   //const cm = req.body.cmp;
-  const cm = "MLMPL_Jigani_2023_24";
+  // const cm = "MLMPL_Jigani_2023_24";
+  const cm = "Magod_Trail";
   console.log("cmp name separte", cm);
 
   // Fetch company Names
