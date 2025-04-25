@@ -1,0 +1,29 @@
+2025-04-21T16:40:28.358Z [test] info: Login Success - adminuser
+2025-04-21T16:43:06.180Z [test] error: null
+2025-04-21T16:43:06.223Z [test] error: null
+2025-04-21T16:43:16.129Z [test] error: null
+2025-04-21T16:43:16.174Z [test] error: null
+2025-04-21T16:43:40.641Z [test] error: null
+2025-04-21T16:43:40.664Z [test] error: null
+2025-04-21T16:44:25.016Z [test] error: null
+2025-04-21T16:44:25.053Z [test] error: null
+2025-04-21T16:45:01.292Z [test] error: null
+2025-04-21T16:45:01.328Z [test] error: null
+2025-04-21T16:45:09.669Z [test] error: Unable to update On_account  at magod_hq_mis.unit_payment_recd_voucher_register   due to Wrong SQL query
+2025-04-21T16:45:24.529Z [test] error: null
+2025-04-21T16:45:24.553Z [test] error: null
+2025-04-21T16:46:36.733Z [test] error: null
+2025-04-21T16:46:36.764Z [test] error: null
+2025-04-21T16:48:48.475Z [test] error: null
+2025-04-21T16:48:48.501Z [test] error: null
+2025-04-21T16:49:57.912Z [test] error: null
+2025-04-21T16:49:57.937Z [test] error: null
+2025-04-21T16:51:35.684Z [test] error: null
+2025-04-21T16:51:35.710Z [test] error: null
+2025-04-21T16:52:32.258Z [test] error: null
+2025-04-21T16:52:32.294Z [test] error: null
+2025-04-21T16:52:54.493Z [test] error: null
+2025-04-21T16:52:54.519Z [test] error: null
+2025-04-21T16:53:28.187Z [test] error: null
+2025-04-21T16:53:28.219Z [test] error: null
+2025-04-21T17:23:27.028Z [test] error: Unable to update On_account  at magod_hq_mis.unit_payment_recd_voucher_register   due to Wrong SQL query

@@ -1,0 +1,6 @@
+2025-04-23T04:32:40.699Z [test] info: Login Success - adminuser
+2025-04-23T04:33:50.429Z [test] error: Unable to post Tax details to FROM magod_setup.taxdb table due to Wrong SQL query
+2025-04-23T04:33:58.975Z [test] error: Unable to post Tax details to FROM magod_setup.taxdb table due to Wrong SQL query
+2025-04-23T05:07:09.436Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2025-04-23T05:07:23.358Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query
+2025-04-23T05:09:47.964Z [test] error: Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query

@@ -542,7 +542,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
         logger.error(prefixError);
         return next(prefixError);
       }
-      console.log("PREFIX RESULT", prefixResult);
+      
 
       const prefix =
         prefixResult[0]?.Prefix !== null ? prefixResult[0]?.Prefix : "";
@@ -561,7 +561,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
 
         let newHrefNo = "";
 
-        console.log("select result", selectResult);
+      
         if (selectResult && selectResult.length > 0) {
           const lastRunNo = selectResult[0].Running_No;
           const numericPart = parseInt(lastRunNo) + 1;
@@ -588,7 +588,7 @@ createNewRouter.post("/postInvoice", async (req, res, next) => {
         `;
 
           // AND Running_EffectiveDate = CURDATE()
-          console.log("update running number ", updateRunningNoQuery);
+          
 
           setupQuery(updateRunningNoQuery, (updateError, updateResult) => {
             if (updateError) {
