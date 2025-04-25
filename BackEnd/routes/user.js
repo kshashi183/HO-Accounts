@@ -58,6 +58,8 @@ userRouter.post(`/login`, jsonParser ,  async (req, res, next) => {
          //res.send(createError.Unauthorized("Invalid Username/Password"))
 
     } catch (error) {
+        console.log("something is wrong");
+        
         next(error)
         logger.error(`Error - ${error}`)
     }

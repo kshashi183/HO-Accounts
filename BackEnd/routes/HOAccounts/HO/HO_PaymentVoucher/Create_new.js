@@ -11,6 +11,8 @@ createnew.get("/ho_openInvoices", (req, res) => {
   const custcode = req.query.customercode;
 
   const unitname = req.query.unitname;
+  console.log("unit and custo code for open inv", custcode, unitname);
+  
 
   const sql = `SELECT *
   
@@ -286,21 +288,22 @@ createnew.post("/cancelUpdate", async (req, res) => {
         "Unable to fetch data from magod_hq_mis.unit_invoices_list due to Wrong SQL query"
       );
     } else {
-      // console.log("right table result cancel after",rightRes);
+       console.log("right table result cancel after",rightRes.length);
       setupQueryMod(fetchLeft, (leftErr, leftResult) => {
         if (leftErr) {
           logger.error(
             "Unable to fetch data from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query"
           );
-          console.log("left table error after cancel", leftErr);
+          // console.log("left table error after cancel", leftErr);
         } else {
-          // console.log("left table res after cancel",leftResult);
+          //  console.log("left table res after cancel",leftResult);
 
           leftResult.forEach((item, index) => {
             const receiveNowNumeric = parseFloat(item.Receive_Now);
             const matchingEntry = rightRes.find(
               (entry) => entry.DC_Inv_No === item.Dc_inv_no
             );
+            console.log("matchingEntry for after cancel", matchingEntry);
             if (matchingEntry) {
               // Execute an update query to update the entry in the unit_invoices_list table
               const updateQuery = `UPDATE magod_hq_mis.unit_invoices_list 
@@ -323,7 +326,7 @@ createnew.post("/cancelUpdate", async (req, res) => {
                 }
               });
             } else {
-              // console.log("there is no matched data");
+               console.log("there is no matched data");
             }
           });
         }
@@ -920,25 +923,32 @@ createnew.post("/cancelCreateNewScreen", (req, res) => {
   const rightTable = `SELECT u.*
                       FROM magod_hq_mis.unit_invoices_list u
                       WHERE u.UnitName = '${unit}'
-                        AND u.Cust_Name = '${custName}'`;
+                        AND u.Cust_Name = '${custName}'
+                        `;
 
   setupQueryMod(rightTable, (rightErr, rightRes) => {
     if (rightErr) {
       logger.error(rightErr);
     } else {
-      // console.log("right table result cancel after",rightRes);
+       console.log("right table result cancel after",rightRes);
+       console.log("right table open inv result.length",rightRes.length)
       setupQueryMod(fetchLeft, (leftErr, leftResult) => {
         if (leftErr) {
           logger.error(leftErr);
           // console.log("left table error after cancel", leftErr);
         } else {
-          // console.log("left table res after cancel",leftResult);
+           console.log("left table res after cancel",leftResult);
 
           leftResult.forEach((item, index) => {
+            
+            
             const receiveNowNumeric = parseFloat(item.Receive_Now);
             const matchingEntry = rightRes.find(
               (entry) => entry.DC_Inv_No === item.Dc_inv_no
             );
+            console.log("matchingEntry for  cancel",matchingEntry);
+            
+            
             if (matchingEntry) {
               // Execute an update query to update the entry in the unit_invoices_list table
 
@@ -950,6 +960,9 @@ createnew.post("/cancelCreateNewScreen", (req, res) => {
                                                     ELSE 'OverPaid'
                                                  END 
                                    WHERE DC_Inv_No = ${item.Dc_inv_no}`;
+
+                                   console.log("paymnt after cancel ", updateQuery);
+                                   
 
               // const updateQuery = `UPDATE magod_hq_mis.unit_invoices_list
               // SET PymtAmtRecd=PymtAmtRecd -${receiveNowNumeric},
@@ -966,7 +979,7 @@ createnew.post("/cancelCreateNewScreen", (req, res) => {
                 }
               });
             } else {
-              // console.log("there is no matched data");
+               console.log("there is no matched data  after cancell");
             }
           });
         }

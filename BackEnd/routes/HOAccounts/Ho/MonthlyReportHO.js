@@ -22,10 +22,85 @@ monthlyReportRouter.post("/monthlyInvoiceSummary", async (req, res, next) => {
   const name = req.body.getName;
   const month = req.body.month;
   const year = req.body.year;
-  try {
-    hqQuery(
-      `SELECT A.InvoiceType, A.WithTax, A.GrandTotal, A.Round_Off, A.InvTotal, A.TaxAmount, A.Discount, A.PymtAmtRecd,
-        A.Del_Chg, A.TptCharges, B.ValueAdded, B.MaterialValue
+
+ 
+
+  let my_query=`SELECT 
+    A.InvoiceType, 
+    A.WithTax, 
+    A.Inv_No,                          
+    A.GrandTotal, 
+    A.Round_Off, 
+    A.InvTotal, 
+    A.TaxAmount, 
+    A.Discount, 
+    A.PymtAmtRecd,
+    A.Del_Chg, 
+    A.TptCharges, 
+    B.ValueAdded, 
+    B.MaterialValue
+FROM
+  (
+    SELECT 
+        d.DC_InvType AS InvoiceType,
+        IF(d.TaxAmount > 0, 1, 0) AS WithTax,
+        d.Inv_No,                   
+        SUM(d.GrandTotal) AS GrandTotal,
+        SUM(PymtAmtRecd) AS PymtAmtRecd,
+        IF(c.IsBranch <> 0, 'Branch', '') AS BranchSale,
+        SUM(d.Round_Off) AS Round_Off,
+        SUM(d.Net_Total) AS InvTotal,
+        SUM(d.TaxAmount) AS TaxAmount,
+        SUM(d.Discount) AS Discount,
+        SUM(d.Del_Chg) AS Del_Chg,
+        SUM(d.TptCharges) AS TptCharges
+    FROM 
+        magod_hq_mis.unit_invoices_list d, 
+        magod_hq_mis.unit_cust_data c
+    WHERE 
+        d.DCStatus NOT LIKE 'Cancelled'
+        AND d.Inv_No IS NOT NULL
+        AND d.UnitName = 'Jigani'
+        AND c.Cust_Code = d.Cust_Code
+        AND c.UnitName = 'Jigani'
+        AND YEAR(d.Inv_Date) = '2022'
+        AND MONTH(d.Inv_Date) = '2'
+    GROUP BY 
+        InvoiceType, WithTax, BranchSale, d.Inv_No   -- ✅ Include Inv_No in GROUP BY
+  ) AS A,
+  (
+    SELECT 
+        d.DC_InvType AS InvoiceType,
+        IF(d.TaxAmount > 0, 1, 0) AS WithTax,
+        IF(c.IsBranch <> 0, 'Branch', '') AS BranchSale,
+        SUM(d1.Mtrl_Amount) AS MaterialValue,
+        SUM(d1.Jw_Amount) AS ValueAdded
+    FROM 
+        magod_hq_mis.unit_invoices_list d, 
+        magod_hq_mis.unit_inv_summary d1, 
+        magod_hq_mis.unit_cust_data c
+    WHERE 
+        d.DCStatus NOT LIKE 'Cancelled'
+        AND d.Inv_No IS NOT NULL
+        AND d.UnitName = 'Jigani'
+        AND YEAR(d.Inv_Date) = '2022'
+        AND MONTH(d.Inv_Date) = '2'
+        AND c.Cust_Code = d.Cust_Code
+        AND c.UnitName = 'Jigani'
+        AND d1.DC_Inv_No = d.DC_Inv_No
+    GROUP BY 
+        InvoiceType, WithTax, BranchSale
+  ) AS B
+WHERE 
+    A.InvoiceType = B.InvoiceType
+    AND A.WithTax = B.WithTax
+    AND A.BranchSale = B.BranchSale;
+
+`
+   console.log(my_query, "details");
+
+   let shravan_query=`SELECT A.InvoiceType, A.WithTax, A.GrandTotal, A.Round_Off, A.InvTotal, A.TaxAmount, A.Discount, A.PymtAmtRecd,
+        A.Del_Chg, A.TptCharges,  B.ValueAdded, B.MaterialValue
  FROM
    (SELECT d.DC_InvType AS InvoiceType,
            IF(d.TaxAmount > 0, 1, 0) AS WithTax,
@@ -64,12 +139,20 @@ monthlyReportRouter.post("/monthlyInvoiceSummary", async (req, res, next) => {
     GROUP BY InvoiceType, WithTax, BranchSale) AS B
  WHERE A.InvoiceType = B.InvoiceType
    AND A.WithTax = B.WithTax
-   AND A.BranchSale = B.BranchSale;`,
+   AND A.BranchSale = B.BranchSale;`
+  
+  try {
+    hqQuery(shravan_query
+      ,
       (err, data) => {
+        console.log("inv summary res", data);
+
+        
         res.send(data);
       }
     );
   } catch (error) {
+    console.log("inv summary res errror", error);
     next(error);
   }
 });

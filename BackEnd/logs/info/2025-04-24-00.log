@@ -1,0 +1,14 @@
+2025-04-23T18:30:01.683Z [test] error: null
+2025-04-23T18:30:04.739Z [test] error: null
+2025-04-23T18:30:23.432Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2025-04-23T18:30:23.685Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147356872 AND HOPrvId='2440'' at line 3
+2025-04-23T18:31:22.362Z [test] error: null
+2025-04-23T18:34:20.854Z [test] error: null
+2025-04-23T18:37:39.598Z [test] error: null
+2025-04-23T18:37:55.527Z [test] error: Unable to update  Amount from magod_hq_mis.ho_paymentrv_details due to Wrong SQL query
+2025-04-23T18:37:55.853Z [test] error: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE Dc_inv_no = 2147356872 AND HOPrvId='2442'' at line 3
+2025-04-23T18:43:09.864Z [test] error: null
+2025-04-23T18:48:28.229Z [test] error: null
+2025-04-23T18:51:04.899Z [test] error: null
+2025-04-23T18:53:23.244Z [test] error: null
+2025-04-23T18:59:38.410Z [test] error: null

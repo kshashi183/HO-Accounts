@@ -392,6 +392,9 @@ tally_Export.post("/getCompanyFromTally", async (req, res) => {
   // console.log("cmp req body", req.body);
   //const cm = req.body.cmp;
   // const cm = "MLMPL_Jigani_2023_24";
+
+  //This is hard coded due to testing purpose, once move on to the 
+  // production we should use the const cm = req.body.cmp;
   const cm = "Magod_Trail";
   console.log("cmp name separte", cm);
 

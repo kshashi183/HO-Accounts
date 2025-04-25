@@ -54,9 +54,11 @@ u.PRV_Status = 'Created' AND Unitname='${unit}'  ;`;
   } else {
     setupQueryMod(sql2, (err, result) => {
       if (err) {
-        logger.error(
-          "Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query"
-        );
+        console.log("need to add fixed on account column");
+        
+        // logger.error(
+        //   "Unable to fetch data from magod_hq_mis.unit_payment_recd_voucher_register due to Wrong SQL query"
+        // );
       } else {
         
         return res.json({ Status: "Success", Result: result });
@@ -110,21 +112,21 @@ unitRV_Adjustment.get("/openInvoices", (req, res) => {
 
 
 //update fixed on account value
-// unitRV_Adjustment.post("/updateFixedOnAccount", (req, res) => {
-//   console.log(" Successf  fixed onaccount")
-//   const sql = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register 
-//                SET fixedOnaccount = On_account`;
+unitRV_Adjustment.post("/updateFixedOnAccount", (req, res) => {
+  console.log(" Successf  fixed onaccount")
+  const sql = `UPDATE magod_hq_mis.unit_payment_recd_voucher_register 
+               SET fixedOnaccount = On_account`;
 
-//   setupQueryMod(sql, (err, result) => {
-//     if (err) {
-//       logger.error("❌ Error updating fixedOnaccount values:", err);
-//       return res.status(500).json({ Status: "Error", Message: "Failed to update records" });
-//     } else {
-//       console.log(`✅ Successfully updated ${result.affectedRows} rows.`);
-//       return res.json({ Status: "Success", Message: `Updated ${result.affectedRows} rows.` });
-//     }
-//   });
-// });
+  setupQueryMod(sql, (err, result) => {
+    if (err) {
+      logger.error(" Error updating fixedOnaccount values:", err);
+      return res.status(500).json({ Status: "Error", Message: "Failed to update records" });
+    } else {
+      console.log(`Successfully updated ${result.affectedRows} rows.`);
+      return res.json({ Status: "Success", Message: `Updated ${result.affectedRows} rows.` });
+    }
+  });
+});
 
 
 
